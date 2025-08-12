@@ -63,6 +63,7 @@ class WhatsAppService extends EventEmitter {
             warn: () => {},
             debug: () => {},
             trace: () => {},
+            child: () => ({} as any),
           }),
         },
       });

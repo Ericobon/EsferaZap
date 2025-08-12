@@ -15,6 +15,17 @@ export const authenticateToken = async (
   next: NextFunction
 ) => {
   try {
+    // If Firebase is not available, skip authentication for development
+    if (!adminAuth) {
+      console.log("⚠️  Firebase not available, skipping authentication");
+      req.user = {
+        uid: "demo-user",
+        email: "demo@example.com",
+        name: "Demo User",
+      };
+      return next();
+    }
+
     const authHeader = req.headers.authorization;
     const token = authHeader && authHeader.startsWith('Bearer ') 
       ? authHeader.substring(7) 

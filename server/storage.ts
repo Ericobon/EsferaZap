@@ -57,6 +57,7 @@ export class MemStorage implements IStorage {
     const user: User = {
       ...insertUser,
       id,
+      company: insertUser.company ?? null,
       createdAt: new Date(),
     };
     this.users.set(id, user);
@@ -86,6 +87,8 @@ export class MemStorage implements IStorage {
     const bot: Bot = {
       ...insertBot,
       id,
+      description: insertBot.description ?? null,
+      aiProvider: insertBot.aiProvider ?? "openai",
       status: "disconnected",
       lastActive: null,
       createdAt: new Date(),
@@ -121,6 +124,8 @@ export class MemStorage implements IStorage {
     const session: WhatsappSession = {
       ...insertSession,
       id,
+      status: insertSession.status ?? "disconnected",
+      qrCode: insertSession.qrCode ?? null,
       lastSeen: null,
       createdAt: new Date(),
     };
