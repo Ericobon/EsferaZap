@@ -2,7 +2,7 @@ import { initializeApp } from "firebase/app";
 import { getAuth } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
 
-// InsightEsfera Firebase Configuration - temporary hardcoded for integration
+// InsightEsfera Firebase Configuration
 const INSIGHT_FIREBASE_CONFIG = {
   apiKey: "AIzaSyDrZCmU8SRDlcpTUyZLsZJLPUGMQBKYFkU",
   authDomain: "login-ee5ed.firebaseapp.com",
@@ -13,7 +13,7 @@ const INSIGHT_FIREBASE_CONFIG = {
   measurementId: "G-TBR5WL76DX"
 };
 
-// Check if Firebase environment variables are available, fallback to InsightEsfera config
+// Check if Firebase environment variables are available, with fallback to InsightEsfera config
 const hasFirebaseConfig = !!(
   import.meta.env.VITE_FIREBASE_API_KEY ||
   INSIGHT_FIREBASE_CONFIG.apiKey
@@ -41,7 +41,7 @@ if (hasFirebaseConfig) {
     } catch (error: any) {
       if (error.code === 'app/duplicate-app') {
         // If app already exists, get the existing app
-        const { getApps, getApp } = await import('firebase/app');
+        const { getApps, getApp } = require('firebase/app');
         app = getApps().length > 0 ? getApp() : initializeApp(firebaseConfig);
       } else {
         throw error;
@@ -51,6 +51,7 @@ if (hasFirebaseConfig) {
     auth = getAuth(app);
     db = getFirestore(app);
     console.log("✅ Firebase client initialized successfully with InsightEsfera project:", firebaseConfig.projectId);
+    console.log("🔗 Connected to InsightEsfera ecosystem authentication");
   } catch (error: any) {
     console.error("❌ Firebase client initialization error:", error.code, error.message);
     // For development, continue without Firebase rather than breaking the app

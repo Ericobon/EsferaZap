@@ -1,6 +1,13 @@
 # Overview
 
-EsferaZap is a multi-tenant SaaS platform for creating and managing AI-powered WhatsApp chatbots. The application enables users to create custom chatbots with AI integration, connect them to WhatsApp via QR codes, and manage conversations through a comprehensive dashboard. Built as a full-stack monorepo, it combines modern web technologies with WhatsApp automation and AI capabilities.
+EsferaZap is a multi-tenant SaaS platform for creating and managing AI-powered WhatsApp chatbots, fully integrated with the InsightEsfera brand and ecosystem. The application enables users to create custom chatbots with AI integration, connect them to WhatsApp via QR codes, and manage conversations through a comprehensive dashboard. Built as a full-stack monorepo, it combines modern web technologies with WhatsApp automation and AI capabilities.
+
+## Recent Changes (August 2025)
+- **InsightEsfera Brand Integration**: Complete visual redesign with InsightEsfera color scheme (teal #1F4E79, orange #F39C12)
+- **Animated Logo**: Interactive sphere logo with gradient animations matching InsightEsfera identity
+- **Firebase Integration**: Configured to use InsightEsfera's Firebase project (login-ee5ed)
+- **Enhanced UI**: Premium design with gradients, shadows, and modern visual effects
+- **Landing Page Redesign**: New hero section with statistics and ecosystem integration messaging
 
 # User Preferences
 
