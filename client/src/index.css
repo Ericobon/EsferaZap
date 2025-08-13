@@ -4,6 +4,15 @@
 @tailwind components;
 @tailwind utilities;
 
+/* WhatsApp Colors */
+:root {
+  --whatsapp-green: #25d366;
+  --whatsapp-green-dark: #128c7e;
+  --whatsapp-green-light: #dcf8c6;
+  --whatsapp-gray: #f0f0f0;
+  --whatsapp-dark: #075e54;
+}
+
 :root {
   /* InsightEsfera Brand Colors */
   --insight-teal: hsl(197 71% 27%);     /* #1F4E79 - Deep Teal Primary */
@@ -95,6 +104,19 @@
 
 .insight-gradient-orange {
   background: linear-gradient(135deg, hsl(32 88% 51%) 0%, hsl(252 83% 57%) 100%);
+}
+
+/* EsferaZap WhatsApp + InsightEsfera Gradients */
+.esferazap-gradient {
+  background: linear-gradient(135deg, #25d366 0%, #128c7e 25%, #0EA5E9 50%, #3B82F6 75%, #1F4E79 100%);
+}
+
+.whatsapp-gradient {
+  background: linear-gradient(135deg, #25d366 0%, #128c7e 50%, #075e54 100%);
+}
+
+.whatsapp-shadow {
+  box-shadow: 0 10px 25px -5px rgba(37, 211, 102, 0.1), 0 8px 10px -6px rgba(37, 211, 102, 0.1);
 }
 
 .insight-sphere-logo {

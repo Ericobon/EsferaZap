@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Bot, MessageCircle, BarChart3, Zap, Globe, Brain, ArrowRight } from "lucide-react";
 import CrossPlatformAuth from "@/components/integration/CrossPlatformAuth";
+import { EsferaZapLogo } from "@/components/ui/EsferaZapLogo";
 
 interface LandingProps {
   onShowLogin: () => void;
@@ -15,15 +16,8 @@ export default function Landing({ onShowLogin, onShowSignup }: LandingProps) {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center space-x-3">
-              {/* InsightEsfera Logo - Animated Sphere */}
-              <div className="relative">
-                <div className="w-10 h-10 insight-sphere-logo rounded-full flex items-center justify-center shadow-lg">
-                  <Globe className="w-5 h-5 text-white" />
-                </div>
-                <div className="absolute -top-1 -right-1">
-                  <Zap className="w-4 h-4 text-secondary" />
-                </div>
-              </div>
+              {/* EsferaZap Logo - WhatsApp + InsightEsfera */}
+              <EsferaZapLogo size={48} animated={true} />
               <div className="flex flex-col">
                 <div className="flex items-center space-x-2">
                   <span className="text-xl font-bold insight-text-gradient">EsferaZap</span>
@@ -70,128 +64,108 @@ export default function Landing({ onShowLogin, onShowSignup }: LandingProps) {
             </span>
           </div>
           
+          {/* Grande logo central */}
+          <div className="flex justify-center mb-12">
+            <EsferaZapLogo size={120} animated={true} />
+          </div>
+          
           <h1 className="text-5xl md:text-7xl font-black mb-8 leading-tight">
-            <span className="text-foreground">Transforme Dados em</span>
+            <span className="text-foreground">Chatbots WhatsApp</span>
             <br />
-            <span className="insight-text-gradient">Conversas Inteligentes</span>
+            <span className="insight-text-gradient">com IA Avançada</span>
           </h1>
           
-          <p className="text-xl md:text-2xl text-muted-foreground mb-10 max-w-4xl mx-auto leading-relaxed">
-            Plataforma SaaS multi-tenant que combina{" "}
-            <span className="font-semibold text-primary">WhatsApp + IA + Análise de Dados</span>{" "}
-            para automatizar atendimento, qualificar leads e gerar insights estratégicos.
+          <p className="text-xl md:text-2xl text-muted-foreground mb-12 max-w-4xl mx-auto leading-relaxed">
+            Automatize conversas, capture leads e transforme atendimento em vendas com 
+            <span className="text-green-600 font-semibold"> tecnologia WhatsApp </span>
+            integrada ao ecossistema 
+            <span className="text-primary font-semibold"> InsightEsfera</span>
           </p>
-
-          {/* Integration Card */}
-          <div className="max-w-md mx-auto mb-12">
-            <CrossPlatformAuth />
-          </div>
           
-          <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
-            <Button 
-              size="lg" 
+          <div className="flex flex-col sm:flex-row items-center justify-center space-y-4 sm:space-y-0 sm:space-x-6 mb-16">
+            <Button
+              size="lg"
               onClick={onShowSignup}
-              className="insight-gradient text-white hover:opacity-90 transition-opacity insight-shadow-lg text-lg px-8 py-4"
+              className="text-lg px-8 py-4 bg-green-600 hover:bg-green-700 text-white border-0 shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200"
             >
-              <Zap className="w-5 h-5 mr-2" />
-              Começar Agora Grátis
+              <MessageCircle className="w-5 h-5 mr-2" />
+              Criar Bot Grátis
             </Button>
-            <Button 
-              size="lg" 
+            <Button
               variant="outline"
-              className="border-primary text-primary hover:bg-primary/5 text-lg px-8 py-4"
+              size="lg"
+              onClick={onShowLogin}
+              className="text-lg px-8 py-4 border-2 hover:bg-accent transition-colors"
             >
-              <Globe className="w-5 h-5 mr-2" />
-              Ver Demo Interativa
+              Fazer Login
+              <ArrowRight className="w-5 h-5 ml-2" />
             </Button>
           </div>
           
-          {/* Stats */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-3xl mx-auto">
+          {/* Statistics */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-20">
             <div className="text-center">
-              <div className="text-3xl font-bold text-primary mb-2">73%</div>
-              <div className="text-sm text-muted-foreground">Redução no tempo de resposta</div>
+              <div className="text-3xl md:text-4xl font-bold text-green-600 mb-2">24/7</div>
+              <div className="text-muted-foreground">Atendimento</div>
             </div>
             <div className="text-center">
-              <div className="text-3xl font-bold text-secondary mb-2">+250%</div>
-              <div className="text-sm text-muted-foreground">Aumento na qualificação de leads</div>
+              <div className="text-3xl md:text-4xl font-bold text-primary mb-2">95%</div>
+              <div className="text-muted-foreground">Satisfação</div>
             </div>
             <div className="text-center">
-              <div className="text-3xl font-bold text-primary mb-2">24/7</div>
-              <div className="text-sm text-muted-foreground">Atendimento automatizado</div>
+              <div className="text-3xl md:text-4xl font-bold text-green-600 mb-2">10x</div>
+              <div className="text-muted-foreground">Mais Conversões</div>
+            </div>
+            <div className="text-center">
+              <div className="text-3xl md:text-4xl font-bold text-primary mb-2">2.1B</div>
+              <div className="text-muted-foreground">Usuários WhatsApp</div>
             </div>
           </div>
         </div>
 
-        {/* Features Grid - InsightEsfera Style */}
-        <div className="grid md:grid-cols-3 gap-8">
-          <div className="group bg-card/50 backdrop-blur-sm p-8 rounded-2xl insight-shadow border border-border/50 hover:insight-shadow-lg transition-all duration-300">
-            <div className="w-16 h-16 insight-gradient rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
-              <Bot className="w-8 h-8 text-white" />
+        {/* Features Grid */}
+        <div className="grid md:grid-cols-3 gap-8 mb-20">
+          <div className="text-center p-8 bg-card/50 backdrop-blur-sm rounded-xl border border-border/50 insight-shadow hover:shadow-lg transition-shadow">
+            <div className="w-16 h-16 mx-auto mb-6 bg-green-100 dark:bg-green-900/20 rounded-full flex items-center justify-center">
+              <MessageCircle className="w-8 h-8 text-green-600" />
             </div>
-            <h3 className="text-xl font-bold text-foreground mb-4">IA Multi-Provider</h3>
-            <p className="text-muted-foreground leading-relaxed">
-              Integração com <span className="font-semibold text-primary">OpenAI GPT</span> e{" "}
-              <span className="font-semibold text-primary">Google Gemini</span> para conversas 
-              naturais e respostas contextuais inteligentes.
+            <h3 className="text-xl font-semibold mb-4 text-foreground">WhatsApp Nativo</h3>
+            <p className="text-muted-foreground">
+              Conexão direta com WhatsApp Business API. QR Code simples e conexão instantânea.
             </p>
           </div>
-
-          <div className="group bg-card/50 backdrop-blur-sm p-8 rounded-2xl insight-shadow border border-border/50 hover:insight-shadow-lg transition-all duration-300">
-            <div className="w-16 h-16 insight-gradient-orange rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
-              <MessageCircle className="w-8 h-8 text-white" />
+          
+          <div className="text-center p-8 bg-card/50 backdrop-blur-sm rounded-xl border border-border/50 insight-shadow hover:shadow-lg transition-shadow">
+            <div className="w-16 h-16 mx-auto mb-6 bg-primary/10 rounded-full flex items-center justify-center">
+              <Brain className="w-8 h-8 text-primary" />
             </div>
-            <h3 className="text-xl font-bold text-foreground mb-4">WhatsApp Nativo</h3>
-            <p className="text-muted-foreground leading-relaxed">
-              Conexão direta via <span className="font-semibold text-primary">Baileys Protocol</span>,
-              sem dependências de APIs terceiras. QR Code automático e gestão de sessões.
+            <h3 className="text-xl font-semibold mb-4 text-foreground">IA Personalizada</h3>
+            <p className="text-muted-foreground">
+              Chatbots inteligentes com GPT-4 e Gemini. Respostas humanizadas e contextual.
             </p>
           </div>
-
-          <div className="group bg-card/50 backdrop-blur-sm p-8 rounded-2xl insight-shadow border border-border/50 hover:insight-shadow-lg transition-all duration-300">
-            <div className="w-16 h-16 insight-gradient rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
-              <BarChart3 className="w-8 h-8 text-white" />
+          
+          <div className="text-center p-8 bg-card/50 backdrop-blur-sm rounded-xl border border-border/50 insight-shadow hover:shadow-lg transition-shadow">
+            <div className="w-16 h-16 mx-auto mb-6 bg-secondary/10 rounded-full flex items-center justify-center">
+              <BarChart3 className="w-8 h-8 text-secondary" />
             </div>
-            <h3 className="text-xl font-bold text-foreground mb-4">Data Intelligence</h3>
-            <p className="text-muted-foreground leading-relaxed">
-              Analytics avançado com <span className="font-semibold text-primary">PostgreSQL + Drizzle ORM</span>.
-              Dashboards em tempo real para otimizar performance e ROI dos bots.
+            <h3 className="text-xl font-semibold mb-4 text-foreground">Analytics Avançado</h3>
+            <p className="text-muted-foreground">
+              Dashboard completo com métricas de conversão, engajamento e ROI em tempo real.
             </p>
           </div>
         </div>
 
-        {/* InsightEsfera Ecosystem Integration */}
-        <div className="mt-24 text-center">
-          <div className="bg-primary/5 border border-primary/20 rounded-2xl p-12 mb-8">
-            <h2 className="text-3xl font-bold mb-4">
-              <span className="text-foreground">Parte do</span>{" "}
-              <span className="insight-text-gradient">InsightEsfera Ecosystem</span>
-            </h2>
-            <p className="text-xl text-muted-foreground mb-8 max-w-3xl mx-auto">
-              EsferaZap se integra perfeitamente com todas as soluções de{" "}
-              <span className="font-semibold text-primary">Data Engineering</span>,{" "}
-              <span className="font-semibold text-primary">Business Intelligence</span> e{" "}
-              <span className="font-semibold text-primary">AI Automation</span> da InsightEsfera.
-            </p>
-            
-            {/* Integration logos/badges */}
-            <div className="flex flex-wrap justify-center gap-4 mb-8">
-              {["Firebase Auth", "PostgreSQL", "OpenAI", "Google Gemini", "Drizzle ORM", "React Query"].map((tech) => (
-                <div key={tech} className="px-4 py-2 bg-background/80 border border-border rounded-full text-sm font-medium text-muted-foreground">
-                  {tech}
-                </div>
-              ))}
-            </div>
-            
-            <Button 
-              size="lg" 
-              variant="outline" 
-              className="border-primary text-primary hover:bg-primary/10"
-            >
-              <Globe className="w-5 h-5 mr-2" />
-              Explorar Ecossistema Completo
-            </Button>
-          </div>
+        {/* Integration Section */}
+        <div className="text-center mb-20">
+          <h2 className="text-3xl md:text-4xl font-bold mb-6 text-foreground">
+            Integração com Ecossistema 
+            <span className="insight-text-gradient"> InsightEsfera</span>
+          </h2>
+          <p className="text-xl text-muted-foreground mb-8 max-w-3xl mx-auto">
+            Use a mesma conta do InsightEsfera. Dados sincronizados, insights integrados e gestão unificada.
+          </p>
+          <CrossPlatformAuth />
         </div>
       </main>
     </div>
