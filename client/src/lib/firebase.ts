@@ -2,11 +2,21 @@ import { initializeApp } from "firebase/app";
 import { getAuth } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
 
-// Check if Firebase environment variables are available
+// InsightEsfera Firebase Configuration - temporary hardcoded for integration
+const INSIGHT_FIREBASE_CONFIG = {
+  apiKey: "AIzaSyDrZCmU8SRDlcpTUyZLsZJLPUGMQBKYFkU",
+  authDomain: "login-ee5ed.firebaseapp.com",
+  projectId: "login-ee5ed",
+  storageBucket: "login-ee5ed.firebasestorage.app",
+  messagingSenderId: "758485377489",
+  appId: "1:758485377489:web:c4220355f73a31e15900f0",
+  measurementId: "G-TBR5WL76DX"
+};
+
+// Check if Firebase environment variables are available, fallback to InsightEsfera config
 const hasFirebaseConfig = !!(
-  import.meta.env.VITE_FIREBASE_API_KEY &&
-  import.meta.env.VITE_FIREBASE_PROJECT_ID &&
-  import.meta.env.VITE_FIREBASE_APP_ID
+  import.meta.env.VITE_FIREBASE_API_KEY ||
+  INSIGHT_FIREBASE_CONFIG.apiKey
 );
 
 let app: any = null;
@@ -15,25 +25,44 @@ let db: any = null;
 
 if (hasFirebaseConfig) {
   const firebaseConfig = {
-    apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
-    authDomain: `${import.meta.env.VITE_FIREBASE_PROJECT_ID}.firebaseapp.com`,
-    projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
-    storageBucket: `${import.meta.env.VITE_FIREBASE_PROJECT_ID}.firebasestorage.app`,
-    messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
-    appId: import.meta.env.VITE_FIREBASE_APP_ID,
+    apiKey: import.meta.env.VITE_FIREBASE_API_KEY || INSIGHT_FIREBASE_CONFIG.apiKey,
+    authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN || INSIGHT_FIREBASE_CONFIG.authDomain,
+    projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID || INSIGHT_FIREBASE_CONFIG.projectId,
+    storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET || INSIGHT_FIREBASE_CONFIG.storageBucket,
+    messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID || INSIGHT_FIREBASE_CONFIG.messagingSenderId,
+    appId: import.meta.env.VITE_FIREBASE_APP_ID || INSIGHT_FIREBASE_CONFIG.appId,
+    measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID || INSIGHT_FIREBASE_CONFIG.measurementId,
   };
 
   try {
-    app = initializeApp(firebaseConfig);
+    // Check if app already exists to avoid duplicate-app error
+    try {
+      app = initializeApp(firebaseConfig);
+    } catch (error: any) {
+      if (error.code === 'app/duplicate-app') {
+        // If app already exists, get the existing app
+        const { getApps, getApp } = await import('firebase/app');
+        app = getApps().length > 0 ? getApp() : initializeApp(firebaseConfig);
+      } else {
+        throw error;
+      }
+    }
+    
     auth = getAuth(app);
     db = getFirestore(app);
-    console.log("✅ Firebase client initialized successfully");
-  } catch (error) {
-    console.error("❌ Firebase client initialization error:", error);
+    console.log("✅ Firebase client initialized successfully with InsightEsfera project:", firebaseConfig.projectId);
+  } catch (error: any) {
+    console.error("❌ Firebase client initialization error:", error.code, error.message);
+    // For development, continue without Firebase rather than breaking the app
+    console.log("🔄 Continuing in demo mode without Firebase authentication");
   }
 } else {
-  console.log("⚠️  Firebase environment variables not found - running in demo mode");
+  console.log("⚠️  Firebase configuration not available - running in demo mode");
 }
+
+// Ensure we always export valid objects, even if Firebase fails
+if (!auth) auth = null;
+if (!db) db = null;
 
 export { auth, db };
 export default app;
