@@ -1,81 +1,150 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap');
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 :root {
+  /* InsightEsfera Brand Colors */
+  --insight-teal: hsl(197 71% 27%);     /* #1F4E79 - Deep Teal Primary */
+  --insight-orange: hsl(32 88% 51%);    /* #F39C12 - Orange Accent */
+  --insight-purple: hsl(252 83% 57%);   /* #6C5CE7 - Purple Secondary */
+  --insight-turquoise: hsl(168 76% 42%);/* #1ABC9C - Turquoise */
+  --insight-dark: hsl(210 29% 24%);     /* #2C3E50 - Dark Navy */
+  --insight-light: hsl(204 14% 83%);    /* #D5DBDB - Light Gray */
+  
+  /* Theme Variables - Light Mode */
   --background: hsl(0 0% 100%);
-  --foreground: hsl(218 11% 15%);
-  --card: hsl(215 20% 98%);
-  --card-foreground: hsl(218 11% 15%);
+  --foreground: hsl(210 29% 24%);
+  --card: hsl(0 0% 100%);
+  --card-foreground: hsl(210 29% 24%);
   --popover: hsl(0 0% 100%);
-  --popover-foreground: hsl(218 11% 15%);
-  --primary: hsl(221 82% 59%);
+  --popover-foreground: hsl(210 29% 24%);
+  --primary: hsl(197 71% 27%);          /* InsightEsfera Teal */
   --primary-foreground: hsl(0 0% 100%);
-  --secondary: hsl(218 11% 15%);
+  --secondary: hsl(32 88% 51%);         /* InsightEsfera Orange */
   --secondary-foreground: hsl(0 0% 100%);
-  --muted: hsl(220 13% 91%);
-  --muted-foreground: hsl(218 11% 15%);
-  --accent: hsl(219 71% 94%);
-  --accent-foreground: hsl(221 82% 59%);
+  --muted: hsl(204 14% 93%);
+  --muted-foreground: hsl(210 29% 45%);
+  --accent: hsl(168 76% 92%);           /* Light Turquoise */
+  --accent-foreground: hsl(197 71% 27%);
   --destructive: hsl(0 84% 60%);
   --destructive-foreground: hsl(0 0% 100%);
-  --border: hsl(220 13% 91%);
-  --input: hsl(220 13% 94%);
-  --ring: hsl(221 82% 59%);
-  --chart-1: hsl(221 82% 59%);
-  --chart-2: hsl(160 100% 36%);
-  --chart-3: hsl(42 93% 56%);
-  --chart-4: hsl(147 78% 42%);
-  --chart-5: hsl(341 75% 51%);
-  --sidebar: hsl(215 20% 98%);
-  --sidebar-foreground: hsl(218 11% 15%);
-  --sidebar-primary: hsl(221 82% 59%);
+  --border: hsl(204 14% 88%);
+  --input: hsl(204 14% 95%);
+  --ring: hsl(197 71% 27%);
+  --chart-1: hsl(197 71% 27%);          /* Teal */
+  --chart-2: hsl(32 88% 51%);           /* Orange */
+  --chart-3: hsl(252 83% 57%);          /* Purple */
+  --chart-4: hsl(168 76% 42%);          /* Turquoise */
+  --chart-5: hsl(341 75% 51%);          /* Pink */
+  --sidebar: hsl(0 0% 100%);
+  --sidebar-foreground: hsl(210 29% 24%);
+  --sidebar-primary: hsl(197 71% 27%);
   --sidebar-primary-foreground: hsl(0 0% 100%);
-  --sidebar-accent: hsl(219 71% 94%);
-  --sidebar-accent-foreground: hsl(221 82% 59%);
-  --sidebar-border: hsl(220 13% 91%);
-  --sidebar-ring: hsl(221 82% 59%);
+  --sidebar-accent: hsl(168 76% 92%);
+  --sidebar-accent-foreground: hsl(197 71% 27%);
+  --sidebar-border: hsl(204 14% 88%);
+  --sidebar-ring: hsl(197 71% 27%);
   --font-sans: 'Inter', system-ui, sans-serif;
   --font-serif: 'Georgia', serif;
   --font-mono: 'JetBrains Mono', monospace;
-  --radius: 0.5rem;
+  --radius: 0.75rem;
 }
 
 .dark {
-  --background: hsl(222 84% 5%);
-  --foreground: hsl(210 40% 98%);
-  --card: hsl(222 84% 5%);
-  --card-foreground: hsl(210 40% 98%);
-  --popover: hsl(222 84% 5%);
-  --popover-foreground: hsl(210 40% 98%);
-  --primary: hsl(221 82% 59%);
+  /* Theme Variables - Dark Mode */
+  --background: hsl(210 29% 8%);        /* Dark Navy Base */
+  --foreground: hsl(0 0% 98%);
+  --card: hsl(210 29% 12%);
+  --card-foreground: hsl(0 0% 98%);
+  --popover: hsl(210 29% 12%);
+  --popover-foreground: hsl(0 0% 98%);
+  --primary: hsl(197 71% 45%);          /* Lighter Teal for Dark Mode */
   --primary-foreground: hsl(0 0% 100%);
-  --secondary: hsl(217 32% 17%);
-  --secondary-foreground: hsl(210 40% 98%);
-  --muted: hsl(217 32% 17%);
-  --muted-foreground: hsl(215 20% 65%);
-  --accent: hsl(217 32% 17%);
-  --accent-foreground: hsl(210 40% 98%);
-  --destructive: hsl(0 62% 30%);
-  --destructive-foreground: hsl(210 40% 98%);
-  --border: hsl(217 32% 17%);
-  --input: hsl(217 32% 17%);
-  --ring: hsl(221 82% 59%);
-  --chart-1: hsl(221 82% 59%);
-  --chart-2: hsl(160 100% 36%);
-  --chart-3: hsl(42 93% 56%);
-  --chart-4: hsl(147 78% 42%);
-  --chart-5: hsl(341 75% 51%);
-  --sidebar: hsl(222 84% 5%);
-  --sidebar-foreground: hsl(210 40% 98%);
-  --sidebar-primary: hsl(221 82% 59%);
+  --secondary: hsl(32 88% 58%);         /* Brighter Orange for Dark Mode */
+  --secondary-foreground: hsl(210 29% 8%);
+  --muted: hsl(210 29% 15%);
+  --muted-foreground: hsl(0 0% 70%);
+  --accent: hsl(168 76% 15%);           /* Dark Turquoise */
+  --accent-foreground: hsl(168 76% 70%);
+  --destructive: hsl(0 84% 60%);
+  --destructive-foreground: hsl(0 0% 100%);
+  --border: hsl(210 29% 18%);
+  --input: hsl(210 29% 15%);
+  --ring: hsl(197 71% 45%);
+  --chart-1: hsl(197 71% 45%);          /* Lighter Teal */
+  --chart-2: hsl(32 88% 58%);           /* Brighter Orange */
+  --chart-3: hsl(252 83% 65%);          /* Lighter Purple */
+  --chart-4: hsl(168 76% 50%);          /* Brighter Turquoise */
+  --chart-5: hsl(341 75% 60%);          /* Brighter Pink */
+  --sidebar: hsl(210 29% 10%);
+  --sidebar-foreground: hsl(0 0% 98%);
+  --sidebar-primary: hsl(197 71% 45%);
   --sidebar-primary-foreground: hsl(0 0% 100%);
-  --sidebar-accent: hsl(217 32% 17%);
-  --sidebar-accent-foreground: hsl(210 40% 98%);
-  --sidebar-border: hsl(217 32% 17%);
-  --sidebar-ring: hsl(221 82% 59%);
+  --sidebar-accent: hsl(168 76% 15%);
+  --sidebar-accent-foreground: hsl(168 76% 70%);
+  --sidebar-border: hsl(210 29% 18%);
+  --sidebar-ring: hsl(197 71% 45%);
+}
+
+/* Custom InsightEsfera Components */
+.insight-gradient {
+  background: linear-gradient(135deg, hsl(197 71% 27%) 0%, hsl(168 76% 42%) 100%);
+}
+
+.insight-gradient-orange {
+  background: linear-gradient(135deg, hsl(32 88% 51%) 0%, hsl(252 83% 57%) 100%);
+}
+
+.insight-sphere-logo {
+  background: linear-gradient(135deg, hsl(197 71% 27%) 0%, hsl(168 76% 42%) 50%, hsl(32 88% 51%) 100%);
+  background-size: 200% 200%;
+  animation: gradient-shift 4s ease-in-out infinite;
+}
+
+@keyframes gradient-shift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+.insight-text-gradient {
+  background: linear-gradient(135deg, hsl(197 71% 27%) 0%, hsl(32 88% 51%) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Enhanced shadows for depth */
+.insight-shadow {
+  box-shadow: 0 10px 25px -5px hsla(197 71% 27% / 0.1), 0 8px 10px -6px hsla(197 71% 27% / 0.1);
+}
+
+.insight-shadow-lg {
+  box-shadow: 0 20px 25px -5px hsla(197 71% 27% / 0.1), 0 10px 10px -5px hsla(197 71% 27% / 0.04);
+}
+
+/* Focus states matching InsightEsfera brand */
+.focus\:ring-insight:focus {
+  --ring-color: hsl(197 71% 27%);
+}
+
+/* Typography hierarchy */
+.text-insight-primary {
+  color: hsl(197 71% 27%);
+}
+
+.text-insight-secondary {
+  color: hsl(32 88% 51%);
+}
+
+.bg-insight-primary {
+  background-color: hsl(197 71% 27%);
+}
+
+.bg-insight-secondary {
+  background-color: hsl(32 88% 51%);
 }
 
 @layer base {

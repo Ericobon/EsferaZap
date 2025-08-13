@@ -6,7 +6,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Bell, ChevronDown, User, Settings, LogOut } from "lucide-react";
+import { Bell, ChevronDown, User, Settings, LogOut, Globe, Zap, BarChart3, Bot } from "lucide-react";
 import { UserData } from "@/lib/auth";
 import { logOut } from "@/lib/auth";
 import { useToast } from "@/hooks/use-toast";
@@ -44,61 +44,109 @@ export default function Header({ userData }: HeaderProps) {
   };
 
   return (
-    <header className="bg-white border-b border-slate-200 sticky top-0 z-40">
+    <header className="bg-background/80 backdrop-blur-sm border-b border-border/50 sticky top-0 z-40">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
-          <div className="flex items-center space-x-4">
-            <div className="flex items-center space-x-2">
-              <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
-                <span className="text-white font-bold text-sm">E</span>
+          <div className="flex items-center space-x-6">
+            {/* InsightEsfera Logo */}
+            <div className="flex items-center space-x-3">
+              <div className="relative">
+                <div className="w-10 h-10 insight-sphere-logo rounded-full flex items-center justify-center shadow-lg">
+                  <Globe className="w-5 h-5 text-white" />
+                </div>
+                <div className="absolute -top-1 -right-1">
+                  <Zap className="w-3 h-3 text-secondary" />
+                </div>
               </div>
-              <span className="text-xl font-bold text-slate-900">EsferaZap</span>
+              <div className="flex flex-col">
+                <span className="text-xl font-bold insight-text-gradient">EsferaZap</span>
+                <span className="text-xs text-muted-foreground">
+                  by <span className="font-semibold text-primary">InsightEsfera</span>
+                </span>
+              </div>
             </div>
-            <nav className="hidden md:flex space-x-6">
-              <a href="#" className="text-primary font-medium border-b-2 border-primary pb-4">
-                Bots
+            
+            {/* Navigation */}
+            <nav className="hidden md:flex space-x-8">
+              <a 
+                href="#" 
+                className="flex items-center space-x-2 text-primary font-medium border-b-2 border-primary pb-4 transition-colors"
+              >
+                <Bot className="w-4 h-4" />
+                <span>Bots</span>
               </a>
-              <a href="#" className="text-slate-600 hover:text-slate-900 pb-4">
-                Analytics
+              <a 
+                href="#" 
+                className="flex items-center space-x-2 text-muted-foreground hover:text-foreground pb-4 transition-colors"
+              >
+                <BarChart3 className="w-4 h-4" />
+                <span>Analytics</span>
               </a>
-              <a href="#" className="text-slate-600 hover:text-slate-900 pb-4">
-                Integrações
+              <a 
+                href="#" 
+                className="flex items-center space-x-2 text-muted-foreground hover:text-foreground pb-4 transition-colors"
+              >
+                <Globe className="w-4 h-4" />
+                <span>Integrações</span>
               </a>
             </nav>
           </div>
           
           <div className="flex items-center space-x-4">
-            <Button variant="ghost" size="icon" className="text-slate-400 hover:text-slate-600">
+            <Button 
+              variant="ghost" 
+              size="icon" 
+              className="text-muted-foreground hover:text-foreground hover:bg-accent transition-colors"
+            >
               <Bell className="w-5 h-5" />
             </Button>
             
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" className="flex items-center space-x-2 hover:bg-slate-100">
-                  <div className="w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center">
-                    <span className="text-primary font-medium text-sm">
+                <Button 
+                  variant="ghost" 
+                  className="flex items-center space-x-3 hover:bg-accent transition-colors"
+                >
+                  <div className="w-9 h-9 insight-gradient rounded-full flex items-center justify-center shadow-sm">
+                    <span className="text-white font-semibold text-sm">
                       {getInitials(userData.name)}
                     </span>
                   </div>
-                  <span className="hidden md:block text-slate-700 font-medium">
-                    {userData.name}
-                  </span>
-                  <ChevronDown className="w-4 h-4 text-slate-400" />
+                  <div className="hidden md:block text-left">
+                    <div className="text-foreground font-medium text-sm">
+                      {userData.name}
+                    </div>
+                    <div className="text-muted-foreground text-xs">
+                      {userData.email}
+                    </div>
+                  </div>
+                  <ChevronDown className="w-4 h-4 text-muted-foreground" />
                 </Button>
               </DropdownMenuTrigger>
               
-              <DropdownMenuContent align="end" className="w-48">
-                <DropdownMenuItem>
-                  <User className="w-4 h-4 mr-2" />
+              <DropdownMenuContent align="end" className="w-56 insight-shadow">
+                <div className="px-3 py-2 border-b border-border">
+                  <div className="text-sm font-medium text-foreground">{userData.name}</div>
+                  <div className="text-xs text-muted-foreground">{userData.email}</div>
+                </div>
+                <DropdownMenuItem className="hover:bg-accent">
+                  <User className="w-4 h-4 mr-3 text-primary" />
                   Perfil
                 </DropdownMenuItem>
-                <DropdownMenuItem>
-                  <Settings className="w-4 h-4 mr-2" />
+                <DropdownMenuItem className="hover:bg-accent">
+                  <Settings className="w-4 h-4 mr-3 text-primary" />
                   Configurações
                 </DropdownMenuItem>
+                <DropdownMenuItem className="hover:bg-accent">
+                  <Globe className="w-4 h-4 mr-3 text-primary" />
+                  InsightEsfera Portal
+                </DropdownMenuItem>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={handleLogout}>
-                  <LogOut className="w-4 h-4 mr-2" />
+                <DropdownMenuItem 
+                  onClick={handleLogout}
+                  className="hover:bg-destructive/10 text-destructive"
+                >
+                  <LogOut className="w-4 h-4 mr-3" />
                   Sair
                 </DropdownMenuItem>
               </DropdownMenuContent>

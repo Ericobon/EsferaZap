@@ -1,6 +1,9 @@
-# EsferaZap 🤖💬
+# EsferaZap by InsightEsfera
 
-**EsferaZap** é uma plataforma SaaS multi-tenant para criação e gerenciamento de chatbots do WhatsApp com inteligência artificial. A aplicação permite que usuários criem chatbots personalizados com integração de IA, conectem ao WhatsApp via códigos QR e gerenciem conversas através de um dashboard abrangente.
+![EsferaZap Logo](https://img.shields.io/badge/EsferaZap-AI%20WhatsApp%20SaaS-1F4E79?style=for-the-badge&logo=whatsapp&logoColor=white)
+![InsightEsfera](https://img.shields.io/badge/by-InsightEsfera-F39C12?style=for-the-badge&logo=data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPGNpcmNsZSBjeD0iMTIiIGN5PSIxMiIgcj0iMTAiIHN0cm9rZT0iI0YzOUMxMiIgc3Ryb2tlLXdpZHRoPSIyIi8+CjxjaXJjbGUgY3g9IjEyIiBjeT0iMTIiIHI9IjMiIGZpbGw9IiNGMzlDMTIiLz4KPC9zdmc+)
+
+**Plataforma SaaS multi-tenant para chatbots WhatsApp com Inteligência Artificial**, integrada ao ecossistema InsightEsfera de soluções de dados. Transforme dados em conversas inteligentes com nossa tecnologia de ponta.
 
 ## 🚀 Características Principais
 
