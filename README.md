@@ -1,163 +1,227 @@
-# EsferaZap by InsightEsfera
+# EsferaZap 🌐⚡
 
-![EsferaZap Logo](https://img.shields.io/badge/EsferaZap-AI%20WhatsApp%20SaaS-1F4E79?style=for-the-badge&logo=whatsapp&logoColor=white)
-![InsightEsfera](https://img.shields.io/badge/by-InsightEsfera-F39C12?style=for-the-badge&logo=data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPGNpcmNsZSBjeD0iMTIiIGN5PSIxMiIgcj0iMTAiIHN0cm9rZT0iI0YzOUMxMiIgc3Ryb2tlLXdpZHRoPSIyIi8+CjxjaXJjbGUgY3g9IjEyIiBjeT0iMTIiIHI9IjMiIGZpbGw9IiNGMzlDMTIiLz4KPC9zdmc+)
+**SaaS Multi-Tenant de Chatbots WhatsApp com IA - Integrado ao Ecossistema InsightEsfera**
 
-**Plataforma SaaS multi-tenant para chatbots WhatsApp com Inteligência Artificial**, integrada ao ecossistema InsightEsfera de soluções de dados. Transforme dados em conversas inteligentes com nossa tecnologia de ponta.
+[![InsightEsfera](https://img.shields.io/badge/InsightEsfera-Ecosystem-teal)](https://www.insightesfera.io)
+[![Firebase](https://img.shields.io/badge/Firebase-login--ee5ed-orange)](https://console.firebase.google.com)
+[![TypeScript](https://img.shields.io/badge/TypeScript-4.9+-blue)](https://www.typescriptlang.org/)
+[![React](https://img.shields.io/badge/React-18+-blue)](https://react.dev/)
 
-## 🚀 Características Principais
+## 🎯 Visão Geral
 
-- **Multi-tenant SaaS**: Suporte para múltiplos usuários e organizações
-- **Integração WhatsApp**: Conexão direta via protocolo WhatsApp Web (Baileys)
-- **IA Integrada**: Suporte para OpenAI GPT e Google Gemini
-- **Dashboard Completo**: Interface moderna para gerenciar bots e conversas
-- **Autenticação Segura**: Sistema de autenticação via Firebase
-- **QR Code**: Conexão simples ao WhatsApp via QR code
-- **Tempo Real**: Processamento de mensagens em tempo real
+EsferaZap é uma plataforma SaaS multi-tenant que combina **WhatsApp + IA + Análise de Dados** para automatizar atendimento, qualificar leads e gerar insights estratégicos. Totalmente integrada ao ecossistema InsightEsfera.
 
-## 🛠 Tecnologias Utilizadas
+### ✨ Features Principais
 
-### Frontend
-- **React** com TypeScript
-- **Vite** como build tool
-- **Tailwind CSS** + shadcn/ui para styling
-- **TanStack React Query** para gerenciamento de estado do servidor
+- 🤖 **Chatbots IA**: Integração com OpenAI GPT e Google Gemini
+- 📱 **WhatsApp Business**: Conexão via QR Code usando Baileys
+- 👥 **Multi-Tenant**: Suporte a múltiplas empresas e usuários
+- 📊 **Dashboard Analytics**: Métricas e insights em tempo real
+- 🔐 **Auth Unificada**: Integração com Firebase da InsightEsfera
+- 🎨 **Design System**: Interface idêntica ao site InsightEsfera
+- 🌐 **Cross-Platform**: Integração completa com ecossistema
+
+## 🚀 Integração InsightEsfera
+
+### Design Unificado
+- ✅ Interface glassmorphism idêntica ao site principal
+- ✅ Logo animado da esfera com gradientes teal/laranja
+- ✅ Tipografia e cores do brand guide InsightEsfera
+- ✅ Componentes responsivos e acessíveis
+
+### Autenticação Compartilhada
+- ✅ Firebase projeto `login-ee5ed`
+- ✅ Single Sign-On (SSO) bidirecional
+- ✅ Sincronização de dados de usuário
+- ✅ Login automático entre plataformas
+
+### Tecnologias
+
+#### Frontend
+- **React 18** + TypeScript + Vite
+- **Tailwind CSS** + shadcn/ui
+- **TanStack Query** para estado do servidor
 - **Wouter** para roteamento
 - **Firebase Auth** para autenticação
 
-### Backend
-- **Node.js** com Express.js
-- **TypeScript** com ES modules
-- **Drizzle ORM** com PostgreSQL
-- **Firebase Admin SDK** para verificação de tokens
-- **Baileys** para integração WhatsApp
-- **WebSocket** para comunicação em tempo real
+#### Backend
+- **Node.js** + Express + TypeScript
+- **Drizzle ORM** + PostgreSQL
+- **Firebase Admin** para verificação de tokens
+- **Baileys** para WhatsApp Web API
+- **WebSocket** para comunicação real-time
 
-### Banco de Dados
-- **PostgreSQL** (Neon serverless)
-- **Fallback in-memory** para desenvolvimento
+## 📦 Instalação
 
-## 🏗 Arquitetura
+### Pré-requisitos
+```bash
+Node.js 18+
+npm ou yarn
+PostgreSQL (opcional - usa fallback em memória)
+```
+
+### Configuração
+```bash
+# Clone o repositório
+git clone https://github.com/seu-usuario/esferazap.git
+cd esferazap
+
+# Instale dependências
+npm install
+
+# Configure variáveis de ambiente
+cp .env.example .env
+
+# Inicie o servidor de desenvolvimento
+npm run dev
+```
+
+### Variáveis de Ambiente
+
+```env
+# Firebase Client (obrigatório)
+VITE_FIREBASE_API_KEY=sua_api_key
+VITE_FIREBASE_AUTH_DOMAIN=login-ee5ed.firebaseapp.com
+VITE_FIREBASE_PROJECT_ID=login-ee5ed
+
+# Firebase Server (recomendado)
+FIREBASE_PRIVATE_KEY="-----BEGIN PRIVATE KEY-----\n...\n-----END PRIVATE KEY-----\n"
+FIREBASE_CLIENT_EMAIL=firebase-adminsdk-xxxxx@login-ee5ed.iam.gserviceaccount.com
+
+# Database (opcional)
+DATABASE_URL=postgresql://user:pass@localhost:5432/esferazap
+```
+
+## 🛠️ Como Obter Credenciais Firebase
+
+1. Acesse [console.firebase.google.com](https://console.firebase.google.com)
+2. Selecione projeto **"login-ee5ed"**
+3. Configurações → Configurações do projeto → Geral
+4. Role até "Seus aplicativos" → "Config SDK"
+5. Para server auth: Contas de serviço → Gerar nova chave privada
+
+## 🏗️ Arquitetura
 
 ```
-EsferaZap/
+esferazap/
 ├── client/              # Frontend React
 │   ├── src/
-│   │   ├── components/  # Componentes React
+│   │   ├── components/  # Componentes reutilizáveis
 │   │   ├── pages/       # Páginas da aplicação
 │   │   ├── hooks/       # Custom hooks
 │   │   └── lib/         # Utilitários e configurações
 ├── server/              # Backend Express
-│   ├── services/        # Serviços (WhatsApp, Firebase, IA)
 │   ├── middleware/      # Middlewares de autenticação
+│   ├── services/        # Serviços (Firebase, WhatsApp)
 │   └── routes.ts        # Rotas da API
 ├── shared/              # Tipos e schemas compartilhados
-└── package.json         # Dependências do projeto
+└── whatsapp_sessions/   # Sessões WhatsApp (gitignored)
 ```
 
-## 🚀 Como Executar
+## 🔗 Integração com Site Principal
 
-### Pré-requisitos
-- Node.js 18+
-- NPM ou Yarn
-- Conta Firebase (opcional para desenvolvimento)
-- Banco PostgreSQL (opcional para desenvolvimento)
-
-### Instalação
-
-1. Clone o repositório:
-```bash
-git clone https://github.com/seu-usuario/esferazap.git
-cd esferazap
+### Adicionar ao InsightEsfera
+```html
+<!-- Botão no header do site -->
+<a href="https://esferazap.insightesfera.io?from=insightesfera&token={USER_TOKEN}" 
+   class="btn-esferazap">
+  EsferaZap - WhatsApp AI
+</a>
 ```
 
-2. Instale as dependências:
-```bash
-npm install
+### Autenticação Automática
+```javascript
+// Redirect com token para login automático
+function accessEsferaZap() {
+  const userToken = firebase.auth().currentUser?.accessToken;
+  window.open(`https://esferazap.insightesfera.io?from=insightesfera&token=${userToken}`);
+}
 ```
-
-3. Configure as variáveis de ambiente (opcional):
-```bash
-# Firebase (opcional)
-VITE_FIREBASE_API_KEY=your_api_key
-VITE_FIREBASE_PROJECT_ID=your_project_id
-VITE_FIREBASE_APP_ID=your_app_id
-
-# Servidor
-FIREBASE_PROJECT_ID=your_project_id
-FIREBASE_PRIVATE_KEY=your_private_key
-FIREBASE_CLIENT_EMAIL=your_client_email
-
-# Database (opcional)
-DATABASE_URL=your_postgresql_url
-```
-
-4. Execute a aplicação:
-```bash
-npm run dev
-```
-
-A aplicação estará disponível em `http://localhost:5000`
-
-## 🔧 Modo de Desenvolvimento
-
-O projeto inclui um modo de desenvolvimento que funciona sem configurações Firebase ou PostgreSQL:
-
-- **Autenticação**: Usa usuário demo automático
-- **Banco de Dados**: Armazenamento em memória
-- **WhatsApp**: Simulação para testes
 
 ## 📱 Funcionalidades
 
-### Autenticação
-- Login/registro de usuários
-- Gerenciamento de perfil
-- Autenticação multi-tenant
+### Dashboard
+- 📊 Estatísticas de bots e conversas
+- 🤖 Gerenciamento de chatbots
+- 📱 Conexões WhatsApp via QR Code
+- 👥 Usuários e permissões
 
-### Gerenciamento de Bots
-- Criar e configurar chatbots
-- Definir instruções personalizadas
-- Escolher provedor de IA (OpenAI/Gemini)
-- Monitorar status de conexão
+### Chatbot IA
+- 🧠 Integração OpenAI GPT / Google Gemini
+- 💬 Processamento de linguagem natural
+- 📋 Instruções personalizáveis
+- 🔄 Respostas automáticas
 
 ### WhatsApp Integration
-- Gerar QR codes para conexão
-- Gerenciar sessões ativas
-- Processar mensagens em tempo real
-- Histórico de conversas
+- 📲 Conexão via QR Code
+- 💬 Envio/recebimento de mensagens
+- 👥 Grupos e contatos
+- 📎 Suporte a mídia
 
-### Dashboard
-- Estatísticas de uso
-- Gerenciamento de bots
-- Monitoramento de conversas
-- Interface responsiva
+## 🚀 Deploy
 
-## 🔒 Segurança
+### Replit (Recomendado)
+```bash
+# O projeto já está configurado para Replit
+# Basta fazer push e usar o botão Deploy
+```
 
-- Autenticação JWT via Firebase
-- Validação de dados com Zod
-- Middleware de autenticação
-- Separação de dados por tenant
-- Exclusão de dados sensíveis do Git
+### Vercel/Netlify
+```bash
+# Build frontend
+npm run build
 
-## 🤝 Contribuição
+# Deploy backend separadamente
+# Configure variáveis de ambiente
+```
 
-1. Faça um fork do projeto
-2. Crie uma branch para sua feature (`git checkout -b feature/AmazingFeature`)
-3. Commit suas mudanças (`git commit -m 'Add some AmazingFeature'`)
-4. Push para a branch (`git push origin feature/AmazingFeature`)
+### Docker
+```dockerfile
+# Dockerfile já configurado
+docker build -t esferazap .
+docker run -p 3000:3000 esferazap
+```
+
+## 📋 Scripts Disponíveis
+
+```bash
+npm run dev          # Servidor de desenvolvimento
+npm run build        # Build para produção
+npm run start        # Servidor de produção
+npm run type-check   # Verificação de tipos
+npm run lint         # Linting do código
+```
+
+## 🤝 Contribuindo
+
+1. Fork o projeto
+2. Crie sua branch: `git checkout -b feature/nova-feature`
+3. Commit mudanças: `git commit -m 'Adiciona nova feature'`
+4. Push para branch: `git push origin feature/nova-feature`
 5. Abra um Pull Request
 
 ## 📄 Licença
 
-Este projeto está sob a licença MIT. Veja o arquivo [LICENSE](LICENSE) para mais detalhes.
+Este projeto é parte do ecossistema InsightEsfera. Todos os direitos reservados.
 
-## 📞 Suporte
+## 🆘 Suporte
 
-Para suporte ou dúvidas, entre em contato:
-- Email: suporte@esferazap.com
-- Issues: [GitHub Issues](https://github.com/seu-usuario/esferazap/issues)
+- 📧 Email: admin@insightesfera.io
+- 📱 WhatsApp: +55 11 91647-4807
+- 🌐 Site: [insightesfera.io](https://www.insightesfera.io)
+
+## 🔄 Changelog
+
+### v1.0.0 (Agosto 2025)
+- ✨ Integração completa com InsightEsfera
+- 🎨 Interface redesenhada com glassmorphism
+- 🔐 Autenticação Firebase compartilhada
+- 🤖 Chatbots IA implementados
+- 📱 WhatsApp Business integrado
+- 📊 Dashboard analytics funcional
 
 ---
 
-Desenvolvido com ❤️ para revolucionar a comunicação via WhatsApp
+**Desenvolvido com ❤️ pela equipe InsightEsfera**
+
+[![InsightEsfera](https://img.shields.io/badge/Powered%20by-InsightEsfera-teal?style=for-the-badge)](https://www.insightesfera.io)
