@@ -9,6 +9,7 @@ import { useState } from "react";
 import Landing from "./pages/landing";
 import Dashboard from "./pages/dashboard";
 import AuthModal from "./components/auth/AuthModal";
+import AuthCallback from "./pages/auth-callback";
 import NotFound from "@/pages/not-found";
 
 function AuthenticatedApp() {
@@ -54,6 +55,10 @@ function AuthenticatedApp() {
           ) : (
             <Landing onShowLogin={handleShowLogin} onShowSignup={handleShowSignup} />
           )}
+        </Route>
+        
+        <Route path="/auth/callback">
+          <AuthCallback />
         </Route>
         
         <Route component={NotFound} />

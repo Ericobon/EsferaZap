@@ -1,17 +1,24 @@
 import { initializeApp } from "firebase/app";
-import { getAuth } from "firebase/auth";
+import { getAuth, setPersistence, browserLocalPersistence } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
 
 // InsightEsfera Firebase Configuration
 const INSIGHT_FIREBASE_CONFIG = {
   apiKey: "AIzaSyDrZCmU8SRDlcpTUyZLsZJLPUGMQBKYFkU",
-  authDomain: "login-ee5ed.firebaseapp.com",
+  authDomain: "login-ee5ed.firebaseapp.com", // Use Firebase domain for auth
   projectId: "login-ee5ed",
   storageBucket: "login-ee5ed.firebasestorage.app",
   messagingSenderId: "758485377489",
   appId: "1:758485377489:web:c4220355f73a31e15900f0",
   measurementId: "G-TBR5WL76DX"
 };
+
+// For local development, ensure auth redirects work
+if (typeof window !== 'undefined' && window.location.hostname === 'localhost') {
+  console.log('🔐 Running in localhost - Firebase Auth configured');
+  console.log('✅ Firestore database ready at: login-ee5ed');
+  console.log('📝 Authentication will work via popup/redirect to Firebase domain');
+}
 
 // Check if Firebase environment variables are available, with fallback to InsightEsfera config
 const hasFirebaseConfig = !!(

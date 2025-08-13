@@ -8,12 +8,18 @@ import { Label } from "@/components/ui/label";
 import { LoadingSpinner } from "@/components/ui/loading-spinner";
 import { signUp } from "@/lib/auth";
 import { useToast } from "@/hooks/use-toast";
+import { ThemeToggleSimple } from "@/components/ui/theme-toggle";
 
 const signupSchema = z.object({
   name: z.string().min(2, "Nome deve ter pelo menos 2 caracteres"),
   email: z.string().email("Email inválido"),
   company: z.string().optional(),
+  phone: z.string().min(10, "Telefone inválido").optional(),
   password: z.string().min(6, "Senha deve ter pelo menos 6 caracteres"),
+  confirmPassword: z.string(),
+}).refine((data) => data.password === data.confirmPassword, {
+  message: "As senhas não correspondem",
+  path: ["confirmPassword"],
 });
 
 type SignupFormData = z.infer<typeof signupSchema>;
@@ -33,17 +39,19 @@ export default function SignupForm({ onSuccess, onSwitchToLogin }: SignupFormPro
       name: "",
       email: "",
       company: "",
+      phone: "",
       password: "",
+      confirmPassword: "",
     },
   });
 
   const onSubmit = async (data: SignupFormData) => {
     try {
       setIsLoading(true);
-      await signUp(data.email, data.password, data.name, data.company);
+      await signUp(data.email, data.password, data.name, data.company, data.phone);
       toast({
         title: "Conta criada com sucesso!",
-        description: "Bem-vindo ao EsferaZap",
+        description: "Bem-vindo ao EsferaZap - Plataforma de automação WhatsApp",
       });
       onSuccess();
     } catch (error) {
@@ -59,8 +67,13 @@ export default function SignupForm({ onSuccess, onSwitchToLogin }: SignupFormPro
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-teal-50 flex items-center justify-center p-4">
-      <div className="max-w-md w-full space-y-8 bg-white/80 backdrop-blur-sm rounded-2xl shadow-2xl p-8 border border-white/20">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-teal-50 dark:from-gray-900 dark:via-gray-800 dark:to-teal-900 flex items-center justify-center p-4">
+      {/* Theme Toggle Button */}
+      <div className="absolute top-4 right-4">
+        <ThemeToggleSimple />
+      </div>
+      
+      <div className="max-w-md w-full space-y-8 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-2xl shadow-2xl p-8 border border-white/20 dark:border-gray-700/20">
         {/* InsightEsfera Branding */}
         <div className="text-center">
           <div className="mx-auto h-16 w-16 bg-gradient-to-br from-teal-600 to-orange-500 rounded-full flex items-center justify-center mb-4 shadow-lg">
@@ -105,6 +118,24 @@ export default function SignupForm({ onSuccess, onSwitchToLogin }: SignupFormPro
               className="h-12 border-gray-200 rounded-xl focus:border-teal-500 focus:ring-teal-500/20 bg-gray-50/50"
             />
           </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="phone" className="text-sm font-semibold text-gray-700">
+              WhatsApp Phone <span className="text-gray-400">(optional)</span>
+            </Label>
+            <Input
+              id="phone"
+              type="tel"
+              placeholder="+55 11 98765-4321"
+              {...form.register("phone")}
+              className="h-12 border-gray-200 rounded-xl focus:border-teal-500 focus:ring-teal-500/20 bg-gray-50/50"
+            />
+            {form.formState.errors.phone && (
+              <p className="text-sm text-red-600 mt-1">
+                {form.formState.errors.phone.message}
+              </p>
+            )}
+          </div>
           
           <div className="space-y-2">
             <Label htmlFor="email" className="text-sm font-semibold text-gray-700">
@@ -138,6 +169,24 @@ export default function SignupForm({ onSuccess, onSwitchToLogin }: SignupFormPro
             {form.formState.errors.password && (
               <p className="text-sm text-red-600 mt-1">
                 {form.formState.errors.password.message}
+              </p>
+            )}
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="confirmPassword" className="text-sm font-semibold text-gray-700">
+              Confirm Password
+            </Label>
+            <Input
+              id="confirmPassword"
+              type="password"
+              placeholder="Confirm your password"
+              {...form.register("confirmPassword")}
+              className="h-12 border-gray-200 rounded-xl focus:border-teal-500 focus:ring-teal-500/20 bg-gray-50/50"
+            />
+            {form.formState.errors.confirmPassword && (
+              <p className="text-sm text-red-600 mt-1">
+                {form.formState.errors.confirmPassword.message}
               </p>
             )}
           </div>

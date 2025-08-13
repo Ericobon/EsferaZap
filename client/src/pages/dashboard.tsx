@@ -12,9 +12,9 @@ import QRCodeModal from "@/components/dashboard/QRCodeModal";
 
 interface DashboardStats {
   totalBots: number;
-  connectedBots: number;
-  todayMessages: number;
-  responseRate: string;
+  totalSessions: number;
+  totalMessages: number;
+  activeUsers: number;
 }
 
 export default function Dashboard() {
@@ -31,7 +31,7 @@ export default function Dashboard() {
 
   // Fetch stats
   const { data: stats, isLoading: statsLoading } = useQuery<DashboardStats>({
-    queryKey: ["/api/stats"],
+    queryKey: ["/api/stats/dashboard"],
     enabled: !!userData,
   });
 
@@ -62,9 +62,9 @@ export default function Dashboard() {
 
   const defaultStats: DashboardStats = {
     totalBots: bots.length,
-    connectedBots: bots.filter(bot => bot.status === "connected").length,
-    todayMessages: 0,
-    responseRate: "0%",
+    totalSessions: 0,
+    totalMessages: 0,
+    activeUsers: 1,
   };
 
   return (

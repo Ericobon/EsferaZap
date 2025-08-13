@@ -1,11 +1,11 @@
 import { Card, CardContent } from "@/components/ui/card";
-import { Bot, Wifi, MessageCircle, TrendingUp } from "lucide-react";
+import { Bot, Activity, MessageCircle, Users } from "lucide-react";
 
 interface StatsData {
   totalBots: number;
-  connectedBots: number;
-  todayMessages: number;
-  responseRate: string;
+  totalSessions: number;
+  totalMessages: number;
+  activeUsers: number;
 }
 
 interface StatsGridProps {
@@ -23,23 +23,23 @@ export default function StatsGrid({ stats, isLoading }: StatsGridProps) {
       bgColor: "bg-primary/10",
     },
     {
-      title: "Conectados",
-      value: stats.connectedBots.toString(),
-      icon: Wifi,
+      title: "Sessões Ativas",
+      value: stats.totalSessions.toString(),
+      icon: Activity,
       iconColor: "text-green-600",
       bgColor: "bg-green-100",
     },
     {
-      title: "Mensagens Hoje",
-      value: stats.todayMessages.toString(),
+      title: "Total de Mensagens",
+      value: stats.totalMessages.toString(),
       icon: MessageCircle,
       iconColor: "text-blue-600",
       bgColor: "bg-blue-100",
     },
     {
-      title: "Taxa de Resposta",
-      value: stats.responseRate,
-      icon: TrendingUp,
+      title: "Usuários Ativos",
+      value: stats.activeUsers.toString(),
+      icon: Users,
       iconColor: "text-purple-600",
       bgColor: "bg-purple-100",
     },

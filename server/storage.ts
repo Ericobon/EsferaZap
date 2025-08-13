@@ -37,7 +37,7 @@ export interface IStorage {
   getMessagesBySession(sessionId: string, limit?: number): Promise<Message[]>;
 }
 
-export class MemStorage implements IStorage {
+class MemStorage implements IStorage {
   private users: Map<string, User> = new Map();
   private bots: Map<string, Bot> = new Map();
   private whatsappSessions: Map<string, WhatsappSession> = new Map();
@@ -180,4 +180,9 @@ export class MemStorage implements IStorage {
   }
 }
 
-export const storage = new MemStorage();
+// Export classes for use by storage factory
+export { MemStorage };
+
+// Main storage instance is created by storage/index.ts
+// Use: import { storage } from './storage/index' for the configured instance
+// IStorage interface is already exported above

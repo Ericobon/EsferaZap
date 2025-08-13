@@ -19,10 +19,24 @@ export interface UserData {
   name: string;
   email: string;
   company?: string;
+  phone?: string;
+  plan?: 'free' | 'starter' | 'professional' | 'enterprise';
+  role?: 'user' | 'admin';
+  whatsappConnected?: boolean;
+  botsCount?: number;
+  messagesQuota?: number;
   createdAt: string;
+  updatedAt?: string;
+  lastLogin?: string;
 }
 
-export const signUp = async (email: string, password: string, name: string, company?: string): Promise<AuthUser> => {
+export const signUp = async (
+  email: string, 
+  password: string, 
+  name: string, 
+  company?: string,
+  phone?: string
+): Promise<AuthUser> => {
   if (!auth || !db) {
     // Demo mode - return mock user
     const mockUser: AuthUser = {
@@ -35,13 +49,21 @@ export const signUp = async (email: string, password: string, name: string, comp
 
   const { user } = await createUserWithEmailAndPassword(auth, email, password);
   
-  // Create user document in Firestore
+  // Create user document in Firestore with extended data
   const userData: UserData = {
     uid: user.uid,
     name,
     email,
     company,
+    phone,
+    plan: 'free', // Default plan
+    role: 'user', // Default role
+    whatsappConnected: false,
+    botsCount: 0,
+    messagesQuota: 1000, // Free tier quota
     createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+    lastLogin: new Date().toISOString(),
   };
   
   await setDoc(doc(db, "users", user.uid), userData);

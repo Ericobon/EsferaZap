@@ -1,15 +1,35 @@
 # EsferaZap 🌐⚡
 
-**SaaS Multi-Tenant de Chatbots WhatsApp com IA - Integrado ao Ecossistema InsightEsfera**
+**Plataforma SaaS de Automação WhatsApp Business com IA**
 
-[![InsightEsfera](https://img.shields.io/badge/InsightEsfera-Ecosystem-teal)](https://www.insightesfera.io)
-[![Firebase](https://img.shields.io/badge/Firebase-login--ee5ed-orange)](https://console.firebase.google.com)
-[![TypeScript](https://img.shields.io/badge/TypeScript-4.9+-blue)](https://www.typescriptlang.org/)
+[![InsightEsfera](https://img.shields.io/badge/InsightEsfera-Ecosystem-teal)](https://app.insightesfera.com)
+[![Status](https://img.shields.io/badge/Status-Development-yellow)](http://localhost:5173)
+[![Firebase](https://img.shields.io/badge/Firebase-Auth%20%26%20Firestore-orange)](https://firebase.google.com)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.0+-blue)](https://www.typescriptlang.org/)
 [![React](https://img.shields.io/badge/React-18+-blue)](https://react.dev/)
+
+## 🚀 Quick Start
+
+```bash
+# Clone e instale
+git clone [repo-url] && cd esferazap
+npm install
+
+# Configure ambiente
+cp client/.env.example client/.env.local
+
+# Execute
+npm run dev        # Backend (porta 5000)
+npx vite          # Frontend (porta 5173)
+```
+
+Acesse: http://localhost:5173
 
 ## 🎯 Visão Geral
 
-EsferaZap é uma plataforma SaaS multi-tenant que combina **WhatsApp + IA + Análise de Dados** para automatizar atendimento, qualificar leads e gerar insights estratégicos. Totalmente integrada ao ecossistema InsightEsfera.
+EsferaZap é uma plataforma SaaS multi-tenant que revoluciona o atendimento via WhatsApp, combinando **IA avançada**, **automação inteligente** e **analytics em tempo real**.
+
+🌐 **Dev:** http://localhost:5173 | **Prod:** https://app.insightesfera.com
 
 ### ✨ Features Principais
 
@@ -78,27 +98,57 @@ npm run dev
 
 ### Variáveis de Ambiente
 
+#### Frontend (client/.env.local)
 ```env
-# Firebase Client (obrigatório)
-VITE_FIREBASE_API_KEY=sua_api_key
+# Firebase Configuration - Projeto InsightEsfera
+VITE_FIREBASE_API_KEY=AIzaSyDrZCmU8SRDlcpTUyZLsZJLPUGMQBKYFkU
 VITE_FIREBASE_AUTH_DOMAIN=login-ee5ed.firebaseapp.com
 VITE_FIREBASE_PROJECT_ID=login-ee5ed
+VITE_FIREBASE_STORAGE_BUCKET=login-ee5ed.firebasestorage.app
+VITE_FIREBASE_MESSAGING_SENDER_ID=758485377489
+VITE_FIREBASE_APP_ID=1:758485377489:web:c4220355f73a31e15900f0
+VITE_FIREBASE_MEASUREMENT_ID=G-TBR5WL76DX
+```
 
+#### Backend (.env)
+```env
 # Firebase Server (recomendado)
 FIREBASE_PRIVATE_KEY="-----BEGIN PRIVATE KEY-----\n...\n-----END PRIVATE KEY-----\n"
 FIREBASE_CLIENT_EMAIL=firebase-adminsdk-xxxxx@login-ee5ed.iam.gserviceaccount.com
+FIREBASE_PROJECT_ID=login-ee5ed
 
 # Database (opcional)
 DATABASE_URL=postgresql://user:pass@localhost:5432/esferazap
 ```
 
-## 🛠️ Como Obter Credenciais Firebase
+## 🛠️ Configuração Firebase
 
+### Setup Automático
+O projeto já está configurado com as credenciais do Firebase da InsightEsfera. Para desenvolvimento local:
+
+1. **Frontend**: Crie o arquivo `client/.env.local` com as variáveis mostradas acima
+2. **Backend**: Configure as variáveis no arquivo `.env` principal
+
+### Modo Demo vs Produção
+- **Sem configuração**: Aplicação roda em "modo demo" com usuário fictício
+- **Com configuração**: Autenticação real integrada ao ecossistema InsightEsfera
+
+### Como Obter Credenciais (se necessário)
 1. Acesse [console.firebase.google.com](https://console.firebase.google.com)
 2. Selecione projeto **"login-ee5ed"**
 3. Configurações → Configurações do projeto → Geral
 4. Role até "Seus aplicativos" → "Config SDK"
 5. Para server auth: Contas de serviço → Gerar nova chave privada
+
+### Verificação da Configuração
+```bash
+# Inicie o frontend
+npx vite
+
+# Verifique no console do navegador:
+# ✅ "Firebase client initialized successfully with InsightEsfera project: login-ee5ed"
+# ❌ "Firebase configuration not available - running in demo mode"
+```
 
 ## 🏗️ Arquitetura
 

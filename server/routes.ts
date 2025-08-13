@@ -1,7 +1,15 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
-import { storage } from "./storage";
+import { storage } from "./storage/index";
 import { authenticateToken, AuthenticatedRequest } from "./middleware/auth";
+import { 
+  multiTenantMiddleware, 
+  validateBotOwnership, 
+  validateSessionOwnership,
+  tenantRateLimit,
+  auditLogger,
+  ensureUserExists
+} from "./middleware/multi-tenant";
 import { whatsappService } from "./services/whatsapp";
 import { insertBotSchema } from "@shared/schema";
 import { Request, Response } from "express";
@@ -12,19 +20,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
     res.json({ status: "ok", timestamp: new Date().toISOString() });
   });
 
-  // Protected routes - require authentication
-  app.use("/api/bots", authenticateToken);
-  app.use("/api/whatsapp", authenticateToken);
-  app.use("/api/stats", authenticateToken);
+  // Protected routes - require authentication and multi-tenancy
+  app.use("/api/bots", authenticateToken, ensureUserExists, multiTenantMiddleware, tenantRateLimit(100, 60000), auditLogger);
+  app.use("/api/whatsapp", authenticateToken, ensureUserExists, multiTenantMiddleware, tenantRateLimit(200, 60000), auditLogger);
+  app.use("/api/stats", authenticateToken, ensureUserExists, multiTenantMiddleware, tenantRateLimit(50, 60000), auditLogger);
+  app.use("/api/user", authenticateToken, ensureUserExists, multiTenantMiddleware, tenantRateLimit(30, 60000), auditLogger);
 
   // Bots routes
   app.get("/api/bots", async (req: AuthenticatedRequest, res: Response) => {
     try {
-      if (!req.user?.uid) {
-        return res.status(401).json({ message: "User not authenticated" });
-      }
-
-      const bots = await storage.getBotsByUserId(req.user.uid);
+      const bots = await req.tenant!.getUserBots();
       res.json(bots);
     } catch (error) {
       console.error("Error fetching bots:", error);
@@ -34,10 +39,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post("/api/bots", async (req: AuthenticatedRequest, res: Response) => {
     try {
-      if (!req.user?.uid) {
-        return res.status(401).json({ message: "User not authenticated" });
-      }
-
       const validation = insertBotSchema.safeParse(req.body);
       if (!validation.success) {
         return res.status(400).json({ 
@@ -48,7 +49,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       const botData = {
         ...validation.data,
-        userId: req.user.uid, // Ensure userId matches authenticated user
+        userId: req.user!.id, // Use the database user ID
       };
 
       const bot = await storage.createBot(botData);
@@ -59,20 +60,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get("/api/bots/:id", async (req: AuthenticatedRequest, res: Response) => {
+  app.get("/api/bots/:id", validateBotOwnership, async (req: AuthenticatedRequest, res: Response) => {
     try {
-      if (!req.user?.uid) {
-        return res.status(401).json({ message: "User not authenticated" });
-      }
-
       const bot = await storage.getBot(req.params.id);
       if (!bot) {
         return res.status(404).json({ message: "Bot não encontrado" });
-      }
-
-      // Ensure user can only access their own bots
-      if (bot.userId !== req.user.uid) {
-        return res.status(403).json({ message: "Acesso negado" });
       }
 
       res.json(bot);
@@ -82,22 +74,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.put("/api/bots/:id", async (req: AuthenticatedRequest, res: Response) => {
+  app.put("/api/bots/:id", validateBotOwnership, async (req: AuthenticatedRequest, res: Response) => {
     try {
-      if (!req.user?.uid) {
-        return res.status(401).json({ message: "User not authenticated" });
-      }
-
-      const bot = await storage.getBot(req.params.id);
-      if (!bot) {
+      const updatedBot = await storage.updateBot(req.params.id, req.body);
+      if (!updatedBot) {
         return res.status(404).json({ message: "Bot não encontrado" });
       }
-
-      if (bot.userId !== req.user.uid) {
-        return res.status(403).json({ message: "Acesso negado" });
-      }
-
-      const updatedBot = await storage.updateBot(req.params.id, req.body);
+      
       res.json(updatedBot);
     } catch (error) {
       console.error("Error updating bot:", error);
@@ -105,21 +88,89 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete("/api/bots/:id", async (req: AuthenticatedRequest, res: Response) => {
+  app.delete("/api/bots/:id", validateBotOwnership, async (req: AuthenticatedRequest, res: Response) => {
     try {
-      if (!req.user?.uid) {
-        return res.status(401).json({ message: "User not authenticated" });
-      }
-
-      const bot = await storage.getBot(req.params.id);
-      if (!bot) {
+      const success = await storage.deleteBot(req.params.id);
+      if (!success) {
         return res.status(404).json({ message: "Bot não encontrado" });
       }
 
-      if (bot.userId !== req.user.uid) {
-        return res.status(403).json({ message: "Acesso negado" });
-      }
+      res.json({ message: "Bot deletado com sucesso" });
+    } catch (error) {
+      console.error("Error deleting bot:", error);
+      res.status(500).json({ message: "Erro interno do servidor" });
+    }
+  });
 
+  // User and Stats routes
+  app.get("/api/user/profile", async (req: AuthenticatedRequest, res: Response) => {
+    try {
+      res.json({
+        id: req.user!.id,
+        uid: req.user!.uid,
+        name: req.user!.name,
+        email: req.user!.email,
+        company: req.user!.company,
+        createdAt: req.user!.createdAt
+      });
+    } catch (error) {
+      console.error("Error fetching user profile:", error);
+      res.status(500).json({ message: "Erro interno do servidor" });
+    }
+  });
+
+  app.get("/api/stats/dashboard", async (req: AuthenticatedRequest, res: Response) => {
+    try {
+      const stats = await req.tenant!.getUserStats();
+      res.json(stats);
+    } catch (error) {
+      console.error("Error fetching dashboard stats:", error);
+      res.status(500).json({ message: "Erro interno do servidor" });
+    }
+  });
+
+  // Bot-specific routes with ownership validation
+  app.get("/api/bots/:id/messages", validateBotOwnership, async (req: AuthenticatedRequest, res: Response) => {
+    try {
+      const limit = parseInt(req.query.limit as string) || 100;
+      const messages = await storage.getMessagesByBot(req.params.id, limit);
+      res.json(messages);
+    } catch (error) {
+      console.error("Error fetching bot messages:", error);
+      res.status(500).json({ message: "Erro interno do servidor" });
+    }
+  });
+
+  // Export conversations for backup
+  app.get("/api/bots/:id/export", validateBotOwnership, async (req: AuthenticatedRequest, res: Response) => {
+    try {
+      if ('exportConversations' in storage && typeof storage.exportConversations === 'function') {
+        const conversations = await (storage as any).exportConversations(req.params.id);
+        res.json({
+          botId: req.params.id,
+          exportDate: new Date().toISOString(),
+          totalMessages: conversations.length,
+          conversations
+        });
+      } else {
+        // Fallback for MemStorage
+        const messages = await storage.getMessagesByBot(req.params.id, 10000);
+        res.json({
+          botId: req.params.id,
+          exportDate: new Date().toISOString(),
+          totalMessages: messages.length,
+          conversations: messages
+        });
+      }
+    } catch (error) {
+      console.error("Error exporting conversations:", error);
+      res.status(500).json({ message: "Erro interno do servidor" });
+    }
+  });
+
+  // Delete bot route
+  app.delete("/api/bots/:id", multiTenantMiddleware, validateBotOwnership, async (req: AuthenticatedRequest, res: Response) => {
+    try {
       // Disconnect WhatsApp session if active
       whatsappService.disconnectSession(req.params.id);
       
