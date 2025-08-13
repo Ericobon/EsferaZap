@@ -1,52 +1,52 @@
-# 🎯 Instruções Finais - Push EsferaZap
+# 🚀 Push Final do EsferaZap v2.0
 
-## Problema Identificado
-O Git tem alguns locks ativos que impedem a configuração automática do remote.
+## Status Atual
+✅ EsferaZap v2.0 com nova identidade visual está pronto
+✅ Logo WhatsApp + InsightEsfera criado e implementado
+✅ Arquivos de deploy Vercel configurados
+✅ Todas as alterações commitadas localmente
 
-## ✅ Solução Simples
+## 🔧 Comando de Push
 
-Execute este comando no terminal:
-
-```bash
-./manual_push.sh
-```
-
-## 🔧 Ou execute manualmente:
+Execute este comando no terminal do Replit:
 
 ```bash
-# Limpar locks
-rm -f .git/index.lock .git/config.lock
-
-# Configurar remote
-git remote remove origin 2>/dev/null || true
-git remote add origin https://github.com/Ericobon/EsferaZap.git
-
-# Fazer push
-git push -u origin main
+git push https://Ericobon:SEU_TOKEN_ATUAL@github.com/Ericobon/EsferaZap.git main
 ```
 
-## 📊 Projeto Pronto
+**Substitua `SEU_TOKEN_ATUAL` pelo token GitHub válido.**
 
-O EsferaZap está **100% completo** com:
+## 📝 O que Será Enviado
 
-✅ **8.147 linhas de código** profissional  
-✅ **81 arquivos** TypeScript/JavaScript  
-✅ **57 componentes React** reutilizáveis  
-✅ **Integração completa** com InsightEsfera  
-✅ **Firebase** configurado (login-ee5ed)  
-✅ **Interface idêntica** ao site principal  
-✅ **Documentação completa** (README.md, guias)  
-✅ **Sistema de autenticação** compartilhado  
-✅ **WhatsApp Bot + IA** implementado  
-✅ **Dashboard multi-tenant** funcional  
+```
+feat: EsferaZap v2.0 - Nova identidade visual WhatsApp + InsightEsfera
 
-## 🚀 Após o Push
+✨ Novo logo EsferaZap com fusão WhatsApp + InsightEsfera
+🎨 Identidade visual atualizada com cores verde WhatsApp
+🔧 Configuração Vercel para deploy em subdomínio
+📱 Logo animado com rede de conexões e balão de conversa
+🌐 Gradientes CSS personalizados esferazap-gradient e whatsapp-gradient
+📖 Guias completos de deploy e configuração de subdomínio
+```
 
-1. **Verificar repositório**: https://github.com/Ericobon/EsferaZap
-2. **Configurar deploy** (Vercel/Netlify recomendado)
-3. **Adicionar credenciais Firebase Server** (opcional)
-4. **Configurar domínio personalizado** (esferazap.insightesfera.io)
+## 📊 Novos Arquivos Adicionados
 
-## 🎊 Resultado Final
+- `client/src/components/ui/EsferaZapLogo.tsx` - Logo personalizado
+- `vercel.json` - Configuração deploy Vercel
+- `VERCEL_DEPLOYMENT.md` - Guia técnico deploy
+- `SUBDOMINIO_VERCEL_GUIA.md` - Guia prático subdomínio
+- Atualizações em `Header.tsx` e `landing.tsx`
+- Novos gradientes CSS em `index.css`
 
-Você terá um repositório GitHub profissional com uma plataforma SaaS completa integrada ao ecossistema InsightEsfera!
+## 🎯 Próximo Passo
+
+Após push bem-sucedido:
+1. Repositório estará atualizado: https://github.com/Ericobon/EsferaZap
+2. Pronto para deploy na Vercel
+3. Configurar subdomínio `esferazap.insightesfera.io`
+
+## 🔧 Se o Token Expirou
+
+1. Gere novo token: https://github.com/settings/tokens
+2. Scopes necessários: `repo`, `workflow`
+3. Use o novo token no comando de push
