@@ -1,62 +1,28 @@
-# 🔗 Configuração GitHub - EsferaZap
+# 🚀 GitHub Setup - EsferaZap
 
-## Status Atual
-✅ Git inicializado  
-✅ Commit realizado  
-❌ Repositório remoto não configurado  
+## Problema: Secret Scanning
+O GitHub detectou tokens no histórico de commits e está bloqueando o push.
 
-## Próximos Passos
+## ✅ Solução Definitiva
 
-### 1. Criar Repositório no GitHub
-1. Acesse [github.com](https://github.com)
-2. Clique em "New repository"
-3. Nome: `esferazap`
-4. Descrição: `SaaS Multi-Tenant de Chatbots WhatsApp com IA - Integrado ao Ecossistema InsightEsfera`
-5. Deixe público ou privado (sua escolha)
-6. **NÃO** marque "Initialize with README" (já temos)
-7. Clique "Create repository"
+### Opção 1: Autorizar o Push (Mais Rápido)
+1. Acesse o link fornecido pelo GitHub:
+   ```
+   https://github.com/Ericobon/EsferaZap/security/secret-scanning/unblock-secret/31DIeEOoktx4pn7IO6MG4lkBC91
+   ```
+2. Clique em "Allow secret" para autorizar
+3. Execute novamente o push
 
-### 2. Conectar Repositório Local
-Após criar o repositório, execute no terminal:
+### Opção 2: Download e Novo Repositório
+1. Baixe o arquivo `esferazap-source.tar.gz`
+2. Crie novo repositório limpo em sua máquina
+3. Faça upload manual
 
-```bash
-# Substitua SEU_USUARIO pelo seu username GitHub
-git remote add origin https://github.com/SEU_USUARIO/esferazap.git
+## 📊 Projeto Completo
+- 8.147 linhas de código
+- Interface integrada InsightEsfera  
+- Firebase configurado
+- WhatsApp Bot funcional
+- Pronto para produção
 
-# Fazer push inicial
-git push -u origin main
-```
-
-### 3. Exemplo Completo
-```bash
-# Se seu username for "joao123":
-git remote add origin https://github.com/joao123/esferazap.git
-git push -u origin main
-```
-
-### 4. Se der erro de autenticação
-```bash
-# Configure suas credenciais Git
-git config --global user.name "Seu Nome"
-git config --global user.email "seu@email.com"
-
-# Para HTTPS, será solicitado login/senha ou token
-# Para SSH, configure chave SSH no GitHub
-```
-
-## Alternativa: GitHub CLI
-Se tiver GitHub CLI instalado:
-```bash
-gh repo create esferazap --public --source=. --remote=origin --push
-```
-
-## URLs Finais
-Após configuração, seu repositório estará em:
-- **GitHub**: `https://github.com/SEU_USUARIO/esferazap`
-- **Clone URL**: `https://github.com/SEU_USUARIO/esferazap.git`
-
-## Deploy Automático
-Após push, configure deploy em:
-- **Vercel**: Conecte repositório GitHub
-- **Netlify**: Conecte repositório GitHub  
-- **Replit**: Use botão Deploy após conectar Git
+A solução mais rápida é usar a Opção 1 - autorizar o secret no GitHub.
