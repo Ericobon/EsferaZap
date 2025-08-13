@@ -78,42 +78,23 @@ PORT=3000
 FRONTEND_URL=http://localhost:5173
 ```
 
-## 🔐 Autenticação Firebase
-
-### Modo Demo vs Produção
-- **Sem `.env.local`**: Aplicação roda em "modo demo" com usuário fictício (`demo@example.com`)
-- **Com `.env.local`**: Autenticação real integrada ao ecossistema InsightEsfera
-
-### Verificação da Configuração
-```bash
-# Console do navegador - Sucesso
-✅ "Firebase client initialized successfully with InsightEsfera project: login-ee5ed"
-
-# Console do navegador - Modo Demo
-⚠️ "Firebase configuration not available - running in demo mode"
-```
-
-### Integração com Website InsightEsfera
-- **SSO**: Login único entre site e app
-- **Projeto compartilhado**: `login-ee5ed`
-- **Sincronização**: Dados de usuário em tempo real
-
 ## 💻 Desenvolvimento Local
 
 ### Setup Inicial
 ```bash
-# Clone e instale dependências
-git clone <repo>
-cd esferazap
+# Backend
+cd backend
 npm install
+npm run dev
 
-# Configure Firebase (OBRIGATÓRIO)
-cp client/.env.example client/.env.local
-# Edite client/.env.local com as credenciais Firebase
+# Frontend
+cd frontend
+npm install
+npm run dev
 
-# Inicie o desenvolvimento
-npm run dev  # Backend na porta 5000
-npx vite     # Frontend na porta 5173/5174
+# Database
+npm run migrate
+npm run seed
 ```
 
 ### Docker Development
