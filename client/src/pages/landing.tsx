@@ -1,5 +1,6 @@
 import { Button } from "@/components/ui/button";
-import { Bot, MessageCircle, BarChart3, Zap, Globe, Brain } from "lucide-react";
+import { Bot, MessageCircle, BarChart3, Zap, Globe, Brain, ArrowRight } from "lucide-react";
+import CrossPlatformAuth from "@/components/integration/CrossPlatformAuth";
 
 interface LandingProps {
   onShowLogin: () => void;
@@ -38,6 +39,13 @@ export default function Landing({ onShowLogin, onShowSignup }: LandingProps) {
             <div className="flex items-center space-x-4">
               <Button
                 variant="ghost"
+                onClick={() => window.open('https://www.insightesfera.io', '_blank')}
+                className="text-foreground/70 hover:text-foreground transition-colors"
+              >
+                InsightEsfera
+              </Button>
+              <Button
+                variant="ghost"
                 onClick={onShowLogin}
                 className="text-foreground/70 hover:text-foreground transition-colors"
               >
@@ -73,6 +81,11 @@ export default function Landing({ onShowLogin, onShowSignup }: LandingProps) {
             <span className="font-semibold text-primary">WhatsApp + IA + Análise de Dados</span>{" "}
             para automatizar atendimento, qualificar leads e gerar insights estratégicos.
           </p>
+
+          {/* Integration Card */}
+          <div className="max-w-md mx-auto mb-12">
+            <CrossPlatformAuth />
+          </div>
           
           <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
             <Button 
