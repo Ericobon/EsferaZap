@@ -11,7 +11,7 @@
 Execute este comando único:
 
 ```bash
-git push https://Ericobon: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@github.com/Ericobon/EsferaZap.git main --force
+git push https://Ericobon:SEU_TOKEN@github.com/Ericobon/EsferaZap.git main --force
 ```
 
 ### Opção 2: Download e Push Local

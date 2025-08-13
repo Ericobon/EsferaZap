@@ -1,6 +1,6 @@
 #!/bin/bash
 
-TOKEN="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"
+TOKEN="SEU_TOKEN_AQUI"
 REPO_URL="https://Ericobon:$TOKEN@github.com/Ericobon/EsferaZap.git"
 
 echo "🚀 Forçando push do EsferaZap..."
