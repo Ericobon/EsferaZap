@@ -1,0 +1,6 @@
+# Comando Simples para Push (substitua SEU_TOKEN)
+
+git push https://Ericobon:SEU_TOKEN@github.com/Ericobon/EsferaZap.git main
+
+# Obtenha o token em: https://github.com/settings/tokens
+# Selecione scopes: repo, workflow
