@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Dialog, DialogContent } from "@/components/ui/dialog";
+// Dialog not needed for full-screen auth
 import { X } from "lucide-react";
 import LoginForm from "./LoginForm";
 import SignupForm from "./SignupForm";
@@ -18,30 +18,30 @@ export default function AuthModal({ isOpen, onClose, initialView = "login" }: Au
     onClose();
   };
 
+  if (!isOpen) return null;
+
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-md p-0">
-        <Button
-          variant="ghost"
-          size="icon"
-          className="absolute top-4 right-4 z-50"
-          onClick={onClose}
-        >
-          <X className="w-4 h-4" />
-        </Button>
-        
-        {currentView === "login" ? (
-          <LoginForm
-            onSuccess={handleSuccess}
-            onSwitchToSignup={() => setCurrentView("signup")}
-          />
-        ) : (
-          <SignupForm
-            onSuccess={handleSuccess}
-            onSwitchToLogin={() => setCurrentView("login")}
-          />
-        )}
-      </DialogContent>
-    </Dialog>
+    <div className="fixed inset-0 z-50 bg-white">
+      <Button
+        variant="ghost"
+        size="icon"
+        className="absolute top-4 right-4 z-50 bg-white/80 backdrop-blur-sm rounded-full shadow-lg"
+        onClick={onClose}
+      >
+        <X className="w-5 h-5" />
+      </Button>
+      
+      {currentView === "login" ? (
+        <LoginForm
+          onSuccess={handleSuccess}
+          onSwitchToSignup={() => setCurrentView("signup")}
+        />
+      ) : (
+        <SignupForm
+          onSuccess={handleSuccess}
+          onSwitchToLogin={() => setCurrentView("login")}
+        />
+      )}
+    </div>
   );
 }
