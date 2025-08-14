@@ -57,6 +57,10 @@ export const bots = pgTable("bots", {
   geminiApiKey: varchar("gemini_api_key"),
   maxTokens: integer("max_tokens").default(1000),
   temperature: varchar("temperature").default('0.7'),
+  // Bot capabilities
+  supportsText: boolean("supports_text").default(true),
+  supportsAudio: boolean("supports_audio").default(false),
+  supportsImages: boolean("supports_images").default(false),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });
@@ -106,6 +110,10 @@ export const insertBotSchema = createInsertSchema(bots).omit({
   id: true,
   createdAt: true,
   updatedAt: true,
+}).extend({
+  supportsText: z.boolean().default(true),
+  supportsAudio: z.boolean().default(false),
+  supportsImages: z.boolean().default(false),
 });
 
 export const insertConversationSchema = createInsertSchema(conversations).omit({

@@ -13,6 +13,8 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Checkbox } from "@/components/ui/checkbox";
+import { MessageSquare, Mic, Image } from "lucide-react";
 import { z } from "zod";
 
 const formSchema = insertBotSchema.extend({
@@ -33,12 +35,15 @@ export default function BotForm({ bot, onClose }: BotFormProps) {
     defaultValues: {
       name: bot?.name || "",
       phoneNumber: bot?.phoneNumber || "",
-      apiKey: bot?.apiKey || "",
+      accessToken: bot?.accessToken || "",
       prompt: bot?.prompt || "",
       geminiApiKey: bot?.geminiApiKey || "",
       maxTokens: bot?.maxTokens || 1000,
       temperature: bot?.temperature || "0.7",
       status: bot?.status || "inactive",
+      supportsText: bot?.supportsText ?? true,
+      supportsAudio: bot?.supportsAudio ?? false,
+      supportsImages: bot?.supportsImages ?? false,
     },
   });
 
@@ -163,7 +168,7 @@ export default function BotForm({ bot, onClose }: BotFormProps) {
               
               <FormField
                 control={form.control}
-                name="apiKey"
+                name="accessToken"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>WhatsApp API Key</FormLabel>
@@ -241,6 +246,86 @@ export default function BotForm({ bot, onClose }: BotFormProps) {
                         <Input placeholder="0.7" {...field} />
                       </FormControl>
                       <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+            </div>
+
+            {/* Bot Capabilities */}
+            <div className="space-y-4">
+              <h3 className="text-lg font-medium text-gray-900">Funcionalidades do Bot</h3>
+              <p className="text-sm text-gray-600">Selecione quais tipos de mensagem o bot será capaz de processar</p>
+              
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <FormField
+                  control={form.control}
+                  name="supportsText"
+                  render={({ field }) => (
+                    <FormItem>
+                      <div className="flex items-center space-x-3 p-4 border rounded-lg hover:bg-gray-50">
+                        <FormControl>
+                          <Checkbox
+                            checked={field.value}
+                            onCheckedChange={field.onChange}
+                          />
+                        </FormControl>
+                        <div className="flex items-center space-x-2">
+                          <MessageSquare className="h-5 w-5 text-blue-600" />
+                          <div>
+                            <FormLabel className="text-sm font-medium cursor-pointer">Texto</FormLabel>
+                            <p className="text-xs text-gray-500">Mensagens de texto</p>
+                          </div>
+                        </div>
+                      </div>
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="supportsAudio"
+                  render={({ field }) => (
+                    <FormItem>
+                      <div className="flex items-center space-x-3 p-4 border rounded-lg hover:bg-gray-50">
+                        <FormControl>
+                          <Checkbox
+                            checked={field.value}
+                            onCheckedChange={field.onChange}
+                          />
+                        </FormControl>
+                        <div className="flex items-center space-x-2">
+                          <Mic className="h-5 w-5 text-green-600" />
+                          <div>
+                            <FormLabel className="text-sm font-medium cursor-pointer">Áudio</FormLabel>
+                            <p className="text-xs text-gray-500">Mensagens de voz</p>
+                          </div>
+                        </div>
+                      </div>
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="supportsImages"
+                  render={({ field }) => (
+                    <FormItem>
+                      <div className="flex items-center space-x-3 p-4 border rounded-lg hover:bg-gray-50">
+                        <FormControl>
+                          <Checkbox
+                            checked={field.value}
+                            onCheckedChange={field.onChange}
+                          />
+                        </FormControl>
+                        <div className="flex items-center space-x-2">
+                          <Image className="h-5 w-5 text-purple-600" />
+                          <div>
+                            <FormLabel className="text-sm font-medium cursor-pointer">Imagens</FormLabel>
+                            <p className="text-xs text-gray-500">Imagens e fotos</p>
+                          </div>
+                        </div>
+                      </div>
                     </FormItem>
                   )}
                 />
