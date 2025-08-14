@@ -14,7 +14,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
-import { MessageSquare, Mic, Image, QrCode } from "lucide-react";
+import { MessageSquare, Mic, Image, QrCode, X } from "lucide-react";
 import { z } from "zod";
 
 const formSchema = insertBotSchema.extend({
@@ -29,6 +29,8 @@ interface BotFormProps {
 
 export default function BotForm({ bot, onClose }: BotFormProps) {
   const { toast } = useToast();
+  const [triggerWords, setTriggerWords] = useState<string[]>(bot?.triggerWords || []);
+  const [currentWord, setCurrentWord] = useState("");
 
   const form = useForm({
     resolver: zodResolver(formSchema),
@@ -43,15 +45,34 @@ export default function BotForm({ bot, onClose }: BotFormProps) {
       supportsText: bot?.supportsText ?? true,
       supportsAudio: bot?.supportsAudio ?? false,
       supportsImages: bot?.supportsImages ?? false,
+      humanHandoffEnabled: bot?.humanHandoffEnabled ?? false,
+      humanHandoffMessage: bot?.humanHandoffMessage || "Um agente humano entrará na conversa em breve.",
+      triggerWords: bot?.triggerWords || [],
     },
   });
 
+  const addTriggerWord = () => {
+    if (currentWord.trim() && triggerWords.length < 5 && !triggerWords.includes(currentWord.trim())) {
+      const newWords = [...triggerWords, currentWord.trim()];
+      setTriggerWords(newWords);
+      form.setValue('triggerWords', newWords);
+      setCurrentWord("");
+    }
+  };
+
+  const removeTriggerWord = (wordToRemove: string) => {
+    const newWords = triggerWords.filter(word => word !== wordToRemove);
+    setTriggerWords(newWords);
+    form.setValue('triggerWords', newWords);
+  };
+
   const createBotMutation = useMutation({
     mutationFn: async (data: any) => {
+      const submitData = { ...data, triggerWords };
       if (bot) {
-        return await apiRequest("PUT", `/api/bots/${bot.id}`, data);
+        return await apiRequest("PUT", `/api/bots/${bot.id}`, submitData);
       } else {
-        return await apiRequest("POST", "/api/bots", data);
+        return await apiRequest("POST", "/api/bots", submitData);
       }
     },
     onSuccess: () => {
@@ -347,6 +368,133 @@ export default function BotForm({ bot, onClose }: BotFormProps) {
                     </FormItem>
                   )}
                 />
+              </div>
+            </div>
+
+            {/* Trigger Settings */}
+            <div className="space-y-4">
+              <h3 className="text-lg font-medium text-gray-900">Configurações de Gatilhos</h3>
+              
+              {/* Human Handoff Trigger */}
+              <FormField
+                control={form.control}
+                name="humanHandoffEnabled"
+                render={({ field }) => (
+                  <FormItem>
+                    <div className="flex items-center space-x-3 p-4 border rounded-lg hover:bg-gray-50">
+                      <FormControl>
+                        <Checkbox
+                          checked={field.value}
+                          onCheckedChange={field.onChange}
+                        />
+                      </FormControl>
+                      <div>
+                        <FormLabel className="text-sm font-medium cursor-pointer">
+                          Direcionar para Humano
+                        </FormLabel>
+                        <p className="text-xs text-gray-500">
+                          Permite que um agente humano entre na conversa
+                        </p>
+                      </div>
+                    </div>
+                  </FormItem>
+                )}
+              />
+
+              {/* Human Handoff Message */}
+              {form.watch("humanHandoffEnabled") && (
+                <FormField
+                  control={form.control}
+                  name="humanHandoffMessage"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Mensagem quando humano entrar</FormLabel>
+                      <FormControl>
+                        <Textarea
+                          placeholder="Mensagem exibida quando um agente humano entrar na conversa"
+                          rows={3}
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              )}
+
+              {/* Trigger Words */}
+              <div className="space-y-3">
+                <div className="flex items-center space-x-3 p-4 border rounded-lg hover:bg-gray-50">
+                  <Checkbox
+                    checked={triggerWords.length > 0}
+                    onCheckedChange={(checked) => {
+                      if (!checked) {
+                        setTriggerWords([]);
+                        form.setValue('triggerWords', []);
+                      }
+                    }}
+                  />
+                  <div>
+                    <Label className="text-sm font-medium">Palavras-chave para Gatilhos</Label>
+                    <p className="text-xs text-gray-500">
+                      Define palavras que ativam ações específicas (máximo 5 palavras)
+                    </p>
+                  </div>
+                </div>
+
+                {triggerWords.length > 0 && (
+                  <div className="space-y-3 pl-4">
+                    {/* Input for adding new words */}
+                    <div className="flex gap-2">
+                      <Input
+                        placeholder="Digite uma palavra-chave"
+                        value={currentWord}
+                        onChange={(e) => setCurrentWord(e.target.value)}
+                        onKeyPress={(e) => {
+                          if (e.key === 'Enter') {
+                            e.preventDefault();
+                            addTriggerWord();
+                          }
+                        }}
+                        disabled={triggerWords.length >= 5}
+                      />
+                      <Button
+                        type="button"
+                        variant="outline"
+                        onClick={addTriggerWord}
+                        disabled={!currentWord.trim() || triggerWords.length >= 5}
+                        size="sm"
+                      >
+                        Adicionar
+                      </Button>
+                    </div>
+
+                    {/* Display current trigger words */}
+                    {triggerWords.length > 0 && (
+                      <div className="flex flex-wrap gap-2">
+                        {triggerWords.map((word, index) => (
+                          <div
+                            key={index}
+                            className="flex items-center gap-1 bg-primary/10 text-primary px-3 py-1 rounded-full text-sm"
+                          >
+                            <span>{word}</span>
+                            <button
+                              type="button"
+                              onClick={() => removeTriggerWord(word)}
+                              className="text-primary hover:text-primary/70 ml-1"
+                            >
+                              <X className="h-3 w-3" />
+                            </button>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+
+                    <p className="text-xs text-muted-foreground">
+                      {triggerWords.length}/5 palavras-chave definidas
+                    </p>
+                  </div>
+                )}
               </div>
             </div>
 

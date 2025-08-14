@@ -24,7 +24,18 @@ export default function Sidebar() {
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
         </svg>
       ), 
-      badge: '3' 
+      badge: '3',
+      submenu: [
+        { 
+          name: 'Bots de IA', 
+          href: '/ia', 
+          icon: (
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+            </svg>
+          ) 
+        }
+      ]
     },
     { 
       name: 'Ferramentas', 
@@ -34,7 +45,18 @@ export default function Sidebar() {
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
         </svg>
-      )
+      ),
+      submenu: [
+        { 
+          name: 'Upload de Documentos', 
+          href: '/ferramentas', 
+          icon: (
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+            </svg>
+          ) 
+        }
+      ]
     },
     { 
       name: 'Conversas', 
@@ -137,21 +159,41 @@ export default function Sidebar() {
         {/* Navigation */}
         <nav className="flex-1 px-4 py-4 space-y-1">
           {navigation.map((item) => (
-            <Link key={item.name} href={item.href}>
-              <div className={`${
-                isActive(item.href)
-                  ? 'bg-primary-light text-primary-dark'
-                  : 'text-gray-600 hover:bg-gray-100'
-              } group flex items-center px-3 py-2 text-sm font-medium rounded-lg cursor-pointer transition-colors`}>
-                <div className="mr-3">{item.icon}</div>
-                {item.name}
-                {item.badge && (
-                  <span className="ml-auto bg-gradient-to-r from-green-500 to-purple-500 text-white text-xs rounded-full px-2 py-1">
-                    {item.badge}
-                  </span>
-                )}
-              </div>
-            </Link>
+            <div key={item.name}>
+              <Link href={item.href}>
+                <div className={`${
+                  isActive(item.href) || (item.submenu && item.submenu.some(sub => isActive(sub.href)))
+                    ? 'bg-primary-light text-primary-dark'
+                    : 'text-gray-600 hover:bg-gray-100'
+                } group flex items-center px-3 py-2 text-sm font-medium rounded-lg cursor-pointer transition-colors`}>
+                  <div className="mr-3">{item.icon}</div>
+                  {item.name}
+                  {item.badge && (
+                    <span className="ml-auto bg-gradient-to-r from-green-500 to-purple-500 text-white text-xs rounded-full px-2 py-1">
+                      {item.badge}
+                    </span>
+                  )}
+                </div>
+              </Link>
+              
+              {/* Submenu */}
+              {item.submenu && (isActive(item.href) || item.submenu.some(sub => isActive(sub.href))) && (
+                <div className="ml-6 mt-2 space-y-1">
+                  {item.submenu.map((subItem) => (
+                    <Link key={subItem.name} href={subItem.href}>
+                      <div className={`${
+                        isActive(subItem.href)
+                          ? 'bg-primary/10 text-primary border-l-2 border-primary'
+                          : 'text-gray-500 hover:bg-gray-50 hover:text-gray-700 border-l-2 border-gray-200'
+                      } flex items-center px-3 py-2 text-xs font-medium rounded-md transition-colors`}>
+                        <div className="mr-2">{subItem.icon}</div>
+                        {subItem.name}
+                      </div>
+                    </Link>
+                  ))}
+                </div>
+              )}
+            </div>
           ))}
           
           {/* Divider */}

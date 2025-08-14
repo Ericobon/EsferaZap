@@ -58,6 +58,10 @@ export const bots = pgTable("bots", {
   supportsText: boolean("supports_text").default(true),
   supportsAudio: boolean("supports_audio").default(false),
   supportsImages: boolean("supports_images").default(false),
+  // Trigger settings
+  humanHandoffEnabled: boolean("human_handoff_enabled").default(false),
+  humanHandoffMessage: text("human_handoff_message").default("Um agente humano entrará na conversa em breve."),
+  triggerWords: text("trigger_words").array().default([]), // Array of trigger words
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });
@@ -113,6 +117,9 @@ export const insertBotSchema = createInsertSchema(bots).omit({
   supportsText: z.boolean().default(true),
   supportsAudio: z.boolean().default(false),
   supportsImages: z.boolean().default(false),
+  humanHandoffEnabled: z.boolean().default(false),
+  humanHandoffMessage: z.string().default("Um agente humano entrará na conversa em breve."),
+  triggerWords: z.array(z.string()).default([]),
 });
 
 export const insertConversationSchema = createInsertSchema(conversations).omit({
