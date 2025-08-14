@@ -7,6 +7,8 @@ import { useAuth } from "@/hooks/useAuth";
 import Landing from "@/pages/landing";
 import Dashboard from "@/pages/dashboard";
 import Bots from "@/pages/bots";
+import IA from "@/pages/ia";
+import Ferramentas from "@/pages/ferramentas";
 import Conversations from "@/pages/conversations";
 import Analytics from "@/pages/analytics";
 import Contacts from "@/pages/contacts";
@@ -23,6 +25,8 @@ function Router() {
         <>
           <Route path="/" component={Dashboard} />
           <Route path="/bots" component={Bots} />
+          <Route path="/ia" component={IA} />
+          <Route path="/ferramentas" component={Ferramentas} />
           <Route path="/conversations" component={Conversations} />
           <Route path="/contacts" component={Contacts} />
           <Route path="/analytics" component={Analytics} />
