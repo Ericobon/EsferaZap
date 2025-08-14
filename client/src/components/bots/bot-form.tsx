@@ -32,6 +32,7 @@ export default function BotForm({ bot, onClose }: BotFormProps) {
   const { toast } = useToast();
   const [triggerWords, setTriggerWords] = useState<string[]>(bot?.triggerWords || []);
   const [currentWord, setCurrentWord] = useState("");
+  const [showTriggerWords, setShowTriggerWords] = useState(bot?.triggerWords?.length > 0 || false);
 
   const form = useForm({
     resolver: zodResolver(formSchema),
@@ -427,8 +428,9 @@ export default function BotForm({ bot, onClose }: BotFormProps) {
               <div className="space-y-3">
                 <div className="flex items-center space-x-3 p-4 border rounded-lg hover:bg-gray-50">
                   <Checkbox
-                    checked={triggerWords.length > 0}
+                    checked={showTriggerWords}
                     onCheckedChange={(checked) => {
+                      setShowTriggerWords(!!checked);
                       if (!checked) {
                         setTriggerWords([]);
                         form.setValue('triggerWords', []);
@@ -443,7 +445,7 @@ export default function BotForm({ bot, onClose }: BotFormProps) {
                   </div>
                 </div>
 
-                {triggerWords.length > 0 && (
+                {showTriggerWords && (
                   <div className="space-y-3 pl-4">
                     {/* Input for adding new words */}
                     <div className="flex gap-2">
