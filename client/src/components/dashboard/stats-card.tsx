@@ -46,7 +46,7 @@ export default function StatsCard({
       <div className="flex items-center justify-between">
         <div>
           <p className="text-sm font-medium text-gray-600">{title}</p>
-          <p className="text-3xl font-bold text-gray-900">{value}</p>
+          <p className="text-3xl font-bold gradient-whatsapp">{value}</p>
         </div>
         <div className={`w-12 h-12 ${iconBg} rounded-lg flex items-center justify-center`}>
           <i className={`${icon} ${iconColor} text-xl`}></i>

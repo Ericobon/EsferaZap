@@ -54,9 +54,9 @@ export default function ConversationList() {
     <div className="bg-white rounded-xl shadow-sm border border-gray-100">
       <div className="p-6 border-b border-gray-200">
         <div className="flex items-center justify-between">
-          <h2 className="text-lg font-semibold text-gray-900">Conversas Recentes</h2>
+          <h2 className="text-lg font-semibold gradient-whatsapp">Conversas Recentes</h2>
           <Link href="/conversations">
-            <a className="text-primary hover:text-primary-dark text-sm">Ver todas</a>
+            <span className="text-primary hover:text-primary-dark text-sm cursor-pointer">Ver todas</span>
           </Link>
         </div>
       </div>

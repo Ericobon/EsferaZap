@@ -72,7 +72,7 @@ export default function BotList({ bots, loading }: BotListProps) {
     return (
       <div className="bg-white rounded-xl shadow-sm border border-gray-100">
         <div className="p-6 border-b border-gray-200">
-          <h2 className="text-lg font-semibold text-gray-900">Meus Bots WhatsApp</h2>
+          <h2 className="text-lg font-semibold gradient-whatsapp">Meus Bots WhatsApp</h2>
         </div>
         <div className="p-6">
           <div className="space-y-4">
@@ -101,11 +101,11 @@ export default function BotList({ bots, loading }: BotListProps) {
     <div className="bg-white rounded-xl shadow-sm border border-gray-100">
       <div className="p-6 border-b border-gray-200">
         <div className="flex items-center justify-between">
-          <h2 className="text-lg font-semibold text-gray-900">Meus Bots WhatsApp</h2>
+          <h2 className="text-lg font-semibold gradient-whatsapp">Meus Bots WhatsApp</h2>
           <Link href="/bots">
-            <a className="text-primary hover:text-primary-dark">
+            <span className="text-primary hover:text-primary-dark cursor-pointer">
               <i className="fas fa-plus mr-1"></i>Adicionar Bot
-            </a>
+            </span>
           </Link>
         </div>
       </div>
