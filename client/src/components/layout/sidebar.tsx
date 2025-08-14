@@ -151,7 +151,7 @@ export default function Sidebar() {
               <div className="text-xl font-bold gradient-whatsapp text-glow">
                 EsferaZap
               </div>
-              <div className="text-xs text-gray-500 font-medium">by InsightEsfera</div>
+              <div className="text-xs text-gray-500 font-medium">by <span className="text-blue-800 font-semibold">InsightEsfera</span></div>
             </div>
           </div>
         </div>
