@@ -29,7 +29,7 @@ export default function Dashboard() {
     }
   }, [isAuthenticated, isLoading, toast]);
 
-  const { data: stats = {}, isLoading: statsLoading } = useQuery<any>({
+  const { data: stats, isLoading: statsLoading } = useQuery<any>({
     queryKey: ["/api/analytics/dashboard"],
     enabled: isAuthenticated,
   });
