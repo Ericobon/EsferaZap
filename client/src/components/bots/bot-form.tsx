@@ -53,12 +53,35 @@ export default function BotForm({ bot, onClose }: BotFormProps) {
     },
   });
 
-  const addTriggerWord = () => {
-    if (currentWord.trim() && triggerWords.length < 5 && !triggerWords.includes(currentWord.trim())) {
-      const newWords = [...triggerWords, currentWord.trim()];
+  const addTriggerWord = (word?: string) => {
+    const wordToAdd = word || currentWord.trim();
+    if (wordToAdd && triggerWords.length < 5 && !triggerWords.includes(wordToAdd)) {
+      const newWords = [...triggerWords, wordToAdd];
       setTriggerWords(newWords);
       form.setValue('triggerWords', newWords);
       setCurrentWord("");
+    }
+  };
+
+  const handleWordInput = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    
+    // Se o usuário digitou espaço, adiciona a palavra atual
+    if (value.endsWith(' ') && value.trim()) {
+      const word = value.trim();
+      addTriggerWord(word);
+      return;
+    }
+    
+    setCurrentWord(value);
+  };
+
+  const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      if (currentWord.trim()) {
+        addTriggerWord();
+      }
     }
   };
 
@@ -448,28 +471,28 @@ export default function BotForm({ bot, onClose }: BotFormProps) {
                 {showTriggerWords && (
                   <div className="space-y-3 pl-4">
                     {/* Input for adding new words */}
-                    <div className="flex gap-2">
+                    <div className="space-y-3">
                       <Input
-                        placeholder="Digite uma palavra-chave"
+                        placeholder="Digite palavras separadas por espaço ou Enter"
                         value={currentWord}
-                        onChange={(e) => setCurrentWord(e.target.value)}
-                        onKeyPress={(e) => {
-                          if (e.key === 'Enter') {
-                            e.preventDefault();
-                            addTriggerWord();
-                          }
-                        }}
+                        onChange={handleWordInput}
+                        onKeyPress={handleKeyPress}
                         disabled={triggerWords.length >= 5}
+                        className="w-full"
                       />
-                      <Button
-                        type="button"
-                        variant="outline"
-                        onClick={addTriggerWord}
-                        disabled={!currentWord.trim() || triggerWords.length >= 5}
-                        size="sm"
-                      >
-                        Adicionar
-                      </Button>
+                      
+                      {currentWord.trim() && (
+                        <Button
+                          type="button"
+                          variant="outline"
+                          onClick={() => addTriggerWord()}
+                          disabled={triggerWords.length >= 5}
+                          size="sm"
+                          className="w-full"
+                        >
+                          Adicionar "{currentWord.trim()}"
+                        </Button>
+                      )}
                     </div>
 
                     {/* Display current trigger words */}
