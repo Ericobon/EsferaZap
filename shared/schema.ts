@@ -34,6 +34,13 @@ export const users = pgTable("users", {
   firstName: varchar("first_name"),
   lastName: varchar("last_name"),
   profileImageUrl: varchar("profile_image_url"),
+  // Additional registration fields
+  fullName: varchar("full_name"),
+  phone: varchar("phone"),
+  company: varchar("company"),
+  sector: varchar("sector"), // setor de atuação
+  registrationMethod: varchar("registration_method").default('replit'), // 'replit', 'google', 'phone'
+  isProfileComplete: boolean("is_profile_complete").default(false),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });

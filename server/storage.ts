@@ -28,7 +28,9 @@ import { eq, desc, and, gte, lte, sql } from "drizzle-orm";
 export interface IStorage {
   // User operations (IMPORTANT: mandatory for Replit Auth)
   getUser(id: string): Promise<User | undefined>;
+  getUserByEmail(email: string): Promise<User | undefined>;
   upsertUser(user: UpsertUser): Promise<User>;
+  createUserWithExtendedInfo(userData: any): Promise<User>;
   
   // Bot operations
   getUserBots(userId: string): Promise<Bot[]>;
@@ -79,6 +81,11 @@ export class DatabaseStorage implements IStorage {
     return user;
   }
 
+  async getUserByEmail(email: string): Promise<User | undefined> {
+    const [user] = await db.select().from(users).where(eq(users.email, email));
+    return user;
+  }
+
   async upsertUser(userData: UpsertUser): Promise<User> {
     const [user] = await db
       .insert(users)
@@ -89,6 +96,18 @@ export class DatabaseStorage implements IStorage {
           ...userData,
           updatedAt: new Date(),
         },
+      })
+      .returning();
+    return user;
+  }
+
+  async createUserWithExtendedInfo(userData: any): Promise<User> {
+    const [user] = await db
+      .insert(users)
+      .values({
+        ...userData,
+        createdAt: new Date(),
+        updatedAt: new Date(),
       })
       .returning();
     return user;
@@ -109,7 +128,7 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getBotByPhoneNumberId(phoneNumberId: string): Promise<Bot | undefined> {
-    const [bot] = await db.select().from(bots).where(eq(bots.phoneNumberId, phoneNumberId));
+    const [bot] = await db.select().from(bots).where(eq(bots.phoneNumber, phoneNumberId));
     return bot;
   }
 

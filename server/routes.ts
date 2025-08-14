@@ -26,6 +26,47 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Registration endpoint for custom form
+  app.post('/api/auth/register', async (req, res) => {
+    try {
+      const { fullName, email, phone, company, sector, password } = req.body;
+      
+      // Basic validation
+      if (!fullName || !email || !phone || !company || !sector || !password) {
+        return res.status(400).json({ message: "Todos os campos são obrigatórios" });
+      }
+
+      // Check if user already exists
+      const existingUser = await storage.getUserByEmail(email);
+      if (existingUser) {
+        return res.status(409).json({ message: "Email já cadastrado" });
+      }
+
+      // Create user with extended info
+      const userData = {
+        email,
+        fullName,
+        phone,
+        company,
+        sector,
+        registrationMethod: 'form',
+        isProfileComplete: true,
+        firstName: fullName.split(' ')[0],
+        lastName: fullName.split(' ').slice(1).join(' '),
+      };
+
+      const user = await storage.createUserWithExtendedInfo(userData);
+      
+      res.status(201).json({ 
+        message: "Usuário cadastrado com sucesso",
+        user: { id: user.id, email: user.email, fullName: user.fullName }
+      });
+    } catch (error) {
+      console.error("Error creating user:", error);
+      res.status(500).json({ message: "Erro interno do servidor" });
+    }
+  });
+
   // Bot management routes
   app.get('/api/bots', isAuthenticated, async (req: any, res) => {
     try {

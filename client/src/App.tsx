@@ -12,6 +12,7 @@ import Ferramentas from "@/pages/ferramentas";
 import Conversations from "@/pages/conversations";
 import Analytics from "@/pages/analytics";
 import Contacts from "@/pages/contacts";
+import RegisterPage from "@/pages/register";
 import NotFound from "@/pages/not-found";
 
 function Router() {
@@ -20,7 +21,10 @@ function Router() {
   return (
     <Switch>
       {isLoading || !isAuthenticated ? (
-        <Route path="/" component={Landing} />
+        <>
+          <Route path="/" component={Landing} />
+          <Route path="/register" component={RegisterPage} />
+        </>
       ) : (
         <>
           <Route path="/" component={Dashboard} />

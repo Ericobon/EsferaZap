@@ -120,13 +120,23 @@ export default function Landing() {
               <p className="text-xl mb-8 opacity-90">
                 Comece agora e transforme seu atendimento com IA
               </p>
-              <Button 
-                size="lg"
-                onClick={() => window.location.href = '/api/login'}
-                className="bg-white text-primary hover:bg-gray-100 text-lg px-8 py-4"
-              >
-                Começar Gratuitamente
-              </Button>
+              <div className="space-x-4">
+                <Button 
+                  size="lg"
+                  onClick={() => window.location.href = '/register'}
+                  className="bg-white text-primary hover:bg-gray-100 text-lg px-8 py-4"
+                >
+                  Começar Gratuitamente
+                </Button>
+                <Button 
+                  size="lg"
+                  onClick={() => window.location.href = '/api/login'}
+                  variant="outline"
+                  className="border-white text-white hover:bg-white hover:text-primary text-lg px-8 py-4"
+                >
+                  Fazer Login
+                </Button>
+              </div>
             </CardContent>
           </Card>
         </div>
