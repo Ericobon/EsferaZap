@@ -92,22 +92,13 @@ export default function Sidebar() {
         {/* Logo Section */}
         <div className="flex items-center flex-shrink-0 px-6 py-4 border-b border-gray-200">
           <div className="flex items-center space-x-3">
-            {/* Professional clean icon with gradient colors */}
-            <div className="relative w-12 h-12 bg-gradient-to-br from-green-500 to-purple-500 rounded-xl flex items-center justify-center shadow-lg border border-white/10">
-              <svg 
-                className="w-6 h-6 text-white" 
-                viewBox="0 0 24 24" 
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              >
-                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
-                <circle cx="9" cy="10" r="1"/>
-                <circle cx="15" cy="10" r="1"/>
-                <path d="M9 14c0-1 1-2 3-2s3 1 3 2"/>
-              </svg>
+            {/* InsightEsfera Logo with Network Sphere */}
+            <div className="relative w-12 h-12 rounded-xl flex items-center justify-center shadow-lg overflow-hidden">
+              <img 
+                src="/attached_assets/logo_identidade_original_marca_1755167560598.png" 
+                alt="InsightEsfera Logo" 
+                className="w-full h-full object-contain"
+              />
               {/* Connection indicator */}
               <div className="absolute -top-1 -right-1 w-3 h-3 bg-gradient-to-r from-green-400 to-purple-400 rounded-full animate-pulse border border-white shadow-sm">
               </div>
