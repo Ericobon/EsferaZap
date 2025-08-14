@@ -14,7 +14,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
-import { MessageSquare, Mic, Image } from "lucide-react";
+import { MessageSquare, Mic, Image, QrCode } from "lucide-react";
 import { z } from "zod";
 
 const formSchema = insertBotSchema.extend({
@@ -35,12 +35,11 @@ export default function BotForm({ bot, onClose }: BotFormProps) {
     defaultValues: {
       name: bot?.name || "",
       phoneNumber: bot?.phoneNumber || "",
-      accessToken: bot?.accessToken || "",
       prompt: bot?.prompt || "",
-      geminiApiKey: bot?.geminiApiKey || "",
       maxTokens: bot?.maxTokens || 1000,
       temperature: bot?.temperature || "0.7",
       status: bot?.status || "inactive",
+      botType: bot?.botType || "business",
       supportsText: bot?.supportsText ?? true,
       supportsAudio: bot?.supportsAudio ?? false,
       supportsImages: bot?.supportsImages ?? false,
@@ -162,37 +161,56 @@ export default function BotForm({ bot, onClose }: BotFormProps) {
               />
             </div>
 
-            {/* API Configuration */}
+            {/* WhatsApp Connection */}
             <div className="space-y-4">
-              <h3 className="text-lg font-medium text-gray-900">Configuração de APIs</h3>
+              <h3 className="text-lg font-medium text-gray-900">Conexão WhatsApp</h3>
               
               <FormField
                 control={form.control}
-                name="accessToken"
+                name="botType"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>WhatsApp API Key</FormLabel>
-                    <FormControl>
-                      <Input type="password" placeholder="Sua chave da API do WhatsApp" {...field} />
-                    </FormControl>
+                    <FormLabel>Tipo de Conta</FormLabel>
+                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Selecione o tipo de conta" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="business">WhatsApp Business</SelectItem>
+                        <SelectItem value="personal">WhatsApp Pessoal</SelectItem>
+                      </SelectContent>
+                    </Select>
                     <FormMessage />
                   </FormItem>
                 )}
               />
 
-              <FormField
-                control={form.control}
-                name="geminiApiKey"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Gemini API Key (opcional)</FormLabel>
-                    <FormControl>
-                      <Input type="password" placeholder="Deixe vazio para usar a chave padrão" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+              <div className="flex items-center justify-center p-6 border-2 border-dashed border-gray-300 rounded-lg">
+                <div className="text-center">
+                  <QrCode className="mx-auto h-12 w-12 text-gray-400 mb-4" />
+                  <h4 className="text-lg font-medium text-gray-900 mb-2">QR Code para Conexão</h4>
+                  <p className="text-sm text-gray-500 mb-4">
+                    Clique no botão abaixo para gerar um QR Code e conectar seu WhatsApp
+                  </p>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    className="flex items-center space-x-2"
+                    onClick={() => {
+                      // TODO: Implementar geração de QR Code
+                      toast({
+                        title: "QR Code",
+                        description: "Funcionalidade de QR Code será implementada em breve.",
+                      });
+                    }}
+                  >
+                    <QrCode className="h-4 w-4" />
+                    <span>Gerar QR Code</span>
+                  </Button>
+                </div>
+              </div>
             </div>
 
             {/* AI Configuration */}

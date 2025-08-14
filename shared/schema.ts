@@ -48,16 +48,13 @@ export const bots = pgTable("bots", {
   userId: varchar("user_id").notNull().references(() => users.id),
   name: varchar("name").notNull(),
   phoneNumber: varchar("phone_number").notNull(),
-  phoneNumberId: varchar("phone_number_id"), // WhatsApp Business API phone number ID
-  accessToken: varchar("access_token"), // WhatsApp API access token
-  verifyToken: varchar("verify_token"), // Webhook verification token
-  webhookUrl: varchar("webhook_url"),
   status: botStatusEnum("status").default('inactive'),
   prompt: text("prompt"),
-  geminiApiKey: varchar("gemini_api_key"),
   maxTokens: integer("max_tokens").default(1000),
   temperature: varchar("temperature").default('0.7'),
-  // Bot capabilities
+  // Bot type and capabilities
+  botType: varchar("bot_type").default('business'), // 'business' or 'personal'
+  qrCode: text("qr_code"), // Generated QR code for WhatsApp connection
   supportsText: boolean("supports_text").default(true),
   supportsAudio: boolean("supports_audio").default(false),
   supportsImages: boolean("supports_images").default(false),
@@ -110,7 +107,9 @@ export const insertBotSchema = createInsertSchema(bots).omit({
   id: true,
   createdAt: true,
   updatedAt: true,
+  qrCode: true,
 }).extend({
+  botType: z.string().default('business'),
   supportsText: z.boolean().default(true),
   supportsAudio: z.boolean().default(false),
   supportsImages: z.boolean().default(false),

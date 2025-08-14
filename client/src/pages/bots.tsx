@@ -12,6 +12,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import type { Bot } from "@shared/schema";
+import { Settings, Trash2, Bot as BotIcon, Activity, QrCode } from "lucide-react";
 
 export default function Bots() {
   const { toast } = useToast();
@@ -178,26 +179,64 @@ export default function Bots() {
                     <CardContent>
                       <div className="space-y-3">
                         <div className="flex items-center text-sm text-gray-600">
-                          <i className="fas fa-clock mr-2 w-4"></i>
+                          <Activity className="h-4 w-4 mr-2" />
                           Criado em {new Date(bot.createdAt!).toLocaleDateString('pt-BR')}
                         </div>
                         
                         {bot.prompt && (
                           <div className="text-sm text-gray-600">
-                            <i className="fas fa-comment-dots mr-2 w-4"></i>
+                            <BotIcon className="h-4 w-4 mr-2" />
                             Prompt personalizado
                           </div>
                         )}
+
+                        {/* Bot capabilities */}
+                        <div className="flex items-center gap-2 text-xs">
+                          {bot.supportsText && (
+                            <Badge variant="secondary" className="text-blue-600 bg-blue-50">
+                              Texto
+                            </Badge>
+                          )}
+                          {bot.supportsAudio && (
+                            <Badge variant="secondary" className="text-green-600 bg-green-50">
+                              Áudio
+                            </Badge>
+                          )}
+                          {bot.supportsImages && (
+                            <Badge variant="secondary" className="text-purple-600 bg-purple-50">
+                              Imagens
+                            </Badge>
+                          )}
+                          <Badge variant="secondary" className="text-gray-600 bg-gray-50">
+                            {bot.botType === 'business' ? 'Business' : 'Pessoal'}
+                          </Badge>
+                        </div>
                         
-                        <div className="flex items-center gap-2 pt-4">
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            onClick={() => handleEdit(bot)}
-                          >
-                            <i className="fas fa-edit mr-1"></i>
-                            Editar
-                          </Button>
+                        <div className="flex items-center justify-between pt-4">
+                          <div className="flex items-center gap-2">
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={() => handleEdit(bot)}
+                            >
+                              <Settings className="h-3 w-3 mr-1" />
+                              Editar
+                            </Button>
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              className="text-blue-600 border-blue-200 hover:bg-blue-50"
+                              onClick={() => {
+                                toast({
+                                  title: "QR Code",
+                                  description: "QR Code para conectar WhatsApp será exibido aqui.",
+                                });
+                              }}
+                            >
+                              <QrCode className="h-3 w-3 mr-1" />
+                              QR Code
+                            </Button>
+                          </div>
                           <Button
                             size="sm"
                             variant="outline"
@@ -205,7 +244,7 @@ export default function Bots() {
                             onClick={() => handleDelete(bot.id)}
                             disabled={deleteBotMutation.isPending}
                           >
-                            <i className="fas fa-trash mr-1"></i>
+                            <Trash2 className="h-3 w-3 mr-1" />
                             Deletar
                           </Button>
                         </div>
