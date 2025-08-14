@@ -1,6 +1,22 @@
 # Overview
 
-EsferaZap is a WhatsApp Business automation platform that enables users to create AI-powered chatbots for WhatsApp conversations. The system provides a comprehensive dashboard for managing bots, monitoring conversations, and analyzing performance metrics. Users can configure chatbots with custom prompts, integrate with OpenAI's GPT models, and track analytics across multiple WhatsApp Business accounts.
+EsferaZap is a comprehensive WhatsApp Business automation platform that enables users to create AI-powered chatbots for WhatsApp conversations. The system provides a comprehensive dashboard for managing bots, monitoring conversations, and analyzing performance metrics. Users can configure chatbots with custom prompts, integrate with AI models (Google Gemini), and track analytics across multiple WhatsApp Business accounts.
+
+## Recent Updates (August 2025)
+
+**Google Calendar Integration Added**
+- Full Google Calendar OAuth integration for scheduling and availability management
+- Calendar connection interface in Settings page with real-time status
+- Automated business hours detection from calendar events
+- Support for appointment reminders and scheduled messages via WhatsApp
+- New calendar integration page with event management and connection controls
+- Enhanced user settings with calendar-specific configuration options
+
+**Enhanced User Interface**
+- Redesigned Settings page with comprehensive configuration sections
+- Calendar integration prominently featured in main navigation
+- Real-time status indicators for external service connections
+- Improved user experience for managing integrations and preferences
 
 # User Preferences
 

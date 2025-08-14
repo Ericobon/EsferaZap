@@ -6,7 +6,18 @@ import { Badge } from "@/components/ui/badge";
 import { Calendar, Clock, MapPin, FileText, CheckCircle2, AlertCircle } from "lucide-react";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
-import Layout from "@/components/layout/layout";
+import Sidebar from "@/components/layout/sidebar";
+
+function Layout({ children }: { children: React.ReactNode }) {
+  return (
+    <div className="h-screen flex overflow-hidden bg-gray-50">
+      <Sidebar />
+      <main className="flex-1 relative overflow-y-auto focus:outline-none">
+        {children}
+      </main>
+    </div>
+  );
+}
 
 interface CalendarEvent {
   id: string;
