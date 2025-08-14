@@ -287,6 +287,47 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Contacts routes
+  app.get('/api/contacts', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const userBots = await storage.getUserBots(userId);
+      
+      if (userBots.length === 0) {
+        return res.json([]);
+      }
+
+      // Get contacts for the first bot (can be enhanced later)
+      const contacts = await storage.getBotContacts(userBots[0].id);
+      res.json(contacts);
+    } catch (error) {
+      console.error("Error fetching contacts:", error);
+      res.status(500).json({ message: "Failed to fetch contacts" });
+    }
+  });
+
+  // Get detailed analytics
+  app.get('/api/analytics/detailed', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const userBots = await storage.getUserBots(userId);
+      
+      if (userBots.length === 0) {
+        return res.json({
+          metrics: [],
+          charts: []
+        });
+      }
+
+      // Get detailed analytics for the first bot
+      const analytics = await storage.getDetailedAnalytics(userBots[0].id);
+      res.json(analytics);
+    } catch (error) {
+      console.error("Error fetching detailed analytics:", error);
+      res.status(500).json({ message: "Failed to fetch analytics" });
+    }
+  });
+
   const httpServer = createServer(app);
 
   // WebSocket server for real-time updates

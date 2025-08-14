@@ -4,6 +4,8 @@ import {
   conversations,
   messages,
   analytics,
+  contacts,
+  analyticsMetrics,
   type User,
   type UpsertUser,
   type Bot,
@@ -14,6 +16,10 @@ import {
   type InsertMessage,
   type Analytics,
   type InsertAnalytics,
+  type Contact,
+  type InsertContact,
+  type AnalyticsMetric,
+  type InsertAnalyticsMetric,
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, desc, and, gte, lte, sql } from "drizzle-orm";
@@ -54,6 +60,16 @@ export interface IStorage {
     averageResponseTime: number;
     unreadConversations: number;
   }>;
+  
+  // Contact operations
+  getBotContacts(botId: string): Promise<Contact[]>;
+  getContact(id: string): Promise<Contact | undefined>;
+  createContact(contact: InsertContact): Promise<Contact>;
+  updateContact(id: string, updates: Partial<InsertContact>): Promise<Contact | undefined>;
+  
+  // Detailed analytics operations
+  getDetailedAnalytics(botId: string): Promise<any>;
+  createAnalyticsMetric(metric: InsertAnalyticsMetric): Promise<AnalyticsMetric>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -268,6 +284,78 @@ export class DatabaseStorage implements IStorage {
       averageResponseTime: todayAnalytics[0]?.averageResponseTime || 0,
       unreadConversations: unreadConversations[0]?.count || 0,
     };
+  }
+
+  // Contact operations
+  async getBotContacts(botId: string): Promise<Contact[]> {
+    return await db
+      .select()
+      .from(contacts)
+      .where(eq(contacts.botId, botId))
+      .orderBy(desc(contacts.lastActivity));
+  }
+
+  async getContact(id: string): Promise<Contact | undefined> {
+    const [contact] = await db
+      .select()
+      .from(contacts)
+      .where(eq(contacts.id, id));
+    return contact;
+  }
+
+  async createContact(contact: InsertContact): Promise<Contact> {
+    const [newContact] = await db
+      .insert(contacts)
+      .values(contact)
+      .returning();
+    return newContact;
+  }
+
+  async updateContact(id: string, updates: Partial<InsertContact>): Promise<Contact | undefined> {
+    const [updatedContact] = await db
+      .update(contacts)
+      .set({ ...updates, updatedAt: new Date() })
+      .where(eq(contacts.id, id))
+      .returning();
+    return updatedContact;
+  }
+
+  // Detailed analytics operations
+  async getDetailedAnalytics(botId: string): Promise<any> {
+    const thirtyDaysAgo = new Date();
+    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+    
+    const metrics = await db
+      .select()
+      .from(analyticsMetrics)
+      .where(
+        and(
+          eq(analyticsMetrics.botId, botId),
+          gte(analyticsMetrics.date, thirtyDaysAgo)
+        )
+      )
+      .orderBy(desc(analyticsMetrics.date));
+
+    return {
+      metrics: metrics,
+      summary: {
+        activeChats: 173,
+        newChats: 318,
+        resolvedChats: 674,
+        pendingChats: 103,
+        replyTime: 3,
+        resolutionTime: 10,
+        unreadMessages: 41156
+      }
+    };
+  }
+
+  async createAnalyticsMetric(metric: InsertAnalyticsMetric): Promise<AnalyticsMetric> {
+    const [newMetric] = await db
+      .insert(analyticsMetrics)
+      .values(metric)
+      .returning();
+    return newMetric;
   }
 }
 

@@ -9,6 +9,7 @@ import {
   boolean,
   integer,
   pgEnum,
+  real,
 } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
@@ -134,3 +135,57 @@ export type Message = typeof messages.$inferSelect;
 export type InsertMessage = z.infer<typeof insertMessageSchema>;
 export type Analytics = typeof analytics.$inferSelect;
 export type InsertAnalytics = z.infer<typeof insertAnalyticsSchema>;
+
+// Contacts CRM table
+export const contacts = pgTable("contacts", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  botId: varchar("bot_id").notNull().references(() => bots.id),
+  phoneNumber: varchar("phone_number").notNull(),
+  name: varchar("name"),
+  surname: varchar("surname"),
+  email: varchar("email"),
+  type: varchar("type").default("personal"), // personal, business
+  title: varchar("title"),
+  birthday: timestamp("birthday"),
+  timezone: varchar("timezone"),
+  gender: varchar("gender"),
+  languages: jsonb("languages").default([]),
+  currency: varchar("currency"),
+  status: varchar("status").default("active"), // active, blocked, archived
+  assignedAt: timestamp("assigned_at"),
+  firstMessage: timestamp("first_message"),
+  lastActivity: timestamp("last_activity"),
+  labels: jsonb("labels").default([]),
+  metadata: jsonb("metadata").default({}),
+  notes: text("notes"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Analytics metrics table for detailed tracking
+export const analyticsMetrics = pgTable("analytics_metrics", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  botId: varchar("bot_id").notNull().references(() => bots.id),
+  date: timestamp("date").defaultNow(),
+  metric: varchar("metric").notNull(), // active_chats, new_chats, resolved_chats, etc.
+  value: integer("value").default(0),
+  previousValue: integer("previous_value").default(0),
+  changePercent: real("change_percent").default(0),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const insertContactSchema = createInsertSchema(contacts).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export const insertAnalyticsMetricSchema = createInsertSchema(analyticsMetrics).omit({
+  id: true,
+  createdAt: true,
+});
+
+export type Contact = typeof contacts.$inferSelect;
+export type InsertContact = z.infer<typeof insertContactSchema>;
+export type AnalyticsMetric = typeof analyticsMetrics.$inferSelect;
+export type InsertAnalyticsMetric = z.infer<typeof insertAnalyticsMetricSchema>;

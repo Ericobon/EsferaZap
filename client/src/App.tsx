@@ -9,6 +9,7 @@ import Dashboard from "@/pages/dashboard";
 import Bots from "@/pages/bots";
 import Conversations from "@/pages/conversations";
 import Analytics from "@/pages/analytics";
+import Contacts from "@/pages/contacts";
 import NotFound from "@/pages/not-found";
 
 function Router() {
@@ -23,6 +24,7 @@ function Router() {
           <Route path="/" component={Dashboard} />
           <Route path="/bots" component={Bots} />
           <Route path="/conversations" component={Conversations} />
+          <Route path="/contacts" component={Contacts} />
           <Route path="/analytics" component={Analytics} />
         </>
       )}
