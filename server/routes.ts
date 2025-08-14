@@ -244,6 +244,49 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Conversation routes
+  app.get('/api/conversations', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const userBots = await storage.getUserBots(userId);
+      
+      if (userBots.length === 0) {
+        return res.json([]);
+      }
+
+      // Get conversations for the first bot (can be enhanced later)
+      const conversations = await storage.getBotConversations(userBots[0].id);
+      res.json(conversations);
+    } catch (error) {
+      console.error("Error fetching conversations:", error);
+      res.status(500).json({ message: "Failed to fetch conversations" });
+    }
+  });
+
+  // Get conversation messages
+  app.get('/api/conversations/:conversationId/messages', isAuthenticated, async (req, res) => {
+    try {
+      const { conversationId } = req.params;
+      const messages = await storage.getConversationMessages(conversationId);
+      res.json(messages);
+    } catch (error) {
+      console.error("Error fetching messages:", error);
+      res.status(500).json({ message: "Failed to fetch messages" });
+    }
+  });
+
+  // Send message
+  app.post('/api/messages', isAuthenticated, async (req, res) => {
+    try {
+      const messageData = req.body;
+      const message = await storage.createMessage(messageData);
+      res.status(201).json(message);
+    } catch (error) {
+      console.error("Error creating message:", error);
+      res.status(500).json({ message: "Failed to create message" });
+    }
+  });
+
   const httpServer = createServer(app);
 
   // WebSocket server for real-time updates

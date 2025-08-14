@@ -31,6 +31,7 @@ export interface IStorage {
   createBot(bot: InsertBot): Promise<Bot>;
   updateBot(id: string, updates: Partial<InsertBot>): Promise<Bot | undefined>;
   deleteBot(id: string): Promise<boolean>;
+  getBotConversations(botId: string, limit?: number): Promise<Conversation[]>;
   
   // Conversation operations
   getBotConversations(botId: string, limit?: number): Promise<Conversation[]>;
