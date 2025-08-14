@@ -14,7 +14,7 @@ export default function Header({ title, action }: HeaderProps) {
             <button className="md:hidden text-gray-600">
               <i className="fas fa-bars text-xl"></i>
             </button>
-            <h1 className="text-2xl font-semibold text-gray-900">{title}</h1>
+            <h1 className="text-2xl font-bold gradient-whatsapp text-glow">{title}</h1>
           </div>
           <div className="flex items-center space-x-4">
             <div className="relative">
