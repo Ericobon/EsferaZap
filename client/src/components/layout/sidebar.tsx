@@ -92,111 +92,13 @@ export default function Sidebar() {
         {/* Logo Section */}
         <div className="flex items-center flex-shrink-0 px-6 py-4 border-b border-gray-200">
           <div className="flex items-center space-x-3">
-            {/* Network Sphere Logo */}
-            <div className="relative w-12 h-12 rounded-xl flex items-center justify-center shadow-lg bg-gradient-to-br from-blue-500 to-purple-600">
-              <svg 
-                className="w-10 h-10" 
-                viewBox="0 0 60 60" 
-                fill="none"
-              >
-                {/* Main sphere structure with connected nodes */}
-                {/* Large central nodes */}
-                <circle cx="30" cy="25" r="4" fill="url(#gradient1)" />
-                <circle cx="20" cy="35" r="3.5" fill="url(#gradient2)" />
-                <circle cx="40" cy="35" r="3.5" fill="url(#gradient3)" />
-                
-                {/* Medium nodes */}
-                <circle cx="15" cy="20" r="2.5" fill="url(#gradient4)" />
-                <circle cx="45" cy="20" r="2.5" fill="url(#gradient5)" />
-                <circle cx="25" cy="45" r="2.5" fill="url(#gradient6)" />
-                <circle cx="35" cy="45" r="2.5" fill="url(#gradient7)" />
-                
-                {/* Small peripheral nodes */}
-                <circle cx="10" cy="30" r="2" fill="url(#gradient8)" />
-                <circle cx="50" cy="30" r="2" fill="url(#gradient9)" />
-                <circle cx="30" cy="10" r="2" fill="url(#gradient10)" />
-                <circle cx="30" cy="50" r="2" fill="url(#gradient11)" />
-                <circle cx="42" cy="15" r="1.5" fill="url(#gradient12)" />
-                <circle cx="18" cy="15" r="1.5" fill="url(#gradient13)" />
-                
-                {/* Connection lines */}
-                <line x1="30" y1="25" x2="20" y2="35" stroke="url(#lineGradient)" strokeWidth="1.5" opacity="0.8" />
-                <line x1="30" y1="25" x2="40" y2="35" stroke="url(#lineGradient)" strokeWidth="1.5" opacity="0.8" />
-                <line x1="30" y1="25" x2="15" y2="20" stroke="url(#lineGradient)" strokeWidth="1" opacity="0.6" />
-                <line x1="30" y1="25" x2="45" y2="20" stroke="url(#lineGradient)" strokeWidth="1" opacity="0.6" />
-                <line x1="20" y1="35" x2="25" y2="45" stroke="url(#lineGradient)" strokeWidth="1" opacity="0.6" />
-                <line x1="40" y1="35" x2="35" y2="45" stroke="url(#lineGradient)" strokeWidth="1" opacity="0.6" />
-                <line x1="15" y1="20" x2="10" y2="30" stroke="url(#lineGradient)" strokeWidth="0.8" opacity="0.5" />
-                <line x1="45" y1="20" x2="50" y2="30" stroke="url(#lineGradient)" strokeWidth="0.8" opacity="0.5" />
-                <line x1="30" y1="25" x2="30" y2="10" stroke="url(#lineGradient)" strokeWidth="0.8" opacity="0.5" />
-                <line x1="25" y1="45" x2="30" y2="50" stroke="url(#lineGradient)" strokeWidth="0.8" opacity="0.5" />
-                <line x1="35" y1="45" x2="30" y2="50" stroke="url(#lineGradient)" strokeWidth="0.8" opacity="0.5" />
-                <line x1="45" y1="20" x2="42" y2="15" stroke="url(#lineGradient)" strokeWidth="0.5" opacity="0.4" />
-                <line x1="15" y1="20" x2="18" y2="15" stroke="url(#lineGradient)" strokeWidth="0.5" opacity="0.4" />
-                
-                {/* Gradients for nodes */}
-                <defs>
-                  <radialGradient id="gradient1" cx="0.3" cy="0.3">
-                    <stop offset="0%" stopColor="#60A5FA" />
-                    <stop offset="100%" stopColor="#3B82F6" />
-                  </radialGradient>
-                  <radialGradient id="gradient2" cx="0.3" cy="0.3">
-                    <stop offset="0%" stopColor="#A78BFA" />
-                    <stop offset="100%" stopColor="#8B5CF6" />
-                  </radialGradient>
-                  <radialGradient id="gradient3" cx="0.3" cy="0.3">
-                    <stop offset="0%" stopColor="#34D399" />
-                    <stop offset="100%" stopColor="#10B981" />
-                  </radialGradient>
-                  <radialGradient id="gradient4" cx="0.3" cy="0.3">
-                    <stop offset="0%" stopColor="#818CF8" />
-                    <stop offset="100%" stopColor="#6366F1" />
-                  </radialGradient>
-                  <radialGradient id="gradient5" cx="0.3" cy="0.3">
-                    <stop offset="0%" stopColor="#F472B6" />
-                    <stop offset="100%" stopColor="#EC4899" />
-                  </radialGradient>
-                  <radialGradient id="gradient6" cx="0.3" cy="0.3">
-                    <stop offset="0%" stopColor="#06B6D4" />
-                    <stop offset="100%" stopColor="#0891B2" />
-                  </radialGradient>
-                  <radialGradient id="gradient7" cx="0.3" cy="0.3">
-                    <stop offset="0%" stopColor="#8B5CF6" />
-                    <stop offset="100%" stopColor="#7C3AED" />
-                  </radialGradient>
-                  <radialGradient id="gradient8" cx="0.3" cy="0.3">
-                    <stop offset="0%" stopColor="#3B82F6" />
-                    <stop offset="100%" stopColor="#1D4ED8" />
-                  </radialGradient>
-                  <radialGradient id="gradient9" cx="0.3" cy="0.3">
-                    <stop offset="0%" stopColor="#10B981" />
-                    <stop offset="100%" stopColor="#059669" />
-                  </radialGradient>
-                  <radialGradient id="gradient10" cx="0.3" cy="0.3">
-                    <stop offset="0%" stopColor="#A855F7" />
-                    <stop offset="100%" stopColor="#9333EA" />
-                  </radialGradient>
-                  <radialGradient id="gradient11" cx="0.3" cy="0.3">
-                    <stop offset="0%" stopColor="#6366F1" />
-                    <stop offset="100%" stopColor="#4F46E5" />
-                  </radialGradient>
-                  <radialGradient id="gradient12" cx="0.3" cy="0.3">
-                    <stop offset="0%" stopColor="#EC4899" />
-                    <stop offset="100%" stopColor="#DB2777" />
-                  </radialGradient>
-                  <radialGradient id="gradient13" cx="0.3" cy="0.3">
-                    <stop offset="0%" stopColor="#0891B2" />
-                    <stop offset="100%" stopColor="#0E7490" />
-                  </radialGradient>
-                  
-                  {/* Gradient for connection lines */}
-                  <linearGradient id="lineGradient">
-                    <stop offset="0%" stopColor="#FFFFFF" stopOpacity="0.8" />
-                    <stop offset="50%" stopColor="#E0E7FF" stopOpacity="0.6" />
-                    <stop offset="100%" stopColor="#FFFFFF" stopOpacity="0.4" />
-                  </linearGradient>
-                </defs>
-              </svg>
+            {/* 3D Network Sphere Logo */}
+            <div className="relative w-12 h-12 rounded-xl flex items-center justify-center shadow-lg overflow-hidden bg-white">
+              <img 
+                src="/attached_assets/Gemini_Generated_Image_hqjd32hqjd32hqjd_1755168856618.png" 
+                alt="3D Network Sphere" 
+                className="w-10 h-10 object-contain"
+              />
               {/* Connection indicator */}
               <div className="absolute -top-1 -right-1 w-3 h-3 bg-gradient-to-r from-green-400 to-purple-400 rounded-full animate-pulse border border-white shadow-sm">
               </div>
