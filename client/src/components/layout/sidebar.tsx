@@ -95,7 +95,7 @@ export default function Sidebar() {
             {/* 3D Network Sphere Logo */}
             <div className="relative w-12 h-12 rounded-xl flex items-center justify-center shadow-lg overflow-hidden bg-white">
               <img 
-                src="/attached_assets/Gemini_Generated_Image_hqjd32hqjd32hqjd_1755168856618.png" 
+                src="/attached_assets/Gemini_Generated_Image_hqjd32hqjd32hqjd_1755169321972.png" 
                 alt="3D Network Sphere" 
                 className="w-10 h-10 object-contain"
               />
