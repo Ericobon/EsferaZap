@@ -3,8 +3,10 @@ import { createServer, type Server } from "http";
 import { WebSocketServer, WebSocket } from "ws";
 import { storage } from "./storage";
 import { setupAuth, isAuthenticated } from "./replitAuth";
-import { whatsappService } from "./services/whatsapp";
-import { generateWhatsAppResponse, analyzeSentiment } from "./services/gemini";
+import { WhatsAppService } from "./services/whatsapp.js";
+import { webhookManager } from "./services/webhookManager.js";
+import { mediaHandler, upload } from "./services/mediaHandler.js";
+import { processWithGemini, analyzeSentiment } from "./services/gemini.js";
 import { insertBotSchema, insertConversationSchema, insertMessageSchema } from "@shared/schema";
 import { z } from "zod";
 
@@ -42,12 +44,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const botData = insertBotSchema.parse({ ...req.body, userId });
       const bot = await storage.createBot(botData);
       
-      // Set up WhatsApp webhook for this bot
-      if (bot.apiKey && bot.phoneNumber) {
-        await whatsappService.setupWebhook(bot.id, bot.apiKey);
-      }
-      
-      res.json(bot);
+      // Bot created successfully
+      res.status(201).json(bot);
     } catch (error) {
       console.error("Error creating bot:", error);
       res.status(500).json({ message: "Failed to create bot" });

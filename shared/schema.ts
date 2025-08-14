@@ -38,15 +38,18 @@ export const users = pgTable("users", {
 });
 
 export const botStatusEnum = pgEnum('bot_status', ['active', 'inactive', 'configuring']);
-export const messageStatusEnum = pgEnum('message_status', ['pending', 'sent', 'delivered', 'read', 'failed']);
-export const messageTypeEnum = pgEnum('message_type', ['text', 'image', 'audio', 'document']);
+export const messageStatusEnum = pgEnum('message_status', ['pending', 'sent', 'delivered', 'read', 'failed', 'received']);
+export const messageTypeEnum = pgEnum('message_type', ['text', 'image', 'audio', 'document', 'video']);
+export const messageDirectionEnum = pgEnum('message_direction', ['inbound', 'outbound']);
 
 export const bots = pgTable("bots", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   userId: varchar("user_id").notNull().references(() => users.id),
   name: varchar("name").notNull(),
   phoneNumber: varchar("phone_number").notNull(),
-  apiKey: varchar("api_key"), // WhatsApp API key
+  phoneNumberId: varchar("phone_number_id"), // WhatsApp Business API phone number ID
+  accessToken: varchar("access_token"), // WhatsApp API access token
+  verifyToken: varchar("verify_token"), // Webhook verification token
   webhookUrl: varchar("webhook_url"),
   status: botStatusEnum("status").default('inactive'),
   prompt: text("prompt"),
@@ -71,11 +74,16 @@ export const conversations = pgTable("conversations", {
 
 export const messages = pgTable("messages", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
-  conversationId: varchar("conversation_id").notNull().references(() => conversations.id),
+  botId: varchar("bot_id").notNull().references(() => bots.id),
+  whatsappMessageId: varchar("whatsapp_message_id"),
+  conversationId: varchar("conversation_id").references(() => conversations.id),
+  fromNumber: varchar("from_number").notNull(),
+  toNumber: varchar("to_number").notNull(),
   content: text("content").notNull(),
-  type: messageTypeEnum("type").default('text'),
-  isFromBot: boolean("is_from_bot").default(false),
+  messageType: messageTypeEnum("message_type").default('text'),
+  direction: messageDirectionEnum("direction").notNull(),
   status: messageStatusEnum("status").default('pending'),
+  timestamp: timestamp("timestamp").defaultNow(),
   metadata: jsonb("metadata"), // Additional data like tokens used, response time
   createdAt: timestamp("created_at").defaultNow(),
 });

@@ -27,6 +27,7 @@ export interface IStorage {
   // Bot operations
   getUserBots(userId: string): Promise<Bot[]>;
   getBot(id: string): Promise<Bot | undefined>;
+  getBotByPhoneNumberId(phoneNumberId: string): Promise<Bot | undefined>;
   createBot(bot: InsertBot): Promise<Bot>;
   updateBot(id: string, updates: Partial<InsertBot>): Promise<Bot | undefined>;
   deleteBot(id: string): Promise<boolean>;
@@ -41,7 +42,7 @@ export interface IStorage {
   // Message operations
   getConversationMessages(conversationId: string, limit?: number): Promise<Message[]>;
   createMessage(message: InsertMessage): Promise<Message>;
-  updateMessageStatus(id: string, status: string): Promise<Message | undefined>;
+  updateMessageStatus(whatsappMessageId: string, status: string): Promise<Message | undefined>;
   
   // Analytics operations
   getBotAnalytics(botId: string, startDate: Date, endDate: Date): Promise<Analytics[]>;
@@ -87,6 +88,11 @@ export class DatabaseStorage implements IStorage {
 
   async getBot(id: string): Promise<Bot | undefined> {
     const [bot] = await db.select().from(bots).where(eq(bots.id, id));
+    return bot;
+  }
+
+  async getBotByPhoneNumberId(phoneNumberId: string): Promise<Bot | undefined> {
+    const [bot] = await db.select().from(bots).where(eq(bots.phoneNumberId, phoneNumberId));
     return bot;
   }
 
@@ -173,11 +179,11 @@ export class DatabaseStorage implements IStorage {
     return newMessage;
   }
 
-  async updateMessageStatus(id: string, status: string): Promise<Message | undefined> {
+  async updateMessageStatus(whatsappMessageId: string, status: string): Promise<Message | undefined> {
     const [updatedMessage] = await db
       .update(messages)
       .set({ status: status as any })
-      .where(eq(messages.id, id))
+      .where(eq(messages.whatsappMessageId, whatsappMessageId))
       .returning();
     return updatedMessage;
   }
