@@ -116,10 +116,8 @@ export default function BotList({ bots, loading }: BotListProps) {
               <i className="fas fa-robot text-gray-400 text-2xl"></i>
             </div>
             <p className="text-gray-600 mb-4">Nenhum bot criado ainda</p>
-            <Link href="/bots">
-              <a className="text-primary hover:text-primary-dark">
-                Criar primeiro bot
-              </a>
+            <Link href="/bots" className="text-primary hover:text-primary-dark">
+              Criar primeiro bot
             </Link>
           </div>
         ) : (
@@ -148,10 +146,8 @@ export default function BotList({ bots, loading }: BotListProps) {
                   <span className="text-sm text-gray-600">
                     {Math.floor(Math.random() * 500) + 100} msgs hoje
                   </span>
-                  <Link href="/bots">
-                    <a className="text-gray-400 hover:text-gray-600">
-                      <i className="fas fa-cog"></i>
-                    </a>
+                  <Link href="/bots" className="text-gray-400 hover:text-gray-600">
+                    <i className="fas fa-cog"></i>
                   </Link>
                 </div>
               </div>
