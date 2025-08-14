@@ -41,6 +41,10 @@ export const users = pgTable("users", {
   sector: varchar("sector"), // setor de atuação
   registrationMethod: varchar("registration_method").default('replit'), // 'replit', 'google', 'phone'
   isProfileComplete: boolean("is_profile_complete").default(false),
+  // Google Calendar integration
+  googleCalendarAccessToken: varchar("google_calendar_access_token"),
+  googleCalendarRefreshToken: varchar("google_calendar_refresh_token"),
+  calendarIntegrationEnabled: boolean("calendar_integration_enabled").default(false),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });

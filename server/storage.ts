@@ -31,6 +31,7 @@ export interface IStorage {
   getUserByEmail(email: string): Promise<User | undefined>;
   upsertUser(user: UpsertUser): Promise<User>;
   createUserWithExtendedInfo(userData: any): Promise<User>;
+  updateUserCalendarTokens(userId: string, tokens: any): Promise<User | undefined>;
   
   // Bot operations
   getUserBots(userId: string): Promise<Bot[]>;
@@ -109,6 +110,22 @@ export class DatabaseStorage implements IStorage {
         createdAt: new Date(),
         updatedAt: new Date(),
       })
+      .returning();
+    return user;
+  }
+
+  async updateUserCalendarTokens(userId: string, tokens: {
+    googleCalendarAccessToken?: string | null;
+    googleCalendarRefreshToken?: string | null;
+    calendarIntegrationEnabled?: boolean;
+  }): Promise<User | undefined> {
+    const [user] = await db
+      .update(users)
+      .set({
+        ...tokens,
+        updatedAt: new Date(),
+      })
+      .where(eq(users.id, userId))
       .returning();
     return user;
   }

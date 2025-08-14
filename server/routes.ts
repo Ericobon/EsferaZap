@@ -369,6 +369,126 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Google Calendar Integration Routes
+  app.get('/api/calendar/status', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const user = await storage.getUser(userId);
+      
+      res.json({
+        connected: !!user?.calendarIntegrationEnabled,
+        hasTokens: !!(user?.googleCalendarAccessToken && user?.googleCalendarRefreshToken)
+      });
+    } catch (error) {
+      console.error("Error checking calendar status:", error);
+      res.status(500).json({ message: "Failed to check calendar status" });
+    }
+  });
+
+  app.post('/api/calendar/connect', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      
+      // Import the service (dynamic import to avoid server startup issues)
+      const { googleCalendarService } = await import('./services/googleCalendar.js');
+      const authUrl = googleCalendarService.getAuthUrl(userId);
+      
+      res.json({ authUrl });
+    } catch (error) {
+      console.error("Error connecting calendar:", error);
+      res.status(500).json({ message: "Failed to generate calendar auth URL" });
+    }
+  });
+
+  app.get('/api/calendar/callback', async (req, res) => {
+    try {
+      const { code, state: userId } = req.query;
+      
+      if (!code || !userId) {
+        return res.status(400).json({ message: "Missing authorization code or user ID" });
+      }
+
+      const { googleCalendarService } = await import('./services/googleCalendar.js');
+      const tokens = await googleCalendarService.getAccessToken(code as string);
+      
+      // Save tokens to user record
+      await storage.updateUserCalendarTokens(userId as string, {
+        googleCalendarAccessToken: tokens.access_token,
+        googleCalendarRefreshToken: tokens.refresh_token,
+        calendarIntegrationEnabled: true
+      });
+
+      // Redirect back to calendar integration page
+      res.redirect('/calendar-integration?connected=true');
+    } catch (error) {
+      console.error("Error in calendar callback:", error);
+      res.redirect('/calendar-integration?error=auth_failed');
+    }
+  });
+
+  app.post('/api/calendar/disconnect', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      
+      await storage.updateUserCalendarTokens(userId, {
+        googleCalendarAccessToken: null,
+        googleCalendarRefreshToken: null,
+        calendarIntegrationEnabled: false
+      });
+
+      res.json({ message: "Calendar disconnected successfully" });
+    } catch (error) {
+      console.error("Error disconnecting calendar:", error);
+      res.status(500).json({ message: "Failed to disconnect calendar" });
+    }
+  });
+
+  app.get('/api/calendar/events', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const user = await storage.getUser(userId);
+      
+      if (!user?.calendarIntegrationEnabled || !user?.googleCalendarAccessToken) {
+        return res.status(400).json({ message: "Calendar not connected" });
+      }
+
+      const { googleCalendarService } = await import('./services/googleCalendar.js');
+      googleCalendarService.setCredentials({
+        access_token: user.googleCalendarAccessToken,
+        refresh_token: user.googleCalendarRefreshToken
+      });
+
+      const events = await googleCalendarService.getUpcomingEvents(10);
+      res.json(events);
+    } catch (error) {
+      console.error("Error fetching calendar events:", error);
+      res.status(500).json({ message: "Failed to fetch calendar events" });
+    }
+  });
+
+  app.get('/api/calendar/business-hours', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const user = await storage.getUser(userId);
+      
+      if (!user?.calendarIntegrationEnabled || !user?.googleCalendarAccessToken) {
+        return res.status(400).json({ message: "Calendar not connected" });
+      }
+
+      const { googleCalendarService } = await import('./services/googleCalendar.js');
+      googleCalendarService.setCredentials({
+        access_token: user.googleCalendarAccessToken,
+        refresh_token: user.googleCalendarRefreshToken
+      });
+
+      const businessHours = await googleCalendarService.getBusinessHours();
+      res.json(businessHours);
+    } catch (error) {
+      console.error("Error fetching business hours:", error);
+      res.status(500).json({ message: "Failed to fetch business hours" });
+    }
+  });
+
   const httpServer = createServer(app);
 
   // WebSocket server for real-time updates

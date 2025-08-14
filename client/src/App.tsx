@@ -13,6 +13,7 @@ import Conversations from "@/pages/conversations";
 import Analytics from "@/pages/analytics";
 import Contacts from "@/pages/contacts";
 import RegisterPage from "@/pages/register";
+import CalendarIntegration from "@/pages/calendar-integration";
 import NotFound from "@/pages/not-found";
 
 function Router() {
@@ -34,6 +35,7 @@ function Router() {
           <Route path="/conversations" component={Conversations} />
           <Route path="/contacts" component={Contacts} />
           <Route path="/analytics" component={Analytics} />
+          <Route path="/calendar-integration" component={CalendarIntegration} />
         </>
       )}
       <Route component={NotFound} />
