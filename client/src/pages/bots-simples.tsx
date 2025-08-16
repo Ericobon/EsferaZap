@@ -1,7 +1,7 @@
 import { useState } from "react";
+import { useQuery, useMutation } from "@tanstack/react-query";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
-import { useQuery, useMutation } from "@tanstack/react-query";
 import { queryClient } from "@/lib/queryClient";
 import { apiRequest } from "@/lib/queryClient";
 import Sidebar from "@/components/layout/sidebar";
@@ -9,75 +9,48 @@ import Header from "@/components/layout/header";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import type { Bot } from "@shared/schema";
 import { Settings, Trash2, Bot as BotIcon, Activity, Plus, MessageSquare, Zap, Globe } from "lucide-react";
 import { URLInfo } from "@/components/bots/url-info";
 import { SimulatorPanel } from "@/components/bots/simulator-panel";
+import { CreateBotWizard } from "@/components/bots/create-bot-wizard";
 
 export default function Bots() {
   const { toast } = useToast();
   const { isAuthenticated, isLoading } = useAuth();
-  const [showCreateForm, setShowCreateForm] = useState(false);
+  const [showCreateWizard, setShowCreateWizard] = useState(false);
   const [showUrlInfo, setShowUrlInfo] = useState<string | null>(null);
   const [showSimulator, setShowSimulator] = useState<string | null>(null);
-  const [newBot, setNewBot] = useState({
-    name: '',
-    phoneNumber: '',
-    prompt: '',
-    whatsappProvider: 'baileys'
-  });
 
   const { data: bots = [], isLoading: botsLoading } = useQuery<Bot[]>({
     queryKey: ["/api/bots"],
     enabled: isAuthenticated,
   });
 
-  const createBotMutation = useMutation({
-    mutationFn: async (botData: any) => {
-      return await apiRequest("POST", "/api/bots", botData);
+  const deleteBotMutation = useMutation({
+    mutationFn: async (botId: string) => {
+      return await apiRequest("DELETE", `/api/bots/${botId}`);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/bots"] });
-      setShowCreateForm(false);
-      setNewBot({ name: '', phoneNumber: '', prompt: '', whatsappProvider: 'meta_business' });
+      queryClient.invalidateQueries({ queryKey: ['/api/bots'] });
       toast({
-        title: "Bot criado com sucesso!",
-        description: "Seu chatbot foi configurado e está pronto para uso.",
+        title: "Bot excluído",
+        description: "Bot removido com sucesso",
       });
     },
-    onError: (error) => {
+    onError: () => {
       toast({
-        title: "Erro ao criar bot",
-        description: "Não foi possível criar o bot. Tente novamente.",
+        title: "Erro ao excluir",
+        description: "Não foi possível remover o bot",
         variant: "destructive",
       });
     },
   });
 
-  const testBotMutation = useMutation({
-    mutationFn: async (botId: string) => {
-      return await apiRequest("POST", `/api/bots/${botId}/test`, {
-        message: "Olá! Este é um teste do chatbot."
-      });
-    },
-    onSuccess: (data) => {
-      toast({
-        title: "Teste do Bot",
-        description: `Resposta: ${data.response}`,
-      });
-    },
-    onError: (error) => {
-      toast({
-        title: "Erro no teste",
-        description: "Não foi possível testar o bot.",
-        variant: "destructive",
-      });
-    },
-  });
+  const handleWizardComplete = (botId: string) => {
+    setShowCreateWizard(false);
+    setShowSimulator(botId); // Abrir simulador automaticamente
+  };
 
   if (isLoading || !isAuthenticated) {
     return (
@@ -92,31 +65,14 @@ export default function Bots() {
     );
   }
 
-  const handleCreateBot = () => {
-    if (!newBot.name || !newBot.phoneNumber) {
-      toast({
-        title: "Campos obrigatórios",
-        description: "Preencha o nome e número do telefone.",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    createBotMutation.mutate({
-      name: newBot.name,
-      phoneNumber: newBot.phoneNumber,
-      prompt: newBot.prompt || "Você é um assistente útil e amigável que responde mensagens do WhatsApp.",
-      whatsappProvider: newBot.whatsappProvider,
-      status: 'active'
-    });
-  };
-
   const getStatusBadge = (status: string) => {
     switch (status) {
       case 'active':
         return <Badge className="bg-green-100 text-green-800">Ativo</Badge>;
       case 'inactive':
         return <Badge className="bg-gray-100 text-gray-800">Inativo</Badge>;
+      case 'connected':
+        return <Badge className="bg-green-100 text-green-800">Conectado</Badge>;
       case 'configuring':
         return <Badge className="bg-yellow-100 text-yellow-800">Configurando</Badge>;
       default:
@@ -133,97 +89,17 @@ export default function Bots() {
           title="Chatbots de IA" 
           action={
             <Button
-              onClick={() => setShowCreateForm(true)}
+              onClick={() => setShowCreateWizard(true)}
               className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
             >
               <Plus className="h-4 w-4 mr-2" />
-              Novo Chatbot
+              Criar Chatbot
             </Button>
           }
         />
         
         <main className="flex-1 overflow-y-auto p-6">
           <div className="max-w-6xl mx-auto space-y-6">
-            
-            {/* Formulário de Criação */}
-            {showCreateForm && (
-              <Card className="border-2 border-blue-200 bg-gradient-to-r from-blue-50 to-purple-50">
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <BotIcon className="h-5 w-5 text-blue-600" />
-                    Criar Novo Chatbot
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                      <Label htmlFor="name">Nome do Bot</Label>
-                      <Input
-                        id="name"
-                        placeholder="Ex: Atendimento EsferaZap"
-                        value={newBot.name}
-                        onChange={(e) => setNewBot(prev => ({ ...prev, name: e.target.value }))}
-                      />
-                    </div>
-                    <div>
-                      <Label htmlFor="phone">Número WhatsApp</Label>
-                      <Input
-                        id="phone"
-                        placeholder="Ex: +5511999999999"
-                        value={newBot.phoneNumber}
-                        onChange={(e) => setNewBot(prev => ({ ...prev, phoneNumber: e.target.value }))}
-                      />
-                    </div>
-                  </div>
-                  
-                  <div>
-                    <Label htmlFor="provider">Provedor WhatsApp (MVP - Gratuito)</Label>
-                    <Select 
-                      value={newBot.whatsappProvider} 
-                      onValueChange={(value) => setNewBot(prev => ({ ...prev, whatsappProvider: value }))}
-                    >
-                      <SelectTrigger>
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="baileys">Baileys (Gratuito - Recomendado MVP)</SelectItem>
-                      </SelectContent>
-                    </Select>
-                    <p className="text-xs text-gray-500 mt-1">
-                      Baileys é uma biblioteca gratuita que conecta diretamente ao WhatsApp Web. 
-                      Ideal para testes e desenvolvimento.
-                    </p>
-                  </div>
-                  
-                  <div>
-                    <Label htmlFor="prompt">Personalidade do Bot (Prompt)</Label>
-                    <Textarea
-                      id="prompt"
-                      placeholder="Defina como o bot deve se comportar e responder..."
-                      value={newBot.prompt}
-                      onChange={(e) => setNewBot(prev => ({ ...prev, prompt: e.target.value }))}
-                      rows={3}
-                    />
-                  </div>
-                  
-                  <div className="flex gap-2">
-                    <Button 
-                      onClick={handleCreateBot}
-                      disabled={createBotMutation.isPending}
-                      className="bg-gradient-to-r from-blue-600 to-purple-600"
-                    >
-                      {createBotMutation.isPending ? "Criando..." : "Criar Chatbot"}
-                    </Button>
-                    <Button 
-                      variant="outline" 
-                      onClick={() => setShowCreateForm(false)}
-                    >
-                      Cancelar
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
-            )}
 
             {/* Lista de Bots */}
             {botsLoading ? (
@@ -237,16 +113,16 @@ export default function Bots() {
                   <div className="w-20 h-20 bg-gradient-to-r from-blue-600 to-purple-600 rounded-full flex items-center justify-center mb-6">
                     <BotIcon className="h-10 w-10 text-white" />
                   </div>
-                  <h2 className="text-2xl font-bold text-gray-800 mb-4">Nenhum Chatbot Criado</h2>
+                  <h2 className="text-2xl font-bold text-gray-800 mb-4">Crie seu Primeiro Chatbot</h2>
                   <p className="text-gray-600 text-center max-w-md mb-6">
-                    Crie seu primeiro chatbot com IA para automatizar o atendimento no WhatsApp.
+                    Configure um chatbot com IA em poucos passos e conecte ao WhatsApp usando Baileys.
                   </p>
                   <Button 
-                    onClick={() => setShowCreateForm(true)}
-                    className="bg-gradient-to-r from-blue-600 to-purple-600"
+                    onClick={() => setShowCreateWizard(true)}
+                    className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
                   >
                     <Plus className="h-4 w-4 mr-2" />
-                    Criar Primeiro Chatbot
+                    Começar Agora
                   </Button>
                 </CardContent>
               </Card>
@@ -257,7 +133,7 @@ export default function Bots() {
                     <CardHeader>
                       <div className="flex items-center justify-between">
                         <CardTitle className="flex items-center gap-2">
-                          <BotIcon className="h-5 w-5 text-blue-600" />
+                          <BotIcon className="h-5 w-5 text-green-600" />
                           {bot.name}
                         </CardTitle>
                         {getStatusBadge(bot.status || 'inactive')}
@@ -266,36 +142,23 @@ export default function Bots() {
                     </CardHeader>
                     <CardContent>
                       <div className="space-y-3">
-                        <div className="text-sm">
-                          <span className="font-medium">Provedor:</span> {bot.whatsappProvider}
+                        <div className="flex items-center gap-2">
+                          <Badge variant="secondary" className="bg-green-100 text-green-800">
+                            Baileys
+                          </Badge>
+                          <span className="text-xs text-gray-500">Gratuito</span>
                         </div>
                         
-                        {bot.serverUrl && (
+                        {bot.prompt && (
                           <div className="text-sm">
-                            <span className="font-medium">URL Servidor:</span>
-                            <p className="text-gray-600 mt-1 font-mono text-xs break-all">
-                              {bot.serverUrl}
+                            <span className="font-medium">Personalidade:</span>
+                            <p className="text-gray-600 mt-1 line-clamp-2">
+                              {bot.prompt}
                             </p>
                           </div>
                         )}
                         
-                        {bot.webhookUrl && (
-                          <div className="text-sm">
-                            <span className="font-medium">Webhook:</span>
-                            <p className="text-gray-600 mt-1 font-mono text-xs break-all">
-                              {bot.webhookUrl}
-                            </p>
-                          </div>
-                        )}
-                        
-                        <div className="text-sm">
-                          <span className="font-medium">Prompt:</span>
-                          <p className="text-gray-600 mt-1 line-clamp-2">
-                            {bot.prompt || "Prompt padrão"}
-                          </p>
-                        </div>
-                        
-                        <div className="flex gap-2 pt-2">
+                        <div className="flex flex-wrap gap-2 pt-2">
                           <Button
                             size="sm"
                             variant="outline"
@@ -304,14 +167,6 @@ export default function Bots() {
                           >
                             <Zap className="h-3 w-3 mr-1" />
                             {showSimulator === bot.id ? "Fechar" : "Testar"}
-                          </Button>
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            className="text-blue-600 border-blue-200 hover:bg-blue-50"
-                          >
-                            <MessageSquare className="h-3 w-3 mr-1" />
-                            Conversas
                           </Button>
                           <Button
                             size="sm"
@@ -325,32 +180,27 @@ export default function Bots() {
                           <Button
                             size="sm"
                             variant="outline"
-                            className="text-gray-600 border-gray-200 hover:bg-gray-50"
+                            onClick={() => deleteBotMutation.mutate(bot.id)}
+                            className="text-red-600 border-red-200 hover:bg-red-50"
                           >
-                            <Settings className="h-3 w-3 mr-1" />
-                            Config
+                            <Trash2 className="h-3 w-3 mr-1" />
+                            Excluir
                           </Button>
                         </div>
+
+                        {/* URL Info Panel */}
+                        {showUrlInfo === bot.id && (
+                          <URLInfo bot={bot} />
+                        )}
+
+                        {/* Simulator Panel */}
+                        {showSimulator === bot.id && (
+                          <div className="mt-4">
+                            <SimulatorPanel botId={bot.id} />
+                          </div>
+                        )}
                       </div>
                     </CardContent>
-                    
-                    {/* Painel de URLs expandido */}
-                    {showUrlInfo === bot.id && (
-                      <div className="border-t">
-                        <div className="p-4">
-                          <URLInfo botId={bot.id} />
-                        </div>
-                      </div>
-                    )}
-                    
-                    {/* Painel do Simulador expandido */}
-                    {showSimulator === bot.id && (
-                      <div className="border-t bg-green-50">
-                        <div className="p-4">
-                          <SimulatorPanel botId={bot.id} botName={bot.name} />
-                        </div>
-                      </div>
-                    )}
                   </Card>
                 ))}
               </div>
@@ -358,6 +208,14 @@ export default function Bots() {
           </div>
         </main>
       </div>
+
+      {/* Create Bot Wizard */}
+      {showCreateWizard && (
+        <CreateBotWizard
+          onClose={() => setShowCreateWizard(false)}
+          onComplete={handleWizardComplete}
+        />
+      )}
     </div>
   );
 }
