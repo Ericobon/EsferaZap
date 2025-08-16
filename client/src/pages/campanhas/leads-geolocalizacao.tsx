@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
 import Sidebar from "@/components/layout/sidebar";
@@ -11,6 +11,22 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Slider } from "@/components/ui/slider";
 import { MapPin, Navigation, Target, Users, Filter, Search } from "lucide-react";
+
+declare global {
+  interface Window {
+    google: any;
+  }
+}
+
+declare global {
+  namespace JSX {
+    interface IntrinsicElements {
+      'gmp-map': any;
+      'gmp-advanced-marker': any;
+      'gmpx-place-picker': any;
+    }
+  }
+}
 
 interface LocationData {
   id: string;
@@ -31,6 +47,10 @@ export default function LeadsGeolocalizacao() {
   const [radius, setRadius] = useState([5]);
   const [locations, setLocations] = useState<LocationData[]>([]);
   const [mapLoaded, setMapLoaded] = useState(false);
+  const [currentPlace, setCurrentPlace] = useState<any>(null);
+  const mapRef = useRef<HTMLElement>(null);
+  const markerRef = useRef<HTMLElement>(null);
+  const placePickerRef = useRef<HTMLElement>(null);
 
   // Dados de exemplo para localizações
   const exampleLocations: LocationData[] = [
@@ -66,10 +86,78 @@ export default function LeadsGeolocalizacao() {
     }
   ];
 
+  // Função de inicialização do Google Maps
+  const initGoogleMaps = async () => {
+    try {
+      await customElements.whenDefined('gmp-map');
+      
+      const map = mapRef.current;
+      const marker = markerRef.current;
+      const placePicker = placePickerRef.current;
+      
+      if (!map || !marker || !placePicker) return;
+      
+      // Configurar o mapa
+      (map as any).innerMap?.setOptions({
+        mapTypeControl: false
+      });
+      
+      // Event listener para mudança de local
+      placePicker.addEventListener('gmpx-placechange', () => {
+        const place = (placePicker as any).value;
+        
+        if (!place.location) {
+          toast({
+            title: "Localização não encontrada",
+            description: `Nenhum detalhe disponível para: '${place.name}'`,
+            variant: "destructive"
+          });
+          (marker as any).position = null;
+          return;
+        }
+        
+        if (place.viewport) {
+          (map as any).innerMap?.fitBounds(place.viewport);
+        } else {
+          (map as any).center = place.location;
+          (map as any).zoom = 17;
+        }
+        
+        (marker as any).position = place.location;
+        setCurrentPlace(place);
+        
+        // Criar dados de leads para esta localização
+        const estimatedLeads = Math.floor(Math.random() * 5000) + 500;
+        const newLocation: LocationData = {
+          id: Date.now().toString(),
+          name: place.displayName || place.name,
+          address: place.formattedAddress,
+          lat: place.location.lat(),
+          lng: place.location.lng(),
+          category: 'custom',
+          estimatedLeads,
+          radius: radius[0]
+        };
+        
+        setLocations(prev => [newLocation, ...prev.slice(0, 4)]);
+        
+        toast({
+          title: "Localização encontrada",
+          description: `${estimatedLeads} leads estimados em ${place.displayName}`,
+        });
+      });
+      
+      setMapLoaded(true);
+      
+    } catch (error) {
+      console.error('Erro ao inicializar Google Maps:', error);
+      setMapLoaded(true); // Ainda mostra a interface mesmo com erro
+    }
+  };
+
   useEffect(() => {
     setLocations(exampleLocations);
-    // Simular carregamento do mapa
-    setTimeout(() => setMapLoaded(true), 1000);
+    initGoogleMaps();
   }, []);
 
   if (isLoading || !isAuthenticated) {
@@ -210,32 +298,107 @@ export default function LeadsGeolocalizacao() {
                 <CardTitle className="flex items-center gap-2">
                   <MapPin className="h-5 w-5" />
                   Mapa de Localizações
-                  <Badge className="ml-2">Google Maps Integration</Badge>
+                  <Badge className="ml-2">Google Maps API</Badge>
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="h-96 bg-gradient-to-br from-blue-50 to-purple-50 rounded-lg border-2 border-dashed border-gray-300 flex items-center justify-center">
-                  {!mapLoaded ? (
-                    <div className="text-center">
-                      <div className="w-16 h-16 bg-blue-600 rounded-lg flex items-center justify-center mx-auto mb-4">
-                        <MapPin className="h-8 w-8 text-white animate-pulse" />
-                      </div>
-                      <p className="text-gray-600 font-medium">Carregando Google Maps...</p>
-                      <p className="text-sm text-gray-500">Integração com API oficial do Google</p>
-                    </div>
-                  ) : (
-                    <div className="text-center">
-                      <div className="w-16 h-16 bg-green-600 rounded-lg flex items-center justify-center mx-auto mb-4">
-                        <MapPin className="h-8 w-8 text-white" />
-                      </div>
-                      <p className="text-gray-700 font-medium">Mapa Interativo do Google</p>
-                      <p className="text-sm text-gray-500">Visualize localizações e áreas de cobertura</p>
-                      <div className="mt-4 text-xs text-gray-400 bg-white px-3 py-1 rounded-full inline-block">
-                        🗺️ Google Maps API integrada - Funcionalidade completa em desenvolvimento
-                      </div>
-                    </div>
-                  )}
+                <div className="mb-4">
+                  <Label>Busca de Localização</Label>
+                  <div className="flex gap-2">
+                    <Input
+                      placeholder="Digite um endereço ou nome do local..."
+                      value={searchAddress}
+                      onChange={(e) => setSearchAddress(e.target.value)}
+                      className="flex-1"
+                    />
+                    <Button onClick={handleSearch} className="bg-gradient-to-r from-blue-600 to-purple-600">
+                      <Search className="h-4 w-4" />
+                    </Button>
+                  </div>
                 </div>
+                
+                <div className="h-96 rounded-lg overflow-hidden border border-gray-200 bg-gradient-to-br from-blue-50 to-purple-50 relative">
+                  {/* Demo Map Interface */}
+                  <div className="absolute inset-0 flex flex-col">
+                    {/* Map Header */}
+                    <div className="bg-white/90 backdrop-blur-sm p-3 border-b border-gray-200/50">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <div className="w-3 h-3 bg-green-500 rounded-full animate-pulse"></div>
+                          <span className="text-sm font-medium text-gray-700">Google Maps API</span>
+                        </div>
+                        <Badge variant="outline" className="text-xs">Demo Mode</Badge>
+                      </div>
+                    </div>
+                    
+                    {/* Map Content */}
+                    <div className="flex-1 flex items-center justify-center relative">
+                      {/* Grid Pattern */}
+                      <div className="absolute inset-0 opacity-10">
+                        <div className="grid grid-cols-8 grid-rows-6 h-full w-full">
+                          {Array.from({ length: 48 }).map((_, i) => (
+                            <div key={i} className="border border-gray-300"></div>
+                          ))}
+                        </div>
+                      </div>
+                      
+                      {/* Markers */}
+                      <div className="relative z-10 grid grid-cols-3 gap-8 p-8">
+                        {exampleLocations.map((location, index) => (
+                          <div
+                            key={location.id}
+                            className="relative group cursor-pointer transform hover:scale-110 transition-transform"
+                            onClick={() => {
+                              setCurrentPlace({
+                                displayName: location.name,
+                                formattedAddress: location.address
+                              });
+                              toast({
+                                title: "Localização Selecionada",
+                                description: `${location.estimatedLeads} leads estimados em ${location.name}`,
+                              });
+                            }}
+                          >
+                            <div className="w-8 h-8 bg-red-500 rounded-full border-2 border-white shadow-lg flex items-center justify-center">
+                              <MapPin className="h-4 w-4 text-white" />
+                            </div>
+                            <div className="absolute -top-10 left-1/2 transform -translate-x-1/2 bg-white/90 backdrop-blur-sm px-2 py-1 rounded text-xs font-medium shadow-md opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
+                              {location.name}
+                            </div>
+                            <div className="absolute top-10 left-1/2 transform -translate-x-1/2 w-2 h-2 bg-blue-500/20 rounded-full animate-ping"></div>
+                          </div>
+                        ))}
+                      </div>
+                      
+                      {/* Center Info */}
+                      <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 bg-white/90 backdrop-blur-sm px-4 py-2 rounded-full shadow-md">
+                        <div className="flex items-center gap-2 text-sm">
+                          <Navigation className="h-4 w-4 text-blue-600" />
+                          <span className="font-medium text-gray-700">São Paulo, SP</span>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    {/* Map Controls */}
+                    <div className="absolute top-20 right-4 space-y-2">
+                      <Button size="sm" variant="outline" className="w-10 h-10 p-0 bg-white/90">+</Button>
+                      <Button size="sm" variant="outline" className="w-10 h-10 p-0 bg-white/90">-</Button>
+                    </div>
+                  </div>
+                </div>
+                
+                {currentPlace && (
+                  <div className="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                    <div className="flex items-center gap-2 mb-2">
+                      <MapPin className="h-4 w-4 text-blue-600" />
+                      <span className="font-medium text-blue-900">{currentPlace.displayName}</span>
+                    </div>
+                    <p className="text-sm text-blue-700">{currentPlace.formattedAddress}</p>
+                    <div className="mt-2 text-xs text-gray-500">
+                      💡 Conecte sua API key do Google Maps para funcionalidade completa
+                    </div>
+                  </div>
+                )}
               </CardContent>
             </Card>
 
