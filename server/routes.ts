@@ -10,6 +10,7 @@ import { mediaHandler, upload } from "./services/mediaHandler.js";
 import { processWithGemini, analyzeSentiment } from "./services/gemini.js";
 import { createWhatsAppProvider } from "./services/whatsapp-providers.js";
 import { URLGeneratorService } from "./services/urlGenerator.js";
+import { WhatsAppSimulator } from "./services/whatsapp-simulator.js";
 import { insertBotSchema, insertConversationSchema, insertMessageSchema } from "@shared/schema";
 import { z } from "zod";
 
@@ -156,6 +157,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
         if (finalWebhookUrl !== bot.webhookUrl) {
           await storage.updateBot(bot.id, { webhookUrl: finalWebhookUrl });
           bot.webhookUrl = finalWebhookUrl;
+        }
+
+        // Auto-configurar para MVP (simulação)
+        if (bot.whatsappProvider === 'baileys') {
+          await storage.updateBot(bot.id, {
+            connectionStatus: 'connected',
+            lastConnectionCheck: new Date()
+          });
         }
       }
       
@@ -389,6 +398,56 @@ export async function registerRoutes(app: Express): Promise<Server> {
         message: "Erro ao configurar provedor",
         error: error instanceof Error ? error.message : "Erro desconhecido"
       });
+    }
+  });
+
+  // WhatsApp Simulator routes (MVP)
+  app.get('/api/bots/:botId/status', isAuthenticated, async (req: any, res) => {
+    try {
+      const { botId } = req.params;
+      const userId = req.user.id;
+      
+      const bot = await storage.getBot(botId);
+      if (!bot || bot.userId !== userId) {
+        return res.status(404).json({ message: "Bot not found" });
+      }
+
+      const status = await WhatsAppSimulator.simulateConnectionStatus(botId);
+      res.json(status);
+
+    } catch (error) {
+      console.error("Error getting status:", error);
+      res.status(500).json({ message: "Failed to get bot status" });
+    }
+  });
+
+  app.post('/api/bots/:botId/simulate', isAuthenticated, async (req: any, res) => {
+    try {
+      const { botId } = req.params;
+      const { message, fromNumber } = req.body;
+      const userId = req.user.id;
+      
+      const bot = await storage.getBot(botId);
+      if (!bot || bot.userId !== userId) {
+        return res.status(404).json({ message: "Bot not found" });
+      }
+
+      const result = await WhatsAppSimulator.simulateMessage(botId, message, fromNumber);
+      res.json(result);
+
+    } catch (error) {
+      console.error("Error simulating message:", error);
+      res.status(500).json({ message: "Failed to simulate message" });
+    }
+  });
+
+  app.get('/api/bots/:botId/examples', isAuthenticated, async (req: any, res) => {
+    try {
+      const examples = WhatsAppSimulator.getExampleMessages();
+      res.json({ examples });
+    } catch (error) {
+      console.error("Error getting examples:", error);
+      res.status(500).json({ message: "Failed to get examples" });
     }
   });
 

@@ -16,17 +16,19 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import type { Bot } from "@shared/schema";
 import { Settings, Trash2, Bot as BotIcon, Activity, Plus, MessageSquare, Zap, Globe } from "lucide-react";
 import { URLInfo } from "@/components/bots/url-info";
+import { SimulatorPanel } from "@/components/bots/simulator-panel";
 
 export default function Bots() {
   const { toast } = useToast();
   const { isAuthenticated, isLoading } = useAuth();
   const [showCreateForm, setShowCreateForm] = useState(false);
   const [showUrlInfo, setShowUrlInfo] = useState<string | null>(null);
+  const [showSimulator, setShowSimulator] = useState<string | null>(null);
   const [newBot, setNewBot] = useState({
     name: '',
     phoneNumber: '',
     prompt: '',
-    whatsappProvider: 'meta_business'
+    whatsappProvider: 'baileys'
   });
 
   const { data: bots = [], isLoading: botsLoading } = useQuery<Bot[]>({
@@ -175,7 +177,7 @@ export default function Bots() {
                   </div>
                   
                   <div>
-                    <Label htmlFor="provider">Provedor WhatsApp</Label>
+                    <Label htmlFor="provider">Provedor WhatsApp (MVP - Gratuito)</Label>
                     <Select 
                       value={newBot.whatsappProvider} 
                       onValueChange={(value) => setNewBot(prev => ({ ...prev, whatsappProvider: value }))}
@@ -184,12 +186,13 @@ export default function Bots() {
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="meta_business">Meta Business API (Oficial)</SelectItem>
-                        <SelectItem value="twilio">Twilio WhatsApp</SelectItem>
-                        <SelectItem value="evolution_api">Evolution API</SelectItem>
-                        <SelectItem value="baileys">Baileys (Gratuito)</SelectItem>
+                        <SelectItem value="baileys">Baileys (Gratuito - Recomendado MVP)</SelectItem>
                       </SelectContent>
                     </Select>
+                    <p className="text-xs text-gray-500 mt-1">
+                      Baileys é uma biblioteca gratuita que conecta diretamente ao WhatsApp Web. 
+                      Ideal para testes e desenvolvimento.
+                    </p>
                   </div>
                   
                   <div>
@@ -296,12 +299,11 @@ export default function Bots() {
                           <Button
                             size="sm"
                             variant="outline"
-                            onClick={() => testBotMutation.mutate(bot.id)}
-                            disabled={testBotMutation.isPending}
+                            onClick={() => setShowSimulator(showSimulator === bot.id ? null : bot.id)}
                             className="text-green-600 border-green-200 hover:bg-green-50"
                           >
                             <Zap className="h-3 w-3 mr-1" />
-                            Testar
+                            {showSimulator === bot.id ? "Fechar" : "Testar"}
                           </Button>
                           <Button
                             size="sm"
@@ -337,6 +339,15 @@ export default function Bots() {
                       <div className="border-t">
                         <div className="p-4">
                           <URLInfo botId={bot.id} />
+                        </div>
+                      </div>
+                    )}
+                    
+                    {/* Painel do Simulador expandido */}
+                    {showSimulator === bot.id && (
+                      <div className="border-t bg-green-50">
+                        <div className="p-4">
+                          <SimulatorPanel botId={bot.id} botName={bot.name} />
                         </div>
                       </div>
                     )}
