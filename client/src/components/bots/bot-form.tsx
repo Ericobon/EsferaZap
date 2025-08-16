@@ -233,30 +233,154 @@ export default function BotForm({ bot, onClose }: BotFormProps) {
                 )}
               />
 
-              <div className="flex items-center justify-center p-6 border-2 border-dashed border-gray-300 rounded-lg">
-                <div className="text-center">
-                  <QrCode className="mx-auto h-12 w-12 text-gray-400 mb-4" />
-                  <h4 className="text-lg font-medium text-gray-900 mb-2">QR Code para Conexão</h4>
-                  <p className="text-sm text-gray-500 mb-4">
-                    Clique no botão abaixo para gerar um QR Code e conectar seu WhatsApp
-                  </p>
-                  <Button
-                    type="button"
-                    variant="outline"
-                    className="flex items-center space-x-2"
-                    onClick={() => {
-                      // TODO: Implementar geração de QR Code
-                      toast({
-                        title: "QR Code",
-                        description: "Funcionalidade de QR Code será implementada em breve.",
-                      });
-                    }}
-                  >
-                    <QrCode className="h-4 w-4" />
-                    <span>Gerar QR Code</span>
-                  </Button>
+              <FormField
+                control={form.control}
+                name="whatsappProvider"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Provedor WhatsApp API</FormLabel>
+                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Selecione o provedor" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="meta_business">Meta Business API</SelectItem>
+                        <SelectItem value="twilio">Twilio WhatsApp</SelectItem>
+                        <SelectItem value="evolution_api">Evolution API</SelectItem>
+                        <SelectItem value="baileys">Baileys (Open Source)</SelectItem>
+                        <SelectItem value="wppconnect">WPPConnect</SelectItem>
+                        <SelectItem value="venom">Venom Bot</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              {/* Provider-specific configuration fields */}
+              {form.watch("whatsappProvider") === "meta_business" && (
+                <div className="space-y-3">
+                  <FormField
+                    control={form.control}
+                    name="accessToken"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Access Token</FormLabel>
+                        <FormControl>
+                          <Input {...field} type="password" placeholder="Token de acesso do Meta Business" />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="phoneNumberId"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Phone Number ID</FormLabel>
+                        <FormControl>
+                          <Input {...field} placeholder="ID do número de telefone" />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="businessAccountId"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Business Account ID</FormLabel>
+                        <FormControl>
+                          <Input {...field} placeholder="ID da conta business" />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
                 </div>
-              </div>
+              )}
+
+              {form.watch("whatsappProvider") === "twilio" && (
+                <div className="space-y-3">
+                  <FormField
+                    control={form.control}
+                    name="apiKey"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Account SID</FormLabel>
+                        <FormControl>
+                          <Input {...field} placeholder="Twilio Account SID" />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="instanceId"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Auth Token</FormLabel>
+                        <FormControl>
+                          <Input {...field} type="password" placeholder="Twilio Auth Token" />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+              )}
+
+              {(form.watch("whatsappProvider") === "evolution_api" || 
+                form.watch("whatsappProvider") === "baileys" ||
+                form.watch("whatsappProvider") === "wppconnect" ||
+                form.watch("whatsappProvider") === "venom") && (
+                <div className="space-y-3">
+                  <FormField
+                    control={form.control}
+                    name="serverUrl"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>URL do Servidor</FormLabel>
+                        <FormControl>
+                          <Input {...field} placeholder="https://sua-evolution-api.com" />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="apiKey"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>API Key</FormLabel>
+                        <FormControl>
+                          <Input {...field} type="password" placeholder="Chave da API" />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="instanceId"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Instance ID</FormLabel>
+                        <FormControl>
+                          <Input {...field} placeholder="Nome da instância" />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+              )}
             </div>
 
             {/* AI Configuration */}

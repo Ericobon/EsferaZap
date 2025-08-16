@@ -8,6 +8,7 @@ import { WhatsAppService } from "./services/whatsapp.js";
 import { webhookManager } from "./services/webhookManager.js";
 import { mediaHandler, upload } from "./services/mediaHandler.js";
 import { processWithGemini, analyzeSentiment } from "./services/gemini.js";
+import { createWhatsAppProvider } from "./services/whatsapp-providers.js";
 import { insertBotSchema, insertConversationSchema, insertMessageSchema } from "@shared/schema";
 import { z } from "zod";
 
@@ -173,6 +174,153 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error deleting bot:", error);
       res.status(500).json({ message: "Failed to delete bot" });
+    }
+  });
+
+  // QR Code and WhatsApp connection routes
+  app.post('/api/bots/:id/generate-qr', isAuthenticated, async (req: any, res) => {
+    try {
+      const { id } = req.params;
+      const bot = await storage.getBot(id);
+      
+      if (!bot) {
+        return res.status(404).json({ message: "Bot não encontrado" });
+      }
+
+      // Verify bot belongs to user
+      if (bot.userId !== req.user.id) {
+        return res.status(403).json({ message: "Acesso negado" });
+      }
+
+      const provider = createWhatsAppProvider({
+        provider: bot.whatsappProvider || 'meta_business',
+        apiKey: bot.apiKey || undefined,
+        accessToken: bot.accessToken || undefined,
+        phoneNumberId: bot.phoneNumberId || undefined,
+        businessAccountId: bot.businessAccountId || undefined,
+        serverUrl: bot.serverUrl || undefined,
+        instanceId: bot.instanceId || undefined,
+        webhookSecret: bot.webhookSecret || undefined
+      });
+
+      const qrResponse = await provider.generateQRCode();
+      
+      // Save QR code and expiration to database
+      if (qrResponse.status === 'pending') {
+        await storage.updateBot(id, {
+          qrCode: qrResponse.qrCode,
+          qrCodeExpires: qrResponse.expires,
+          connectionStatus: 'connecting'
+        });
+      }
+
+      res.json(qrResponse);
+    } catch (error) {
+      console.error("Error generating QR code:", error);
+      res.status(500).json({ 
+        message: "Erro ao gerar QR Code",
+        error: error instanceof Error ? error.message : "Erro desconhecido"
+      });
+    }
+  });
+
+  app.get('/api/bots/:id/connection-status', isAuthenticated, async (req: any, res) => {
+    try {
+      const { id } = req.params;
+      const bot = await storage.getBot(id);
+      
+      if (!bot) {
+        return res.status(404).json({ message: "Bot não encontrado" });
+      }
+
+      if (bot.userId !== req.user.id) {
+        return res.status(403).json({ message: "Acesso negado" });
+      }
+
+      const provider = createWhatsAppProvider({
+        provider: bot.whatsappProvider || 'meta_business',
+        apiKey: bot.apiKey || undefined,
+        accessToken: bot.accessToken || undefined,
+        phoneNumberId: bot.phoneNumberId || undefined,
+        businessAccountId: bot.businessAccountId || undefined,
+        serverUrl: bot.serverUrl || undefined,
+        instanceId: bot.instanceId || undefined,
+        webhookSecret: bot.webhookSecret || undefined
+      });
+
+      const connectionStatus = await provider.checkConnection();
+      
+      // Update connection status in database
+      await storage.updateBot(id, {
+        connectionStatus: connectionStatus.connected ? 'connected' : 'disconnected',
+        lastConnectionCheck: new Date()
+      });
+
+      res.json({
+        connected: connectionStatus.connected,
+        status: connectionStatus.status,
+        provider: bot.whatsappProvider,
+        lastCheck: new Date()
+      });
+    } catch (error) {
+      console.error("Error checking connection status:", error);
+      res.status(500).json({ 
+        message: "Erro ao verificar status de conexão",
+        error: error instanceof Error ? error.message : "Erro desconhecido"
+      });
+    }
+  });
+
+  app.post('/api/bots/:id/configure-provider', isAuthenticated, async (req: any, res) => {
+    try {
+      const { id } = req.params;
+      const {
+        whatsappProvider,
+        apiKey,
+        accessToken,
+        phoneNumberId,
+        businessAccountId,
+        serverUrl,
+        instanceId,
+        webhookSecret
+      } = req.body;
+
+      const bot = await storage.getBot(id);
+      
+      if (!bot) {
+        return res.status(404).json({ message: "Bot não encontrado" });
+      }
+
+      if (bot.userId !== req.user.id) {
+        return res.status(403).json({ message: "Acesso negado" });
+      }
+
+      const updates: any = {
+        whatsappProvider,
+        connectionStatus: 'disconnected' // Reset connection status when changing provider
+      };
+
+      // Add provider-specific fields only if provided
+      if (apiKey !== undefined) updates.apiKey = apiKey;
+      if (accessToken !== undefined) updates.accessToken = accessToken;
+      if (phoneNumberId !== undefined) updates.phoneNumberId = phoneNumberId;
+      if (businessAccountId !== undefined) updates.businessAccountId = businessAccountId;
+      if (serverUrl !== undefined) updates.serverUrl = serverUrl;
+      if (instanceId !== undefined) updates.instanceId = instanceId;
+      if (webhookSecret !== undefined) updates.webhookSecret = webhookSecret;
+
+      const updatedBot = await storage.updateBot(id, updates);
+
+      res.json({
+        message: "Provedor configurado com sucesso",
+        bot: updatedBot
+      });
+    } catch (error) {
+      console.error("Error configuring provider:", error);
+      res.status(500).json({ 
+        message: "Erro ao configurar provedor",
+        error: error instanceof Error ? error.message : "Erro desconhecido"
+      });
     }
   });
 

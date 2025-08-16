@@ -12,7 +12,8 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import type { Bot } from "@shared/schema";
-import { Settings, Trash2, Bot as BotIcon, Activity, QrCode } from "lucide-react";
+import { Settings, Trash2, Bot as BotIcon, Activity, QrCode, Wifi } from "lucide-react";
+import { QRCodeDialog } from "@/components/bots/qr-code-dialog";
 
 export default function Bots() {
   const { toast } = useToast();
@@ -98,6 +99,25 @@ export default function Bots() {
   const handleFormClose = () => {
     setShowForm(false);
     setEditingBot(null);
+  };
+
+  const checkConnectionStatus = async (botId: string) => {
+    try {
+      const response = await apiRequest(`/api/bots/${botId}/connection-status`);
+      toast({
+        title: "Status da Conexão",
+        description: response.connected ? 
+          `Conectado via ${response.provider}` : 
+          `Desconectado: ${response.status}`,
+        variant: response.connected ? "default" : "destructive",
+      });
+    } catch (error) {
+      toast({
+        title: "Erro",
+        description: "Falha ao verificar status de conexão",
+        variant: "destructive",
+      });
+    }
   };
 
   const getStatusBadge = (status: string) => {
@@ -222,19 +242,15 @@ export default function Bots() {
                               <Settings className="h-3 w-3 mr-1" />
                               Editar
                             </Button>
+                            <QRCodeDialog bot={bot} />
                             <Button
                               size="sm"
                               variant="outline"
-                              className="text-blue-600 border-blue-200 hover:bg-blue-50"
-                              onClick={() => {
-                                toast({
-                                  title: "QR Code",
-                                  description: "QR Code para conectar WhatsApp será exibido aqui.",
-                                });
-                              }}
+                              className="text-green-600 border-green-200 hover:bg-green-50"
+                              onClick={() => checkConnectionStatus(bot.id)}
                             >
-                              <QrCode className="h-3 w-3 mr-1" />
-                              QR Code
+                              <Wifi className="h-3 w-3 mr-1" />
+                              Status
                             </Button>
                           </div>
                           <Button

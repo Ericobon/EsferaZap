@@ -53,6 +53,7 @@ export const botStatusEnum = pgEnum('bot_status', ['active', 'inactive', 'config
 export const messageStatusEnum = pgEnum('message_status', ['pending', 'sent', 'delivered', 'read', 'failed', 'received']);
 export const messageTypeEnum = pgEnum('message_type', ['text', 'image', 'audio', 'document', 'video']);
 export const messageDirectionEnum = pgEnum('message_direction', ['inbound', 'outbound']);
+export const whatsappProviderEnum = pgEnum('whatsapp_provider', ['meta_business', 'twilio', 'evolution_api', 'baileys', 'wppconnect', 'venom']);
 
 export const bots = pgTable("bots", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
@@ -66,9 +67,23 @@ export const bots = pgTable("bots", {
   // Bot type and capabilities
   botType: varchar("bot_type").default('business'), // 'business' or 'personal'
   qrCode: text("qr_code"), // Generated QR code for WhatsApp connection
+  qrCodeExpires: timestamp("qr_code_expires"),
   supportsText: boolean("supports_text").default(true),
   supportsAudio: boolean("supports_audio").default(false),
   supportsImages: boolean("supports_images").default(false),
+  // WhatsApp API Provider Configuration
+  whatsappProvider: whatsappProviderEnum("whatsapp_provider").default('meta_business'),
+  apiKey: varchar("api_key"), // API Key for the provider
+  accessToken: text("access_token"), // OAuth Access Token
+  refreshToken: text("refresh_token"), // OAuth Refresh Token
+  phoneNumberId: varchar("phone_number_id"), // For Meta Business API
+  businessAccountId: varchar("business_account_id"), // For Meta Business API
+  webhookUrl: varchar("webhook_url"), // Webhook URL for receiving messages
+  webhookSecret: varchar("webhook_secret"), // Webhook verification token
+  instanceId: varchar("instance_id"), // For Evolution API and similar
+  serverUrl: varchar("server_url"), // Custom server URL for self-hosted solutions
+  connectionStatus: varchar("connection_status").default('disconnected'), // connected, disconnected, error
+  lastConnectionCheck: timestamp("last_connection_check"),
   // Trigger settings
   humanHandoffEnabled: boolean("human_handoff_enabled").default(false),
   humanHandoffMessage: text("human_handoff_message").default("Um agente humano entrará na conversa em breve."),
@@ -123,8 +138,12 @@ export const insertBotSchema = createInsertSchema(bots).omit({
   createdAt: true,
   updatedAt: true,
   qrCode: true,
+  qrCodeExpires: true,
+  connectionStatus: true,
+  lastConnectionCheck: true,
 }).extend({
   botType: z.string().default('business'),
+  whatsappProvider: z.enum(['meta_business', 'twilio', 'evolution_api', 'baileys', 'wppconnect', 'venom']).default('meta_business'),
   supportsText: z.boolean().default(true),
   supportsAudio: z.boolean().default(false),
   supportsImages: z.boolean().default(false),
