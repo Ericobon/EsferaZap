@@ -1,11 +1,72 @@
+import { useState } from "react";
+import { useMutation } from "@tanstack/react-query";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Separator } from "@/components/ui/separator";
+import { useToast } from "@/hooks/use-toast";
+import { apiRequest } from "@/lib/queryClient";
 import { Link } from "wouter";
-import { ArrowRight, Users, BarChart3, MessageCircle, Zap } from "lucide-react";
+import { ArrowRight, Users, BarChart3, MessageCircle, Zap, Mail, Lock, Eye, EyeOff, Phone } from "lucide-react";
+import { FaGoogle, FaGithub } from "react-icons/fa";
+
+const loginSchema = z.object({
+  email: z.string().email("Email inválido"),
+  password: z.string().min(1, "Senha é obrigatória"),
+});
+
+type LoginForm = z.infer<typeof loginSchema>;
 
 export default function Login() {
-  const handleReplotAuth = () => {
-    window.location.href = "/api/auth/replit";
+  const [showPassword, setShowPassword] = useState(false);
+  const [loginMethod, setLoginMethod] = useState<'email' | 'phone'>('email');
+  const { toast } = useToast();
+
+  const form = useForm<LoginForm>({
+    resolver: zodResolver(loginSchema),
+    defaultValues: {
+      email: "",
+      password: "",
+    },
+  });
+
+  const loginMutation = useMutation({
+    mutationFn: async (data: LoginForm) => {
+      const response = await apiRequest("POST", "/api/auth/login", data);
+      return response.json();
+    },
+    onSuccess: () => {
+      toast({
+        title: "Login realizado com sucesso!",
+        description: "Redirecionando para o dashboard...",
+      });
+      setTimeout(() => {
+        window.location.href = "/";
+      }, 1000);
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Erro no login",
+        description: error.message || "Email ou senha incorretos.",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const handleGoogleAuth = () => {
+    window.location.href = "/api/auth/google";
+  };
+
+  const handleGitHubAuth = () => {
+    window.location.href = "/api/auth/github";
+  };
+
+  const onSubmit = (data: LoginForm) => {
+    loginMutation.mutate(data);
   };
 
   return (
@@ -106,12 +167,26 @@ export default function Login() {
             </CardHeader>
 
             <CardContent className="space-y-6">
-              <Button
-                onClick={handleReplotAuth}
-                className="w-full h-12 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-medium"
-              >
-                Entrar com Replit
-              </Button>
+              {/* OAuth Buttons */}
+              <div className="space-y-3">
+                <Button
+                  onClick={handleGoogleAuth}
+                  variant="outline"
+                  className="w-full h-12 text-gray-700 border-gray-200 hover:bg-gray-50"
+                >
+                  <FaGoogle className="mr-3 text-red-500" />
+                  Entrar com Google
+                </Button>
+                
+                <Button
+                  onClick={handleGitHubAuth}
+                  variant="outline"
+                  className="w-full h-12 text-gray-700 border-gray-200 hover:bg-gray-50"
+                >
+                  <FaGithub className="mr-3 text-gray-800" />
+                  Entrar com GitHub
+                </Button>
+              </div>
 
               <div className="relative">
                 <div className="absolute inset-0 flex items-center">
@@ -121,6 +196,104 @@ export default function Login() {
                   <span className="bg-white px-2 text-gray-500">Ou</span>
                 </div>
               </div>
+
+              {/* Login Method Toggle */}
+              <div className="flex rounded-lg border border-gray-200 p-1">
+                <button
+                  type="button"
+                  onClick={() => setLoginMethod('email')}
+                  className={`flex-1 flex items-center justify-center py-2 px-3 rounded-md text-sm font-medium transition-colors ${
+                    loginMethod === 'email'
+                      ? 'bg-blue-100 text-blue-700'
+                      : 'text-gray-500 hover:text-gray-700'
+                  }`}
+                >
+                  <Mail className="w-4 h-4 mr-2" />
+                  Email
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setLoginMethod('phone')}
+                  className={`flex-1 flex items-center justify-center py-2 px-3 rounded-md text-sm font-medium transition-colors ${
+                    loginMethod === 'phone'
+                      ? 'bg-blue-100 text-blue-700'
+                      : 'text-gray-500 hover:text-gray-700'
+                  }`}
+                >
+                  <Phone className="w-4 h-4 mr-2" />
+                  Telefone
+                </button>
+              </div>
+
+              {/* Login Form */}
+              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+                <div>
+                  <Label htmlFor="email" className="text-sm font-medium text-gray-700">
+                    {loginMethod === 'email' ? 'Email' : 'Telefone'}
+                  </Label>
+                  <div className="relative mt-1">
+                    {loginMethod === 'email' ? (
+                      <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                    ) : (
+                      <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                    )}
+                    <Input
+                      id="email"
+                      type={loginMethod === 'email' ? 'email' : 'tel'}
+                      placeholder={loginMethod === 'email' ? 'seu@email.com' : '(11) 99999-9999'}
+                      className="pl-10 h-12 border-gray-200 focus:border-blue-500 focus:ring-blue-500"
+                      {...form.register("email")}
+                    />
+                  </div>
+                  {form.formState.errors.email && (
+                    <p className="text-red-500 text-xs mt-1">
+                      {form.formState.errors.email.message}
+                    </p>
+                  )}
+                </div>
+
+                <div>
+                  <Label htmlFor="password" className="text-sm font-medium text-gray-700">
+                    Senha
+                  </Label>
+                  <div className="relative mt-1">
+                    <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                    <Input
+                      id="password"
+                      type={showPassword ? "text" : "password"}
+                      placeholder="Sua senha"
+                      className="pl-10 pr-10 h-12 border-gray-200 focus:border-blue-500 focus:ring-blue-500"
+                      {...form.register("password")}
+                    />
+                    <button
+                      type="button"
+                      className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                      onClick={() => setShowPassword(!showPassword)}
+                    >
+                      {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                    </button>
+                  </div>
+                  {form.formState.errors.password && (
+                    <p className="text-red-500 text-xs mt-1">
+                      {form.formState.errors.password.message}
+                    </p>
+                  )}
+                </div>
+
+                <div className="text-right">
+                  <a href="#" className="text-sm text-blue-600 hover:underline">
+                    Esqueceu a senha?
+                  </a>
+                </div>
+
+                <Button
+                  type="submit"
+                  disabled={loginMutation.isPending}
+                  className="w-full h-12 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-medium"
+                >
+                  {loginMutation.isPending ? "Entrando..." : "Entrar"}
+                </Button>
+              </form>
 
               <div className="text-center">
                 <p className="text-sm text-gray-600">

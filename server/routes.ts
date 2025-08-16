@@ -2,7 +2,8 @@ import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { WebSocketServer, WebSocket } from "ws";
 import { storage } from "./storage";
-import { setupAuth, isAuthenticated } from "./replitAuth";
+import { setupAuth, isAuthenticated } from "./auth";
+import passport from 'passport';
 import { WhatsAppService } from "./services/whatsapp.js";
 import { webhookManager } from "./services/webhookManager.js";
 import { mediaHandler, upload } from "./services/mediaHandler.js";
@@ -17,7 +18,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Auth routes
   app.get('/api/auth/user', isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.user.id;
       const user = await storage.getUser(userId);
       res.json(user);
     } catch (error) {
@@ -44,6 +45,35 @@ export async function registerRoutes(app: Express): Promise<Server> {
         res.json({ message: 'Logout realizado com sucesso' });
       });
     });
+  });
+
+  // Google OAuth routes
+  app.get('/api/auth/google', passport.authenticate('google', { 
+    scope: ['profile', 'email'] 
+  }));
+
+  app.get('/api/auth/google/callback', 
+    passport.authenticate('google', { failureRedirect: '/login' }),
+    (req, res) => {
+      res.redirect('/');
+    }
+  );
+
+  // GitHub OAuth routes
+  app.get('/api/auth/github', passport.authenticate('github', { 
+    scope: ['user:email'] 
+  }));
+
+  app.get('/api/auth/github/callback', 
+    passport.authenticate('github', { failureRedirect: '/login' }),
+    (req, res) => {
+      res.redirect('/');
+    }
+  );
+
+  // Local login route
+  app.post('/api/auth/login', passport.authenticate('local'), (req, res) => {
+    res.json({ message: 'Login realizado com sucesso', user: req.user });
   });
 
   // Registration endpoint for custom form
@@ -90,7 +120,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Bot management routes
   app.get('/api/bots', isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.user.id;
       const bots = await storage.getUserBots(userId);
       res.json(bots);
     } catch (error) {
@@ -101,7 +131,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post('/api/bots', isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.user.id;
       const botData = insertBotSchema.parse({ ...req.body, userId });
       const bot = await storage.createBot(botData);
       
@@ -176,7 +206,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Analytics routes
   app.get('/api/analytics/dashboard', isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.user.id;
       const stats = await storage.getUserDashboardStats(userId);
       res.json(stats);
     } catch (error) {
@@ -308,7 +338,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Conversation routes
   app.get('/api/conversations', isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.user.id;
       const userBots = await storage.getUserBots(userId);
       
       if (userBots.length === 0) {
@@ -351,7 +381,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Contacts routes
   app.get('/api/contacts', isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.user.id;
       const userBots = await storage.getUserBots(userId);
       
       if (userBots.length === 0) {
@@ -370,7 +400,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Get detailed analytics
   app.get('/api/analytics/detailed', isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.user.id;
       const userBots = await storage.getUserBots(userId);
       
       if (userBots.length === 0) {
@@ -392,7 +422,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Google Calendar Integration Routes
   app.get('/api/calendar/status', isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.user.id;
       const user = await storage.getUser(userId);
       
       res.json({
@@ -407,7 +437,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post('/api/calendar/connect', isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.user.id;
       
       // Import the service (dynamic import to avoid server startup issues)
       const { googleCalendarService } = await import('./services/googleCalendar.js');
@@ -448,7 +478,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post('/api/calendar/disconnect', isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.user.id;
       
       await storage.updateUserCalendarTokens(userId, {
         googleCalendarAccessToken: null,
@@ -465,7 +495,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.get('/api/calendar/events', isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.user.id;
       const user = await storage.getUser(userId);
       
       if (!user?.calendarIntegrationEnabled || !user?.googleCalendarAccessToken) {
@@ -488,7 +518,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.get('/api/calendar/business-hours', isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.user.id;
       const user = await storage.getUser(userId);
       
       if (!user?.calendarIntegrationEnabled || !user?.googleCalendarAccessToken) {
