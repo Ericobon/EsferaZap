@@ -14,12 +14,14 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import type { Bot } from "@shared/schema";
-import { Settings, Trash2, Bot as BotIcon, Activity, Plus, MessageSquare, Zap } from "lucide-react";
+import { Settings, Trash2, Bot as BotIcon, Activity, Plus, MessageSquare, Zap, Globe } from "lucide-react";
+import { URLInfo } from "@/components/bots/url-info";
 
 export default function Bots() {
   const { toast } = useToast();
   const { isAuthenticated, isLoading } = useAuth();
   const [showCreateForm, setShowCreateForm] = useState(false);
+  const [showUrlInfo, setShowUrlInfo] = useState<string | null>(null);
   const [newBot, setNewBot] = useState({
     name: '',
     phoneNumber: '',
@@ -265,6 +267,24 @@ export default function Bots() {
                           <span className="font-medium">Provedor:</span> {bot.whatsappProvider}
                         </div>
                         
+                        {bot.serverUrl && (
+                          <div className="text-sm">
+                            <span className="font-medium">URL Servidor:</span>
+                            <p className="text-gray-600 mt-1 font-mono text-xs break-all">
+                              {bot.serverUrl}
+                            </p>
+                          </div>
+                        )}
+                        
+                        {bot.webhookUrl && (
+                          <div className="text-sm">
+                            <span className="font-medium">Webhook:</span>
+                            <p className="text-gray-600 mt-1 font-mono text-xs break-all">
+                              {bot.webhookUrl}
+                            </p>
+                          </div>
+                        )}
+                        
                         <div className="text-sm">
                           <span className="font-medium">Prompt:</span>
                           <p className="text-gray-600 mt-1 line-clamp-2">
@@ -294,6 +314,15 @@ export default function Bots() {
                           <Button
                             size="sm"
                             variant="outline"
+                            onClick={() => setShowUrlInfo(showUrlInfo === bot.id ? null : bot.id)}
+                            className="text-blue-600 border-blue-200 hover:bg-blue-50"
+                          >
+                            <Globe className="h-3 w-3 mr-1" />
+                            URLs
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="outline"
                             className="text-gray-600 border-gray-200 hover:bg-gray-50"
                           >
                             <Settings className="h-3 w-3 mr-1" />
@@ -302,6 +331,15 @@ export default function Bots() {
                         </div>
                       </div>
                     </CardContent>
+                    
+                    {/* Painel de URLs expandido */}
+                    {showUrlInfo === bot.id && (
+                      <div className="border-t">
+                        <div className="p-4">
+                          <URLInfo botId={bot.id} />
+                        </div>
+                      </div>
+                    )}
                   </Card>
                 ))}
               </div>

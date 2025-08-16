@@ -9,6 +9,7 @@ import { webhookManager } from "./services/webhookManager.js";
 import { mediaHandler, upload } from "./services/mediaHandler.js";
 import { processWithGemini, analyzeSentiment } from "./services/gemini.js";
 import { createWhatsAppProvider } from "./services/whatsapp-providers.js";
+import { URLGeneratorService } from "./services/urlGenerator.js";
 import { insertBotSchema, insertConversationSchema, insertMessageSchema } from "@shared/schema";
 import { z } from "zod";
 
@@ -133,11 +134,39 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post('/api/bots', isAuthenticated, async (req: any, res) => {
     try {
       const userId = req.user.id;
-      const botData = insertBotSchema.parse({ ...req.body, userId });
+      
+      // Gerar URLs automaticamente
+      const serverURL = URLGeneratorService.generateServerURL();
+      const webhookUrls = URLGeneratorService.generateProviderWebhooks('temp-id');
+      
+      const botData = insertBotSchema.parse({ 
+        ...req.body, 
+        userId,
+        serverUrl: serverURL,
+        webhookUrl: webhookUrls[req.body.whatsappProvider as keyof typeof webhookUrls] || webhookUrls.meta_business
+      });
+      
       const bot = await storage.createBot(botData);
       
-      // Bot created successfully
-      res.status(201).json(bot);
+      // Atualizar webhook URL com o ID real do bot
+      if (bot && bot.id) {
+        const finalWebhookUrls = URLGeneratorService.generateProviderWebhooks(bot.id);
+        const finalWebhookUrl = finalWebhookUrls[bot.whatsappProvider as keyof typeof finalWebhookUrls];
+        
+        if (finalWebhookUrl !== bot.webhookUrl) {
+          await storage.updateBot(bot.id, { webhookUrl: finalWebhookUrl });
+          bot.webhookUrl = finalWebhookUrl;
+        }
+      }
+      
+      res.status(201).json({
+        ...bot,
+        generatedUrls: {
+          serverURL,
+          webhookURL: bot.webhookUrl,
+          allWebhooks: URLGeneratorService.generateProviderWebhooks(bot.id)
+        }
+      });
     } catch (error) {
       console.error("Error creating bot:", error);
       res.status(500).json({ message: "Failed to create bot" });
@@ -360,6 +389,44 @@ export async function registerRoutes(app: Express): Promise<Server> {
         message: "Erro ao configurar provedor",
         error: error instanceof Error ? error.message : "Erro desconhecido"
       });
+    }
+  });
+
+  // URL Generator endpoint
+  app.get('/api/environment', isAuthenticated, async (req: any, res) => {
+    try {
+      const environmentInfo = URLGeneratorService.getEnvironmentInfo();
+      res.json(environmentInfo);
+    } catch (error) {
+      console.error("Error getting environment info:", error);
+      res.status(500).json({ message: "Failed to get environment info" });
+    }
+  });
+
+  // Generate URLs for specific bot
+  app.get('/api/bots/:botId/urls', isAuthenticated, async (req: any, res) => {
+    try {
+      const { botId } = req.params;
+      const userId = req.user.id;
+      
+      // Verificar se o bot pertence ao usuário
+      const bot = await storage.getBot(botId);
+      if (!bot || bot.userId !== userId) {
+        return res.status(404).json({ message: "Bot not found" });
+      }
+      
+      const urls = {
+        serverURL: URLGeneratorService.generateServerURL(),
+        webhookURL: URLGeneratorService.generateWebhookURL(botId),
+        verifyURL: URLGeneratorService.generateWebhookVerifyURL(),
+        providerWebhooks: URLGeneratorService.generateProviderWebhooks(botId),
+        environment: URLGeneratorService.getEnvironmentInfo()
+      };
+      
+      res.json(urls);
+    } catch (error) {
+      console.error("Error generating URLs:", error);
+      res.status(500).json({ message: "Failed to generate URLs" });
     }
   });
 
