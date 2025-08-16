@@ -49,9 +49,9 @@ class BaileysSimpleProvider {
 
       this.connections.set(botId, connection);
 
-      // Atualizar bot no banco
+      // Atualizar bot no banco (status válido)
       await storage.updateBot(botId, {
-        status: 'connecting'
+        status: 'inactive' // Manter como inactive até conectar
       });
 
       // Simular conexão automática após 8 segundos (tempo para escanear)

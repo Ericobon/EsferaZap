@@ -11,7 +11,7 @@ import { processWithGemini, analyzeSentiment } from "./services/gemini.js";
 import { createWhatsAppProvider } from "./services/whatsapp-providers.js";
 import { URLGeneratorService } from "./services/urlGenerator.js";
 import { WhatsAppSimulator } from "./services/whatsapp-simulator.js";
-import { baileysSimpleProvider } from "./services/baileys-simple.js";
+import { baileysRealProvider } from "./services/baileys-real.js";
 import { insertBotSchema, insertConversationSchema, insertMessageSchema } from "@shared/schema";
 import { z } from "zod";
 
@@ -165,7 +165,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           // Iniciar conexão Baileys em background
           setTimeout(async () => {
             console.log(`[API] Iniciando conexão Baileys para bot ${bot.id}`);
-            const result = await baileysSimpleProvider.connectBot(bot.id);
+            const result = await baileysRealProvider.connectBot(bot.id);
             console.log(`[API] Resultado conexão Baileys:`, result);
           }, 1000);
         }
@@ -652,7 +652,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       // Conectar via Baileys
-      const result = await baileysSimpleProvider.connectBot(botId);
+      const result = await baileysRealProvider.connectBot(botId);
       
       if (result.success) {
         res.json({
@@ -689,8 +689,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: "Bot não encontrado" });
       }
 
-      const status = baileysSimpleProvider.getConnectionStatus(botId);
-      const qrCode = baileysSimpleProvider.getQRCode(botId);
+      const status = baileysRealProvider.getConnectionStatus(botId);
+      const qrCode = baileysRealProvider.getQRCode(botId);
 
       res.json({
         botId,
