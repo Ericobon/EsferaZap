@@ -177,6 +177,45 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Test bot route
+  app.post('/api/bots/:botId/test', isAuthenticated, async (req: any, res) => {
+    try {
+      const { botId } = req.params;
+      const { message } = req.body;
+      const userId = req.user.id;
+
+      // Get bot details
+      const bot = await storage.getBot(botId);
+      if (!bot || bot.userId !== userId) {
+        return res.status(404).json({ message: "Bot not found" });
+      }
+
+      // Generate AI response using Gemini
+      const { generateWhatsAppResponse } = await import("./services/gemini.js");
+      const aiResponse = await generateWhatsAppResponse(
+        message,
+        [],
+        bot.prompt,
+        parseFloat(bot.temperature || '0.7')
+      );
+
+      res.json({ 
+        success: true,
+        response: aiResponse,
+        bot: bot.name,
+        timestamp: new Date().toISOString()
+      });
+
+    } catch (error) {
+      console.error("Error testing bot:", error);
+      res.status(500).json({ 
+        success: false,
+        message: "Erro ao testar o bot",
+        error: error instanceof Error ? error.message : "Unknown error"
+      });
+    }
+  });
+
   // QR Code and WhatsApp connection routes
   app.post('/api/bots/:id/generate-qr', isAuthenticated, async (req: any, res) => {
     try {

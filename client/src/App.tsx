@@ -7,13 +7,12 @@ import { useAuth } from "@/hooks/useAuth";
 import Home from "@/pages/home";
 import Login from "@/pages/login";
 import Dashboard from "@/pages/dashboard";
-import Bots from "@/pages/bots";
+import Bots from "@/pages/bots-simples";
 import IA from "@/pages/ia";
 import UploadDocumentos from "@/pages/upload-documentos";
-import CompraLeads from "@/pages/campanhas/compra-leads";
-import Geolocalizacao from "@/pages/campanhas/geolocalizacao";
-import LeadsGeolocalizacao from "@/pages/campanhas/leads-geolocalizacao";
-import CNAEsSegmento from "@/pages/campanhas/cnaes-segmento";
+import CompraLeads from "@/pages/campanhas/compra-leads-simples";
+import Geolocalizacao from "@/pages/campanhas/geolocalizacao-simples";
+import CNAEsSegmento from "@/pages/campanhas/cnaes-segmento-simples";
 import Conversations from "@/pages/conversations";
 import Analytics from "@/pages/analytics";
 import Contacts from "@/pages/contacts";
@@ -39,7 +38,6 @@ function Router() {
           <Route path="/upload-documentos" component={UploadDocumentos} />
           <Route path="/campanhas/compra-leads" component={CompraLeads} />
           <Route path="/campanhas/geolocalizacao" component={Geolocalizacao} />
-          <Route path="/campanhas/leads-geolocalizacao" component={LeadsGeolocalizacao} />
           <Route path="/campanhas/cnaes-segmento" component={CNAEsSegmento} />
           <Route path="/conversations" component={Conversations} />
           <Route path="/contacts" component={Contacts} />
