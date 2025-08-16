@@ -205,7 +205,7 @@ export default function Bots() {
                             </div>
                           </div>
                           <div className="flex items-center gap-2">
-                            {getStatusBadge(bot.status)}
+                            {getStatusBadge(bot.status || 'inactive')}
                             <Badge variant="outline" className="text-xs">
                               {bot.whatsappProvider}
                             </Badge>

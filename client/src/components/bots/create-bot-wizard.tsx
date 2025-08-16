@@ -39,8 +39,8 @@ export function CreateBotWizard({ onClose, onComplete }: CreateBotWizardProps) {
         whatsappProvider: 'baileys'
       });
     },
-    onSuccess: (data) => {
-      setCreatedBotId(data.id);
+    onSuccess: (response: any) => {
+      setCreatedBotId(response.id);
       setCurrentStep(4);
       queryClient.invalidateQueries({ queryKey: ['/api/bots'] });
       toast({
