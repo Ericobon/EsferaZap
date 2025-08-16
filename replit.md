@@ -4,7 +4,18 @@ EsferaZap is a comprehensive WhatsApp Business automation platform that enables 
 
 ## Recent Updates (August 2025)
 
-**WhatsApp Provider Categorization System (Latest - August 16, 2025)**
+**Dashboard Navigation Restructure & Campaign Management (Latest - August 16, 2025)**
+- Restructured dashboard navigation removing "Ferramentas" subfolder
+- Moved "Upload de documentos" directly under IA section alongside "Bots de IA"
+- Created new "Campanhas" section with two main branches:
+  - **Compra de Leads**: Lead marketplace with filtering, categorization, and purchase system
+  - **Leads por Geolocalização**: Google Maps integration for location-based lead generation
+- Implemented complete document upload interface with drag-and-drop, progress tracking
+- Built lead purchasing system with category filters, pricing tiers, and quality badges
+- Added Google Maps API integration framework for geolocation-based campaigns
+- Updated routing system to support new campaign management pages
+
+**WhatsApp Provider Categorization System (August 16, 2025)**
 - Implemented comprehensive categorization of WhatsApp APIs into two tiers:
   - **Official/Paid APIs**: Meta Business API, Twilio WhatsApp, Evolution API
   - **Free/Personal APIs**: Baileys, WPPConnect, Venom Bot  
