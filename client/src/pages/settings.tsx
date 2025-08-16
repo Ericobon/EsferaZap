@@ -76,6 +76,23 @@ export default function SettingsPage() {
     },
   });
 
+  const logoutMutation = useMutation({
+    mutationFn: () => apiRequest("/api/logout", "POST"),
+    onSuccess: () => {
+      // Limpar cache do React Query
+      queryClient.clear();
+      // Redirecionar para página de login
+      window.location.href = "/login";
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Erro no logout",
+        description: error.message || "Não foi possível fazer logout",
+        variant: "destructive",
+      });
+    },
+  });
+
   const handleConnect = () => {
     setIsConnecting(true);
     connectCalendarMutation.mutate();
@@ -368,6 +385,37 @@ export default function SettingsPage() {
                 </div>
                 <Button variant="outline" size="sm">
                   Ver Sessões
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Logout Section */}
+          <Card className="border-red-200">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2 text-red-600">
+                <Shield className="h-5 w-5" />
+                Sair da Conta
+              </CardTitle>
+              <CardDescription>
+                Encerrar sessão e retornar à página de login
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="flex items-center justify-between">
+                <div>
+                  <Label className="text-sm font-medium">Logout</Label>
+                  <p className="text-sm text-gray-600">
+                    Desconecte-se com segurança da sua conta
+                  </p>
+                </div>
+                <Button 
+                  variant="destructive" 
+                  size="sm"
+                  onClick={() => logoutMutation.mutate()}
+                  disabled={logoutMutation.isPending}
+                >
+                  {logoutMutation.isPending ? "Saindo..." : "Sair da Conta"}
                 </Button>
               </div>
             </CardContent>

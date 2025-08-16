@@ -26,6 +26,26 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Logout route
+  app.post('/api/logout', isAuthenticated, async (req: any, res) => {
+    req.logout((err: any) => {
+      if (err) {
+        console.error('Logout error:', err);
+        return res.status(500).json({ message: 'Erro no logout' });
+      }
+      
+      req.session.destroy((err: any) => {
+        if (err) {
+          console.error('Session destroy error:', err);
+          return res.status(500).json({ message: 'Erro ao encerrar sessão' });
+        }
+        
+        res.clearCookie('connect.sid');
+        res.json({ message: 'Logout realizado com sucesso' });
+      });
+    });
+  });
+
   // Registration endpoint for custom form
   app.post('/api/auth/register', async (req, res) => {
     try {
