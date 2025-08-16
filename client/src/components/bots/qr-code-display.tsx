@@ -28,11 +28,19 @@ export function QRCodeDisplay({ botId, botName, phoneNumber, onConnectionSuccess
       // Chamar API real do Baileys
       const response = await apiRequest('POST', `/api/bots/${botId}/connect-whatsapp`);
       
-      if (response.success && response.qrCode) {
-        setQrCodeData('baileys_qr_generated');
-        setQrCodeImage(response.qrCode);
-        setConnectionStatus('connecting');
-        setCountdown(8);
+      console.log('Resposta da API:', response);
+      
+      if (response.success) {
+        if (response.qrCode) {
+          console.log('QR Code recebido do backend:', response.qrCode.substring(0, 50) + '...');
+          setQrCodeData('baileys_qr_generated');
+          setQrCodeImage(response.qrCode);
+          setConnectionStatus('connecting');
+          setCountdown(8);
+        } else {
+          console.log('QR Code não encontrado na resposta');
+          setConnectionStatus('connecting');
+        }
         
         // Polling para verificar status da conexão
         const pollStatus = async () => {
@@ -78,7 +86,7 @@ export function QRCodeDisplay({ botId, botName, phoneNumber, onConnectionSuccess
           }
         }, 1000);
         
-        return response.qrCode;
+        return response.qrCode || 'connecting';
       }
       
       throw new Error(response.error || 'Erro ao gerar QR Code');
@@ -163,12 +171,16 @@ export function QRCodeDisplay({ botId, botName, phoneNumber, onConnectionSuccess
 
         {/* QR Code Area */}
         <div className="bg-white border-2 border-dashed border-gray-300 rounded-lg p-8">
+          {/* Debug info */}
+          <div className="text-xs text-gray-400 mb-2">
+            Status: {connectionStatus} | QR: {qrCodeImage ? 'Sim' : 'Não'} | Pending: {generateQRMutation.isPending ? 'Sim' : 'Não'}
+          </div>
           {generateQRMutation.isPending ? (
             <div className="flex flex-col items-center gap-4">
               <RefreshCw className="h-12 w-12 text-gray-400 animate-spin" />
               <p className="text-gray-600">Gerando QR Code...</p>
             </div>
-          ) : qrCodeData && qrCodeImage && connectionStatus !== 'connected' ? (
+          ) : qrCodeImage && connectionStatus !== 'connected' ? (
             <div className="flex flex-col items-center gap-4">
               {/* QR Code real gerado */}
               <div className="p-4 bg-white rounded-lg border-2 border-gray-200">

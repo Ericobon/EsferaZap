@@ -50,12 +50,14 @@ class BaileysRealProvider {
       // Simular event listeners conforme documentação
       this.setupEventListeners(connection);
 
-      // Simular geração de QR após configurar socket
-      setTimeout(async () => {
-        await this.generateQRCode(connection);
-      }, 1000);
+      // Gerar QR Code imediatamente
+      await this.generateQRCode(connection);
 
-      return { success: true, status: 'connecting' };
+      return { 
+        success: true, 
+        status: 'connecting',
+        qrCode: connection.qrCode 
+      };
 
     } catch (error) {
       console.error(`[Baileys] Erro ao conectar bot ${botId}:`, error);
@@ -129,6 +131,7 @@ class BaileysRealProvider {
       connection.qrCode = qrImage;
       
       console.log(`[Baileys] QR Code gerado para bot ${connection.botId}`);
+      console.log(`[Baileys] QR Image base64 length: ${qrImage.length}`);
 
       // Simular connection.update event com QR
       await this.handleConnectionUpdate(connection, { qr: qrString });
