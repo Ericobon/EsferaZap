@@ -67,14 +67,34 @@ export default function Sidebar() {
           ) 
         },
         { 
-          name: 'Leads por Geolocalização', 
-          href: '/campanhas/leads-geolocalizacao', 
+          name: 'Geolocalização', 
+          href: '/campanhas/geolocalizacao', 
           icon: (
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
             </svg>
-          ) 
+          ),
+          submenu: [
+            { 
+              name: 'Leads por Geolocalização', 
+              href: '/campanhas/leads-geolocalizacao', 
+              icon: (
+                <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                </svg>
+              ) 
+            },
+            { 
+              name: 'CNAEs Segmento', 
+              href: '/campanhas/cnaes-segmento', 
+              icon: (
+                <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                </svg>
+              ) 
+            }
+          ]
         }
       ]
     },
@@ -198,19 +218,39 @@ export default function Sidebar() {
               </Link>
               
               {/* Submenu */}
-              {item.submenu && (isActive(item.href) || item.submenu.some(sub => isActive(sub.href))) && (
+              {item.submenu && (isActive(item.href) || item.submenu.some(sub => isActive(sub.href) || (sub.submenu && sub.submenu.some(subsub => isActive(subsub.href))))) && (
                 <div className="ml-6 mt-2 space-y-1">
                   {item.submenu.map((subItem) => (
-                    <Link key={subItem.name} href={subItem.href}>
-                      <div className={`${
-                        isActive(subItem.href)
-                          ? 'bg-primary/10 text-primary border-l-2 border-primary'
-                          : 'text-gray-500 hover:bg-gray-50 hover:text-gray-700 border-l-2 border-gray-200'
-                      } flex items-center px-3 py-2 text-xs font-medium rounded-md transition-colors`}>
-                        <div className="mr-2">{subItem.icon}</div>
-                        {subItem.name}
-                      </div>
-                    </Link>
+                    <div key={subItem.name}>
+                      <Link href={subItem.href}>
+                        <div className={`${
+                          isActive(subItem.href) || (subItem.submenu && subItem.submenu.some(subsub => isActive(subsub.href)))
+                            ? 'bg-primary/10 text-primary border-l-2 border-primary'
+                            : 'text-gray-500 hover:bg-gray-50 hover:text-gray-700 border-l-2 border-gray-200'
+                        } flex items-center px-3 py-2 text-xs font-medium rounded-md transition-colors`}>
+                          <div className="mr-2">{subItem.icon}</div>
+                          {subItem.name}
+                        </div>
+                      </Link>
+                      
+                      {/* Sub-submenu for nested items like Geolocalização */}
+                      {subItem.submenu && (isActive(subItem.href) || subItem.submenu.some(subsub => isActive(subsub.href))) && (
+                        <div className="ml-6 mt-1 space-y-1">
+                          {subItem.submenu.map((subSubItem) => (
+                            <Link key={subSubItem.name} href={subSubItem.href}>
+                              <div className={`${
+                                isActive(subSubItem.href)
+                                  ? 'bg-primary/10 text-primary border-l-2 border-primary'
+                                  : 'text-gray-400 hover:bg-gray-50 hover:text-gray-600 border-l-2 border-gray-100'
+                              } flex items-center px-3 py-1.5 text-xs font-medium rounded-md transition-colors`}>
+                                <div className="mr-2">{subSubItem.icon}</div>
+                                {subSubItem.name}
+                              </div>
+                            </Link>
+                          ))}
+                        </div>
+                      )}
+                    </div>
                   ))}
                 </div>
               )}
