@@ -11,6 +11,7 @@ import { processWithGemini, analyzeSentiment } from "./services/gemini.js";
 import { createWhatsAppProvider } from "./services/whatsapp-providers.js";
 import { URLGeneratorService } from "./services/urlGenerator.js";
 import { WhatsAppSimulator } from "./services/whatsapp-simulator.js";
+import { baileysSimpleProvider } from "./services/baileys-simple.js";
 import { insertBotSchema, insertConversationSchema, insertMessageSchema } from "@shared/schema";
 import { z } from "zod";
 
@@ -159,12 +160,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
           bot.webhookUrl = finalWebhookUrl;
         }
 
-        // Auto-configurar para MVP (simulação)
+        // Auto-conectar Baileys quando bot é criado
         if (bot.whatsappProvider === 'baileys') {
-          await storage.updateBot(bot.id, {
-            connectionStatus: 'connected',
-            lastConnectionCheck: new Date()
-          });
+          // Iniciar conexão Baileys em background
+          setTimeout(async () => {
+            console.log(`[API] Iniciando conexão Baileys para bot ${bot.id}`);
+            const result = await baileysSimpleProvider.connectBot(bot.id);
+            console.log(`[API] Resultado conexão Baileys:`, result);
+          }, 1000);
         }
       }
       
@@ -633,6 +636,72 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error processing webhook:", error);
       res.status(500).json({ message: "Failed to process webhook" });
+    }
+  });
+
+  // Rota para conectar WhatsApp via Baileys
+  app.post('/api/bots/:botId/connect-whatsapp', isAuthenticated, async (req: any, res) => {
+    try {
+      const { botId } = req.params;
+      const userId = req.user.id;
+
+      // Verificar se o bot pertence ao usuário
+      const bot = await storage.getBot(botId);
+      if (!bot || bot.userId !== userId) {
+        return res.status(404).json({ message: "Bot não encontrado" });
+      }
+
+      // Conectar via Baileys
+      const result = await baileysSimpleProvider.connectBot(botId);
+      
+      if (result.success) {
+        res.json({
+          success: true,
+          qrCode: result.qrCode,
+          status: result.status,
+          message: "QR Code gerado com sucesso"
+        });
+      } else {
+        res.status(500).json({
+          success: false,
+          error: result.error
+        });
+      }
+
+    } catch (error) {
+      console.error("Erro ao conectar WhatsApp:", error);
+      res.status(500).json({ 
+        success: false,
+        error: "Erro interno do servidor" 
+      });
+    }
+  });
+
+  // Rota para verificar status da conexão WhatsApp
+  app.get('/api/bots/:botId/whatsapp-status', isAuthenticated, async (req: any, res) => {
+    try {
+      const { botId } = req.params;
+      const userId = req.user.id;
+
+      // Verificar se o bot pertence ao usuário
+      const bot = await storage.getBot(botId);
+      if (!bot || bot.userId !== userId) {
+        return res.status(404).json({ message: "Bot não encontrado" });
+      }
+
+      const status = baileysSimpleProvider.getConnectionStatus(botId);
+      const qrCode = baileysSimpleProvider.getQRCode(botId);
+
+      res.json({
+        botId,
+        status,
+        qrCode,
+        connected: status === 'connected'
+      });
+
+    } catch (error) {
+      console.error("Erro ao verificar status WhatsApp:", error);
+      res.status(500).json({ message: "Erro interno do servidor" });
     }
   });
 

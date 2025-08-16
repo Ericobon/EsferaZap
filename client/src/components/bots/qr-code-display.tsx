@@ -22,49 +22,66 @@ export function QRCodeDisplay({ botId, botName, phoneNumber, onConnectionSuccess
   const [countdown, setCountdown] = useState<number>(8);
   const { toast } = useToast();
 
-  // Gerar QR Code real
+  // Conectar com Baileys real
   const generateQRMutation = useMutation({
     mutationFn: async () => {
-      // Simular delay de geração
-      await new Promise(resolve => setTimeout(resolve, 1500));
+      // Chamar API real do Baileys
+      const response = await apiRequest('POST', `/api/bots/${botId}/connect-whatsapp`);
       
-      // Gerar QR Code data real do Baileys
-      const qrData = `2@${Math.random().toString(36).substring(2, 15)}${Math.random().toString(36).substring(2, 15)},${Math.random().toString(36).substring(2, 15)}${Math.random().toString(36).substring(2, 15)},${botId}`;
-      
-      // Gerar imagem QR Code
-      const qrImage = await QRCodeLib.toDataURL(qrData, {
-        width: 250,
-        margin: 2,
-        color: {
-          dark: '#000000',
-          light: '#FFFFFF'
-        }
-      });
-      
-      setQrCodeData(qrData);
-      setQrCodeImage(qrImage);
-      setConnectionStatus('connecting');
-      setCountdown(8);
-      
-      // Countdown timer
-      const timer = setInterval(() => {
-        setCountdown(prev => {
-          if (prev <= 1) {
-            clearInterval(timer);
-            setConnectionStatus('connected');
-            queryClient.invalidateQueries({ queryKey: ['/api/bots'] });
-            toast({
-              title: "WhatsApp Conectado!",
-              description: "Seu bot está pronto para receber mensagens",
-            });
-            onConnectionSuccess?.();
-            return 0;
+      if (response.success && response.qrCode) {
+        setQrCodeData('baileys_qr_generated');
+        setQrCodeImage(response.qrCode);
+        setConnectionStatus('connecting');
+        setCountdown(8);
+        
+        // Polling para verificar status da conexão
+        const pollStatus = async () => {
+          try {
+            const statusResponse = await apiRequest('GET', `/api/bots/${botId}/whatsapp-status`);
+            
+            if (statusResponse.status === 'connected') {
+              setConnectionStatus('connected');
+              queryClient.invalidateQueries({ queryKey: ['/api/bots'] });
+              toast({
+                title: "WhatsApp Conectado!",
+                description: "Seu bot está pronto para receber mensagens",
+              });
+              onConnectionSuccess?.();
+              return true; // Stop polling
+            }
+            return false; // Continue polling
+          } catch (error) {
+            console.error('Erro ao verificar status:', error);
+            return false;
           }
-          return prev - 1;
-        });
-      }, 1000);
+        };
+        
+        // Countdown timer com polling
+        const timer = setInterval(async () => {
+          setCountdown(prev => {
+            if (prev <= 1) {
+              clearInterval(timer);
+              // Verificar status final
+              pollStatus();
+              return 0;
+            }
+            return prev - 1;
+          });
+          
+          // Verificar status a cada 2 segundos
+          if (countdown % 2 === 0) {
+            const connected = await pollStatus();
+            if (connected) {
+              clearInterval(timer);
+              setCountdown(0);
+            }
+          }
+        }, 1000);
+        
+        return response.qrCode;
+      }
       
-      return qrData;
+      throw new Error(response.error || 'Erro ao gerar QR Code');
     },
     onError: () => {
       toast({

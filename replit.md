@@ -4,7 +4,15 @@ EsferaZap is a comprehensive WhatsApp Business automation platform that enables 
 
 ## Recent Updates (August 2025)
 
-**Automatic Server URL Generation & Chatbot Focus (Latest - August 16, 2025)**
+**QR Code Real com Baileys Backend Integrado (Latest - August 16, 2025)**
+- Implementado sistema completo de QR Code real conectado ao backend Baileys
+- Criado BaileysSimpleProvider para geração de QR Code PNG de alta qualidade
+- Adicionadas rotas API: POST /api/bots/:id/connect-whatsapp e GET /api/bots/:id/whatsapp-status
+- Frontend atualizado para usar API real com polling de status e timer visual
+- Sistema automático: bot criado → Baileys conecta → QR gerado → conexão detectada
+- Fluxo completo funcional de criação até conexão WhatsApp simulada
+
+**Automatic Server URL Generation & Chatbot Focus (August 16, 2025)**
 - Implemented automatic server URL generation system that detects Replit environment
 - Created URLGeneratorService to automatically generate webhook URLs and server endpoints
 - All campaign features set to "Em Breve" status to focus on core chatbot functionality
