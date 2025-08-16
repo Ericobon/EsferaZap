@@ -73,7 +73,7 @@ export default function Register() {
   });
 
   const registerMutation = useMutation({
-    mutationFn: (data: RegisterForm) => {
+    mutationFn: async (data: RegisterForm) => {
       const payload = {
         fullName: `${data.firstName} ${data.lastName}`,
         email: data.email,
@@ -82,7 +82,8 @@ export default function Register() {
         sector: data.sector,
         password: data.password,
       };
-      return apiRequest("/api/auth/register", "POST", payload);
+      const response = await apiRequest("POST", "/api/auth/register", payload);
+      return response.json();
     },
     onSuccess: () => {
       toast({
@@ -90,7 +91,7 @@ export default function Register() {
         description: "Bem-vindo ao EsferaZap. Redirecionando...",
       });
       setTimeout(() => {
-        window.location.href = "/login";
+        window.location.href = "/";
       }, 2000);
     },
     onError: (error: any) => {
