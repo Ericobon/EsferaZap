@@ -207,9 +207,92 @@ export default function Bots() {
                     className="bg-primary hover:bg-primary-dark"
                   >
                     <i className="fas fa-plus mr-2"></i>
-                    Criar Primeiro Bot
-                  </Button>
-                </div>
+                  Criar Primeiro Bot
+                </Button>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {bots.map((bot: Bot) => (
+                  <Card key={bot.id} className="hover:shadow-lg transition-shadow">
+                    <CardHeader className="pb-3">
+                      <div className="flex items-center justify-between">
+                        <CardTitle className="text-lg">{bot.name}</CardTitle>
+                        {getStatusBadge(bot.status || 'inactive')}
+                      </div>
+                      <p className="text-sm text-gray-600">{bot.phoneNumber}</p>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="space-y-3">
+                        <div className="flex items-center text-sm text-gray-600">
+                          <Activity className="h-4 w-4 mr-2" />
+                          Criado em {new Date(bot.createdAt!).toLocaleDateString('pt-BR')}
+                        </div>
+                        
+                        {bot.prompt && (
+                          <div className="text-sm text-gray-600">
+                            <BotIcon className="h-4 w-4 mr-2" />
+                            Prompt personalizado
+                          </div>
+                        )}
+
+                        {/* Bot capabilities */}
+                        <div className="flex items-center gap-2 text-xs">
+                          {bot.supportsText && (
+                            <Badge variant="secondary" className="text-blue-600 bg-blue-50">
+                              Texto
+                            </Badge>
+                          )}
+                          {bot.supportsAudio && (
+                            <Badge variant="secondary" className="text-green-600 bg-green-50">
+                              Áudio
+                            </Badge>
+                          )}
+                          {bot.supportsImages && (
+                            <Badge variant="secondary" className="text-purple-600 bg-purple-50">
+                              Imagens
+                            </Badge>
+                          )}
+                          <Badge variant="secondary" className="text-gray-600 bg-gray-50">
+                            {bot.botType === 'business' ? 'Business' : 'Pessoal'}
+                          </Badge>
+                        </div>
+                        
+                        <div className="flex items-center justify-between pt-4">
+                          <div className="flex items-center gap-2">
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={() => handleEdit(bot)}
+                            >
+                              <Settings className="h-3 w-3 mr-1" />
+                              Editar
+                            </Button>
+                            <QRCodeDialog bot={bot} />
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              className="text-green-600 border-green-200 hover:bg-green-50"
+                              onClick={() => checkConnectionStatus(bot.id)}
+                            >
+                              <Wifi className="h-3 w-3 mr-1" />
+                              Status
+                            </Button>
+                          </div>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            className="text-red-600 border-red-200 hover:bg-red-50"
+                            onClick={() => handleDelete(bot.id)}
+                            disabled={deleteBotMutation.isPending}
+                          >
+                            <Trash2 className="h-3 w-3 mr-1" />
+                            Deletar
+                          </Button>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
               </div>
             ) : (
               <div className="space-y-6">

@@ -54,6 +54,7 @@ export const messageStatusEnum = pgEnum('message_status', ['pending', 'sent', 'd
 export const messageTypeEnum = pgEnum('message_type', ['text', 'image', 'audio', 'document', 'video']);
 export const messageDirectionEnum = pgEnum('message_direction', ['inbound', 'outbound']);
 export const whatsappProviderEnum = pgEnum('whatsapp_provider', ['meta_business', 'twilio', 'evolution_api', 'baileys', 'wppconnect', 'venom']);
+export const providerTierEnum = pgEnum('provider_tier', ['free_personal', 'official_paid']);
 
 export const bots = pgTable("bots", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
@@ -73,6 +74,7 @@ export const bots = pgTable("bots", {
   supportsImages: boolean("supports_images").default(false),
   // WhatsApp API Provider Configuration
   whatsappProvider: whatsappProviderEnum("whatsapp_provider").default('meta_business'),
+  providerTier: providerTierEnum("provider_tier").default('official_paid'),
   apiKey: varchar("api_key"), // API Key for the provider
   accessToken: text("access_token"), // OAuth Access Token
   refreshToken: text("refresh_token"), // OAuth Refresh Token

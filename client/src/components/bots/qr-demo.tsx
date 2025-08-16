@@ -39,12 +39,15 @@ export function QRDemo({ botId }: QRDemoProps) {
   const { toast } = useToast();
 
   const providers = {
-    meta_business: 'Meta Business API',
-    twilio: 'Twilio WhatsApp',
-    evolution_api: 'Evolution API',
-    baileys: 'Baileys (Open Source)',
-    wppconnect: 'WPPConnect',
-    venom: 'Venom Bot'
+    // APIs Oficiais (Pagas)
+    meta_business: { name: 'Meta Business API', tier: 'official_paid', cost: 'Paga' },
+    twilio: { name: 'Twilio WhatsApp', tier: 'official_paid', cost: 'Paga' },
+    evolution_api: { name: 'Evolution API', tier: 'official_paid', cost: 'Paga' },
+    
+    // APIs Gratuitas (Pessoais)
+    baileys: { name: 'Baileys (Open Source)', tier: 'free_personal', cost: 'Gratuita' },
+    wppconnect: { name: 'WPPConnect', tier: 'free_personal', cost: 'Gratuita' },
+    venom: { name: 'Venom Bot', tier: 'free_personal', cost: 'Gratuita' }
   };
 
   const generateDemoQR = async () => {
@@ -79,7 +82,7 @@ export function QRDemo({ botId }: QRDemoProps) {
       
       toast({
         title: "QR Code Gerado!",
-        description: `QR Code demo para ${providers[selectedProvider as keyof typeof providers]}`,
+        description: `QR Code demo para ${providers[selectedProvider as keyof typeof providers].name}`,
       });
     }, 1500);
   };
@@ -90,7 +93,7 @@ export function QRDemo({ botId }: QRDemoProps) {
       title: isConnected ? "Desconectado" : "Conectado!",
       description: isConnected ? 
         "WhatsApp desconectado do sistema" : 
-        `WhatsApp conectado via ${providers[selectedProvider as keyof typeof providers]}`,
+        `WhatsApp conectado via ${providers[selectedProvider as keyof typeof providers].name}`,
       variant: isConnected ? "destructive" : "default",
     });
   };
@@ -152,9 +155,29 @@ export function QRDemo({ botId }: QRDemoProps) {
                 <SelectValue placeholder="Selecione o provedor" />
               </SelectTrigger>
               <SelectContent>
-                {Object.entries(providers).map(([key, label]) => (
-                  <SelectItem key={key} value={key}>{label}</SelectItem>
-                ))}
+                <div className="p-2 text-xs font-semibold text-gray-600 border-b">APIs Oficiais (Pagas)</div>
+                {Object.entries(providers)
+                  .filter(([_, provider]) => provider.tier === 'official_paid')
+                  .map(([key, provider]) => (
+                    <SelectItem key={key} value={key}>
+                      <div className="flex items-center justify-between w-full">
+                        <span>{provider.name}</span>
+                        <Badge variant="default" className="ml-2 text-xs">Paga</Badge>
+                      </div>
+                    </SelectItem>
+                  ))}
+                
+                <div className="p-2 text-xs font-semibold text-gray-600 border-b border-t mt-1">APIs Gratuitas (Pessoais)</div>
+                {Object.entries(providers)
+                  .filter(([_, provider]) => provider.tier === 'free_personal')
+                  .map(([key, provider]) => (
+                    <SelectItem key={key} value={key}>
+                      <div className="flex items-center justify-between w-full">
+                        <span>{provider.name}</span>
+                        <Badge variant="secondary" className="ml-2 text-xs">Gratuita</Badge>
+                      </div>
+                    </SelectItem>
+                  ))}
               </SelectContent>
             </Select>
           </div>
@@ -212,7 +235,13 @@ export function QRDemo({ botId }: QRDemoProps) {
             Conexão WhatsApp
           </CardTitle>
           <CardDescription>
-            {providers[selectedProvider as keyof typeof providers]}
+            {providers[selectedProvider as keyof typeof providers].name}
+            <Badge 
+              variant={providers[selectedProvider as keyof typeof providers].tier === 'free_personal' ? "secondary" : "default"}
+              className="ml-2"
+            >
+              {providers[selectedProvider as keyof typeof providers].cost}
+            </Badge>
           </CardDescription>
         </CardHeader>
         
@@ -300,9 +329,18 @@ export function QRDemo({ botId }: QRDemoProps) {
           </div>
 
           {/* Provider Badge */}
-          <div className="flex justify-center">
-            <Badge variant="secondary" className="text-xs">
-              {providers[selectedProvider as keyof typeof providers]}
+          <div className="flex justify-center gap-2">
+            <Badge 
+              variant={providers[selectedProvider as keyof typeof providers].tier === 'free_personal' ? "secondary" : "default"}
+              className="text-xs"
+            >
+              {providers[selectedProvider as keyof typeof providers].name}
+            </Badge>
+            <Badge 
+              variant={providers[selectedProvider as keyof typeof providers].tier === 'free_personal' ? "outline" : "destructive"}
+              className="text-xs"
+            >
+              {providers[selectedProvider as keyof typeof providers].cost}
             </Badge>
           </div>
         </CardContent>

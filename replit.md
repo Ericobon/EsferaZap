@@ -4,7 +4,17 @@ EsferaZap is a comprehensive WhatsApp Business automation platform that enables 
 
 ## Recent Updates (August 2025)
 
-**New Registration Interface (Latest)**
+**WhatsApp Provider Categorization System (Latest - August 16, 2025)**
+- Implemented comprehensive categorization of WhatsApp APIs into two tiers:
+  - **Official/Paid APIs**: Meta Business API, Twilio WhatsApp, Evolution API
+  - **Free/Personal APIs**: Baileys, WPPConnect, Venom Bot  
+- Added `provider_tier` enum to database schema with automatic classification
+- Created detailed comparison interface showing features, limitations, and use cases
+- Enhanced QR Code demo with provider-specific categorization and visual indicators
+- Added comprehensive provider information component with recommendations
+- Updated database with migration to support new provider tier classification
+
+**New Registration Interface**
 - Complete redesign following modern Figma-based patterns with EsferaZap brand colors
 - Multi-step registration form with personal info and company details
 - Enhanced database schema with phone, company, and sector fields
