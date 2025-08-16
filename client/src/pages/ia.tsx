@@ -7,18 +7,17 @@ import { isUnauthorizedError } from "@/lib/authUtils";
 import { apiRequest } from "@/lib/queryClient";
 import Sidebar from "@/components/layout/sidebar";
 import Header from "@/components/layout/header";
-import BotForm from "@/components/bots/bot-form";
+import { CreateBotWizard } from "@/components/bots/create-bot-wizard";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import type { Bot } from "@shared/schema";
-import { Settings, Trash2, Bot as BotIcon, Activity, QrCode, Brain, Sparkles } from "lucide-react";
+import { Brain, Plus, Settings, Trash2, BotIcon, Activity, QrCode, Sparkles } from "lucide-react";
 
 export default function IA() {
   const { toast } = useToast();
   const { isAuthenticated, isLoading } = useAuth();
-  const [showForm, setShowForm] = useState(false);
-  const [editingBot, setEditingBot] = useState<Bot | null>(null);
+  const [showCreateWizard, setShowCreateWizard] = useState(false);
 
   // Redirect to home if not authenticated
   useEffect(() => {
@@ -46,110 +45,89 @@ export default function IA() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/bots"] });
-      queryClient.invalidateQueries({ queryKey: ["/api/analytics/dashboard"] });
       toast({
-        title: "Bot deletado",
-        description: "O bot foi deletado com sucesso.",
+        title: "Bot deletado com sucesso!",
+        description: "O bot foi removido permanentemente.",
       });
     },
     onError: (error) => {
       if (isUnauthorizedError(error)) {
         toast({
           title: "Unauthorized",
-          description: "You are logged out. Logging in again...",
+          description: "Você foi deslogado. Redirecionando...",
           variant: "destructive",
         });
         setTimeout(() => {
           window.location.href = "/api/login";
-        }, 500);
+        }, 1000);
         return;
       }
+      
       toast({
-        title: "Erro",
-        description: "Falha ao deletar o bot.",
+        title: "Erro ao deletar bot",
+        description: "Não foi possível deletar o bot. Tente novamente.",
         variant: "destructive",
       });
     },
   });
 
-  if (isLoading || !isAuthenticated) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <div className="w-16 h-16 bg-primary rounded-lg flex items-center justify-center mx-auto mb-4">
-            <Brain className="text-white text-2xl animate-pulse" />
-          </div>
-          <div className="text-xl font-semibold text-gray-900">Carregando...</div>
-        </div>
-      </div>
-    );
-  }
-
-  const handleEdit = (bot: Bot) => {
-    setEditingBot(bot);
-    setShowForm(true);
-  };
-
   const handleDelete = (botId: string) => {
-    if (confirm("Tem certeza que deseja deletar este bot?")) {
+    if (confirm("Tem certeza que deseja deletar este bot? Esta ação não pode ser desfeita.")) {
       deleteBotMutation.mutate(botId);
     }
   };
 
-  const handleFormClose = () => {
-    setShowForm(false);
-    setEditingBot(null);
+  const getStatusBadge = (status: string) => {
+    const statusConfig = {
+      active: { label: "Ativo", className: "bg-green-100 text-green-800" },
+      inactive: { label: "Inativo", className: "bg-gray-100 text-gray-800" },
+      connecting: { label: "Conectando", className: "bg-yellow-100 text-yellow-800" },
+      error: { label: "Erro", className: "bg-red-100 text-red-800" },
+    };
+    
+    const config = statusConfig[status as keyof typeof statusConfig] || statusConfig.inactive;
+    return <Badge className={config.className}>{config.label}</Badge>;
   };
 
-  const getStatusBadge = (status: string) => {
-    switch (status) {
-      case 'active':
-        return <Badge className="bg-green-100 text-green-800">Ativo</Badge>;
-      case 'inactive':
-        return <Badge className="bg-gray-100 text-gray-800">Inativo</Badge>;
-      case 'configuring':
-        return <Badge className="bg-yellow-100 text-yellow-800">Configurando</Badge>;
-      default:
-        return <Badge className="bg-gray-100 text-gray-800">{status}</Badge>;
-    }
+  const handleWizardComplete = (botId: string) => {
+    setShowCreateWizard(false);
+    queryClient.invalidateQueries({ queryKey: ["/api/bots"] });
+    toast({
+      title: "Bot de IA criado!",
+      description: "Seu bot está pronto para uso.",
+    });
   };
+
+  if (isLoading) {
+    return <div>Carregando...</div>;
+  }
+
+  if (!isAuthenticated) {
+    return null;
+  }
 
   return (
-    <div className="flex h-screen overflow-hidden">
+    <div className="flex h-screen bg-gray-50">
       <Sidebar />
-      
-      <div className="flex flex-col flex-1 overflow-hidden">
+      <div className="flex-1 flex flex-col">
         <Header 
-          title="Inteligência Artificial" 
-          subtitle="Gerencie seus bots de IA para WhatsApp"
+          title="Bots de IA" 
           action={
             <Button
-              onClick={() => setShowForm(true)}
-              className="bg-primary hover:bg-primary-dark"
+              onClick={() => setShowCreateWizard(true)}
+              className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
             >
-              <Sparkles className="h-4 w-4 mr-2" />
-              Novo Bot de IA
+              <Plus className="h-4 w-4 mr-2" />
+              Criar Bot de IA
             </Button>
           }
         />
         
-        <main className="flex-1 overflow-y-auto">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-            
-            {showForm && (
-              <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
-                <div className="bg-white rounded-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-                  <BotForm 
-                    bot={editingBot}
-                    onClose={handleFormClose}
-                  />
-                </div>
-              </div>
-            )}
-
+        <main className="flex-1 overflow-auto p-6">
+          <div className="max-w-7xl mx-auto">
             {botsLoading ? (
               <div className="text-center py-12">
-                <Brain className="h-16 w-16 text-primary mx-auto mb-4 animate-pulse" />
+                <Brain className="h-12 w-12 text-gray-400 mx-auto mb-4 animate-pulse" />
                 <p className="text-gray-600">Carregando bots de IA...</p>
               </div>
             ) : bots.length === 0 ? (
@@ -160,8 +138,8 @@ export default function IA() {
                 <h3 className="text-xl font-semibold text-gray-900 mb-2">Nenhum bot de IA criado</h3>
                 <p className="text-gray-600 mb-6">Crie seu primeiro bot de IA para começar a automatizar conversas no WhatsApp</p>
                 <Button
-                  onClick={() => setShowForm(true)}
-                  className="bg-primary hover:bg-primary-dark"
+                  onClick={() => setShowCreateWizard(true)}
+                  className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
                 >
                   <Sparkles className="h-4 w-4 mr-2" />
                   Criar Primeiro Bot de IA
@@ -222,7 +200,10 @@ export default function IA() {
                             <Button
                               size="sm"
                               variant="outline"
-                              onClick={() => handleEdit(bot)}
+                              onClick={() => toast({
+                                title: "Em breve",
+                                description: "Funcionalidade de edição será adicionada",
+                              })}
                             >
                               <Settings className="h-3 w-3 mr-1" />
                               Editar
@@ -262,6 +243,14 @@ export default function IA() {
           </div>
         </main>
       </div>
+
+      {/* Create Bot Wizard */}
+      {showCreateWizard && (
+        <CreateBotWizard
+          onClose={() => setShowCreateWizard(false)}
+          onComplete={handleWizardComplete}
+        />
+      )}
     </div>
   );
 }
