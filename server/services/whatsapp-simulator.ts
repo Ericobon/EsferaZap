@@ -6,7 +6,7 @@ export class WhatsAppSimulator {
    */
   static async simulateMessage(botId: string, message: string, fromNumber: string = '+5511999999999') {
     try {
-      const { storage } = await import('../storage');
+      const { storage } = await import('../storage.js');
       const bot = await storage.getBot(botId);
       
       if (!bot || !bot.prompt) {
@@ -18,7 +18,7 @@ export class WhatsAppSimulator {
       const aiResponse = await generateWhatsAppResponse(message, [], bot.prompt);
 
       // Simular conversa no banco
-      let conversation = await storage.getConversationByPhone(botId, fromNumber);
+      let conversation = await storage.getActiveConversationByPhone(botId, fromNumber);
       if (!conversation) {
         conversation = await storage.createConversation({
           botId,

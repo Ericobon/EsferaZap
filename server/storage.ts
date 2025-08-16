@@ -217,6 +217,19 @@ export class DatabaseStorage implements IStorage {
     return conversation;
   }
 
+  async getConversationByPhone(botId: string, customerPhone: string): Promise<Conversation | undefined> {
+    const [conversation] = await db
+      .select()
+      .from(conversations)
+      .where(
+        and(
+          eq(conversations.botId, botId),
+          eq(conversations.customerPhone, customerPhone)
+        )
+      );
+    return conversation;
+  }
+
   // Message operations
   async getConversationMessages(conversationId: string, limit = 100): Promise<Message[]> {
     return await db
