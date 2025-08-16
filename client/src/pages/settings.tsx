@@ -389,37 +389,6 @@ export default function SettingsPage() {
               </div>
             </CardContent>
           </Card>
-
-          {/* Logout Section */}
-          <Card className="border-red-200">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-red-600">
-                <Shield className="h-5 w-5" />
-                Sair da Conta
-              </CardTitle>
-              <CardDescription>
-                Encerrar sessão e retornar à página de login
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="flex items-center justify-between">
-                <div>
-                  <Label className="text-sm font-medium">Logout</Label>
-                  <p className="text-sm text-gray-600">
-                    Desconecte-se com segurança da sua conta
-                  </p>
-                </div>
-                <Button 
-                  variant="destructive" 
-                  size="sm"
-                  onClick={() => logoutMutation.mutate()}
-                  disabled={logoutMutation.isPending}
-                >
-                  {logoutMutation.isPending ? "Saindo..." : "Sair da Conta"}
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
         </div>
       </div>
     </Layout>

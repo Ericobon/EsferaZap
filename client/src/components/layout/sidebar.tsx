@@ -1,5 +1,7 @@
 import { useAuth } from "@/hooks/useAuth";
 import { Link, useLocation } from "wouter";
+import { useQuery } from "@tanstack/react-query";
+import UserMenu from './user-menu';
 import type { User } from "@shared/schema";
 
 export default function Sidebar() {
@@ -109,15 +111,7 @@ export default function Sidebar() {
         </svg>
       ),
     },
-    { 
-      name: 'API Keys', 
-      href: '/api-keys', 
-      icon: (
-        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" />
-        </svg>
-      )
-    },
+
     { 
       name: 'Suporte', 
       href: '/support', 
@@ -224,36 +218,21 @@ export default function Sidebar() {
 
         {/* User Section */}
         <div className="flex-shrink-0 px-4 py-4 border-t border-gray-200">
-          <div className="flex items-center space-x-3">
-            <div className="w-8 h-8 rounded-full overflow-hidden bg-gray-200">
-              {user?.profileImageUrl ? (
-                <img 
-                  src={user.profileImageUrl} 
-                  alt="Avatar do usuário" 
-                  className="w-full h-full object-cover" 
-                />
-              ) : (
-                <div className="w-full h-full bg-primary flex items-center justify-center">
-                  <span className="text-white text-sm font-semibold">
-                    {user?.firstName?.[0]}{user?.lastName?.[0]}
-                  </span>
-                </div>
-              )}
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-3 flex-1">
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-medium text-gray-900 truncate">
+                  {user?.fullName || `${user?.firstName} ${user?.lastName}` || "ERICO BONILHA"}
+                </p>
+                <p className="text-xs text-gray-500 truncate">
+                  {user?.email || "admin@insightesfera.io"}
+                </p>
+              </div>
             </div>
-            <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium text-gray-900 truncate">
-                {user?.firstName} {user?.lastName}
-              </p>
-              <p className="text-xs text-gray-500 truncate">
-                {user?.email}
-              </p>
-            </div>
-            <button 
-              onClick={() => window.location.href = '/api/logout'}
-              className="text-gray-400 hover:text-gray-600"
-            >
-              <i className="fas fa-sign-out-alt"></i>
-            </button>
+            <UserMenu user={{
+              fullName: user?.fullName || `${user?.firstName} ${user?.lastName}` || "ERICO BONILHA",
+              email: user?.email || "admin@insightesfera.io"
+            }} />
           </div>
         </div>
       </div>
