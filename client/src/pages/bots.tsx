@@ -7,12 +7,12 @@ import { isUnauthorizedError } from "@/lib/authUtils";
 import { apiRequest } from "@/lib/queryClient";
 import Sidebar from "@/components/layout/sidebar";
 import Header from "@/components/layout/header";
-import BotForm from "@/components/bots/bot-form";
+import { CreateBotWizard } from "@/components/bots/create-bot-wizard";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import type { Bot } from "@shared/schema";
-import { Settings, Trash2, Bot as BotIcon, Activity, QrCode, Wifi } from "lucide-react";
+import { Settings, Trash2, Bot as BotIcon, Activity, QrCode, Wifi, Plus } from "lucide-react";
 import { QRCodeDialog } from "@/components/bots/qr-code-dialog";
 import { QRDemo } from "@/components/bots/qr-demo";
 import { ProviderCategoriesInfo } from "@/components/bots/provider-categories-info";
@@ -20,8 +20,7 @@ import { ProviderCategoriesInfo } from "@/components/bots/provider-categories-in
 export default function Bots() {
   const { toast } = useToast();
   const { isAuthenticated, isLoading } = useAuth();
-  const [showForm, setShowForm] = useState(false);
-  const [editingBot, setEditingBot] = useState<Bot | null>(null);
+  const [showCreateWizard, setShowCreateWizard] = useState(false);
 
   // Redirect to home if not authenticated
   useEffect(() => {
@@ -87,20 +86,15 @@ export default function Bots() {
     );
   }
 
-  const handleEdit = (bot: Bot) => {
-    setEditingBot(bot);
-    setShowForm(true);
-  };
-
   const handleDelete = (botId: string) => {
     if (confirm("Tem certeza que deseja deletar este bot?")) {
       deleteBotMutation.mutate(botId);
     }
   };
 
-  const handleFormClose = () => {
-    setShowForm(false);
-    setEditingBot(null);
+  const handleWizardComplete = (botId: string) => {
+    setShowCreateWizard(false);
+    // Aqui pode abrir o simulador se necessário
   };
 
   const checkConnectionStatus = async (botId: string) => {
@@ -145,11 +139,11 @@ export default function Bots() {
           title="Meus Bots" 
           action={
             <Button
-              onClick={() => setShowForm(true)}
-              className="bg-primary hover:bg-primary-dark"
+              onClick={() => setShowCreateWizard(true)}
+              className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
             >
-              <i className="fas fa-plus mr-2"></i>
-              Novo Bot
+              <Plus className="h-4 w-4 mr-2" />
+              Criar Chatbot
             </Button>
           }
         />
@@ -157,16 +151,7 @@ export default function Bots() {
         <main className="flex-1 overflow-y-auto">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
             
-            {showForm && (
-              <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
-                <div className="bg-white rounded-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-                  <BotForm 
-                    bot={editingBot}
-                    onClose={handleFormClose}
-                  />
-                </div>
-              </div>
-            )}
+{/* Wizard será renderizado no final do componente */}
 
             {botsLoading ? (
               <div className="text-center py-12">
@@ -203,10 +188,10 @@ export default function Bots() {
                   <h3 className="text-xl font-semibold text-gray-900 mb-2">Nenhum bot criado</h3>
                   <p className="text-gray-600 mb-6">Crie seu primeiro bot para começar a automatizar o WhatsApp</p>
                   <Button
-                    onClick={() => setShowForm(true)}
-                    className="bg-primary hover:bg-primary-dark"
+                    onClick={() => setShowCreateWizard(true)}
+                    className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
                   >
-                    <i className="fas fa-plus mr-2"></i>
+                    <Plus className="h-4 w-4 mr-2" />
                     Criar Primeiro Bot
                   </Button>
                 </div>
@@ -244,11 +229,11 @@ export default function Bots() {
                             <Button
                               size="sm"
                               variant="outline"
-                              onClick={() => handleEdit(bot)}
+                              onClick={() => alert('Funcionalidade de edição será adicionada em breve')}
                               className="text-blue-600 border-blue-200 hover:bg-blue-50"
                             >
                               <Settings className="h-3 w-3 mr-1" />
-                              Editar
+                              Configurar
                             </Button>
                             <QRCodeDialog bot={bot} />
                             <Button
@@ -281,6 +266,14 @@ export default function Bots() {
           </div>
         </main>
       </div>
+
+      {/* Create Bot Wizard */}
+      {showCreateWizard && (
+        <CreateBotWizard
+          onClose={() => setShowCreateWizard(false)}
+          onComplete={handleWizardComplete}
+        />
+      )}
     </div>
   );
 }

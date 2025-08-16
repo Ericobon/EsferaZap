@@ -154,3 +154,9 @@
     text-shadow: 0 0 15px rgba(37, 211, 102, 0.4), 0 0 30px rgba(168, 85, 247, 0.3);
   }
 }
+
+/* Fix dropdown hover style - make text bold instead of white */
+[data-radix-collection-item]:hover {
+  font-weight: 600 !important;
+  color: inherit !important;
+}

@@ -7,7 +7,7 @@ import { useAuth } from "@/hooks/useAuth";
 import Home from "@/pages/home";
 import Login from "@/pages/login";
 import Dashboard from "@/pages/dashboard";
-import Bots from "@/pages/bots-simples";
+import Bots from "@/pages/bots";
 import IA from "@/pages/ia";
 import UploadDocumentos from "@/pages/upload-documentos";
 import CompraLeads from "@/pages/campanhas/compra-leads-simples";
