@@ -155,8 +155,24 @@
   }
 }
 
-/* Fix dropdown hover style - make text bold instead of white */
-[data-radix-collection-item]:hover {
+/* Fix dropdown hover style - make text bold instead of white for all Radix components */
+[data-radix-collection-item]:hover,
+[data-radix-select-item]:hover,
+[data-radix-dropdown-menu-item]:hover,
+[data-radix-context-menu-item]:hover,
+[data-radix-menubar-item]:hover,
+[data-radix-navigation-menu-item]:hover {
   font-weight: 600 !important;
   color: inherit !important;
+  background-color: rgba(0, 0, 0, 0.05) !important;
+}
+
+/* Dark mode dropdown fix */
+.dark [data-radix-collection-item]:hover,
+.dark [data-radix-select-item]:hover,
+.dark [data-radix-dropdown-menu-item]:hover,
+.dark [data-radix-context-menu-item]:hover,
+.dark [data-radix-menubar-item]:hover,
+.dark [data-radix-navigation-menu-item]:hover {
+  background-color: rgba(255, 255, 255, 0.1) !important;
 }

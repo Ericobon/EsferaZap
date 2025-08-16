@@ -13,9 +13,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import type { Bot } from "@shared/schema";
 import { Settings, Trash2, Bot as BotIcon, Activity, QrCode, Wifi, Plus } from "lucide-react";
-import { QRCodeDialog } from "@/components/bots/qr-code-dialog";
-import { QRDemo } from "@/components/bots/qr-demo";
-import { ProviderCategoriesInfo } from "@/components/bots/provider-categories-info";
+// Removendo imports de componentes não utilizados no wizard
 
 export default function Bots() {
   const { toast } = useToast();
@@ -155,35 +153,29 @@ export default function Bots() {
 
             {botsLoading ? (
               <div className="text-center py-12">
-                <i className="fas fa-spinner fa-spin text-4xl text-primary mb-4"></i>
-                <p className="text-gray-600">Carregando bots...</p>
+                <BotIcon className="h-12 w-12 text-gray-400 mx-auto mb-4 animate-pulse" />
+                <p className="text-gray-600">Carregando chatbots...</p>
               </div>
             ) : bots.length === 0 ? (
               <div className="space-y-8">
-                {/* QR Demo quando não há bots */}
+                {/* Card de Chamada para Ação - Primeiro Bot */}
                 <Card className="border-dashed border-2 border-blue-200 bg-gradient-to-r from-blue-50 to-purple-50">
                   <CardHeader>
                     <CardTitle className="text-center text-blue-700 flex items-center justify-center gap-2">
-                      <QrCode className="h-5 w-5" />
-                      Demo: Provedores WhatsApp - Gratuitos vs Pagos
+                      <BotIcon className="h-5 w-5" />
+                      Bem-vindo ao EsferaZap
                     </CardTitle>
                     <div className="text-center">
                       <p className="text-sm text-gray-600">
-                        Teste a integração com diferentes tipos de provedores
+                        Crie seu primeiro chatbot com IA para WhatsApp de forma rápida e simples
                       </p>
                     </div>
                   </CardHeader>
-                  <CardContent>
-                    <div className="space-y-6">
-                      <ProviderCategoriesInfo />
-                      <QRDemo />
-                    </div>
-                  </CardContent>
                 </Card>
 
                 <div className="text-center py-12">
                   <div className="w-24 h-24 bg-gray-100 rounded-lg flex items-center justify-center mx-auto mb-6">
-                    <i className="fas fa-robot text-gray-400 text-4xl"></i>
+                    <BotIcon className="h-12 w-12 text-gray-400" />
                   </div>
                   <h3 className="text-xl font-semibold text-gray-900 mb-2">Nenhum bot criado</h3>
                   <p className="text-gray-600 mb-6">Crie seu primeiro bot para começar a automatizar o WhatsApp</p>
@@ -220,7 +212,7 @@ export default function Bots() {
                           </div>
                           {bot.prompt && (
                             <p className="text-sm text-gray-600 max-w-md line-clamp-2">
-                              {bot.prompt.substring(0, 100)}...
+                              {bot.prompt.length > 100 ? bot.prompt.substring(0, 100) + '...' : bot.prompt}
                             </p>
                           )}
                         </div>
@@ -235,7 +227,15 @@ export default function Bots() {
                               <Settings className="h-3 w-3 mr-1" />
                               Configurar
                             </Button>
-                            <QRCodeDialog bot={bot} />
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              className="text-purple-600 border-purple-200 hover:bg-purple-50"
+                              onClick={() => alert('QR Code será implementado em breve')}
+                            >
+                              <QrCode className="h-3 w-3 mr-1" />
+                              QR Code
+                            </Button>
                             <Button
                               size="sm"
                               variant="outline"
