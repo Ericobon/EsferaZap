@@ -1,333 +1,472 @@
 import { useState } from "react";
+import { useMutation } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { Eye, EyeOff, Building, Phone, Mail, User, Lock } from "lucide-react";
-import { useMutation } from "@tanstack/react-query";
-import { apiRequest } from "@/lib/queryClient";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/hooks/use-toast";
+import { apiRequest } from "@/lib/queryClient";
+import { Link } from "wouter";
+import { Eye, EyeOff, ArrowLeft, Building, User, Mail, Phone, Lock, Briefcase } from "lucide-react";
 
-const sectors = [
-  "Tecnologia da Informação",
-  "Saúde",
-  "Educação", 
-  "Marketing",
-  "Vendas",
-  "Administração",
-  "Engenharia",
-  "Jurídico",
-  "Outros"
-];
-
-const registrationSchema = z.object({
-  fullName: z.string().min(2, "Nome deve ter pelo menos 2 caracteres"),
+// Schema de validação para o formulário
+const registerSchema = z.object({
+  firstName: z.string().min(2, "Nome deve ter pelo menos 2 caracteres"),
+  lastName: z.string().min(2, "Sobrenome deve ter pelo menos 2 caracteres"),
   email: z.string().email("Email inválido"),
-  phone: z.string().min(10, "Telefone deve ter pelo menos 10 dígitos"),
-  company: z.string().min(2, "Nome da empresa deve ter pelo menos 2 caracteres"),
+  phone: z.string().min(10, "Telefone deve ter pelo menos 10 dígitos").regex(/^\(\d{2}\)\s\d{4,5}-\d{4}$/, "Formato: (11) 99999-9999"),
+  company: z.string().min(2, "Nome da empresa é obrigatório"),
   sector: z.string().min(1, "Selecione um setor"),
   password: z.string().min(8, "Senha deve ter pelo menos 8 caracteres"),
   confirmPassword: z.string(),
+  acceptTerms: z.boolean().refine((val) => val === true, "Você deve aceitar os termos"),
+  acceptNewsletter: z.boolean().optional(),
 }).refine((data) => data.password === data.confirmPassword, {
-  message: "Senhas não conferem",
+  message: "Senhas não coincidem",
   path: ["confirmPassword"],
 });
 
-type RegistrationForm = z.infer<typeof registrationSchema>;
+type RegisterForm = z.infer<typeof registerSchema>;
 
-export default function RegisterPage() {
+const sectors = [
+  "Tecnologia",
+  "E-commerce",
+  "Saúde",
+  "Educação",
+  "Financeiro",
+  "Varejo",
+  "Serviços",
+  "Manufatura",
+  "Imobiliário",
+  "Alimentício",
+  "Turismo",
+  "Consultoria",
+  "Marketing",
+  "Outro"
+];
+
+export default function Register() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [currentStep, setCurrentStep] = useState(1);
   const { toast } = useToast();
 
-  const form = useForm<RegistrationForm>({
-    resolver: zodResolver(registrationSchema),
+  const form = useForm<RegisterForm>({
+    resolver: zodResolver(registerSchema),
     defaultValues: {
-      fullName: "",
+      firstName: "",
+      lastName: "",
       email: "",
       phone: "",
       company: "",
       sector: "",
       password: "",
       confirmPassword: "",
+      acceptTerms: false,
+      acceptNewsletter: false,
     },
   });
 
   const registerMutation = useMutation({
-    mutationFn: (data: RegistrationForm) => apiRequest("/api/auth/register", "POST", data),
+    mutationFn: (data: RegisterForm) => {
+      const payload = {
+        fullName: `${data.firstName} ${data.lastName}`,
+        email: data.email,
+        phone: data.phone,
+        company: data.company,
+        sector: data.sector,
+        password: data.password,
+      };
+      return apiRequest("/api/auth/register", "POST", payload);
+    },
     onSuccess: () => {
       toast({
-        title: "Cadastro realizado com sucesso!",
-        description: "Você pode fazer login agora.",
+        title: "Conta criada com sucesso!",
+        description: "Bem-vindo ao EsferaZap. Redirecionando...",
       });
-      // Redirect to login or home
-      window.location.href = "/api/login";
+      setTimeout(() => {
+        window.location.href = "/login";
+      }, 2000);
     },
     onError: (error: any) => {
       toast({
         title: "Erro no cadastro",
-        description: error.message || "Tente novamente",
+        description: error.message || "Algo deu errado. Tente novamente.",
         variant: "destructive",
       });
     },
   });
 
-  const onSubmit = (data: RegistrationForm) => {
+  const onSubmit = (data: RegisterForm) => {
     registerMutation.mutate(data);
   };
 
-  const handleGoogleRegister = () => {
-    window.location.href = "/api/login";
+  const formatPhoneNumber = (value: string) => {
+    const numbers = value.replace(/\D/g, '');
+    if (numbers.length <= 2) return `(${numbers}`;
+    if (numbers.length <= 6) return `(${numbers.slice(0, 2)}) ${numbers.slice(2)}`;
+    if (numbers.length <= 10) return `(${numbers.slice(0, 2)}) ${numbers.slice(2, 6)}-${numbers.slice(6)}`;
+    return `(${numbers.slice(0, 2)}) ${numbers.slice(2, 7)}-${numbers.slice(7, 11)}`;
+  };
+
+  const nextStep = () => {
+    const fieldsToValidate = currentStep === 1 
+      ? ['firstName', 'lastName', 'email', 'phone'] 
+      : ['company', 'sector', 'password', 'confirmPassword'];
+    
+    form.trigger(fieldsToValidate as any).then(isValid => {
+      if (isValid) {
+        setCurrentStep(2);
+      }
+    });
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-blue-50 to-green-50 flex items-center justify-center p-4">
-      <Card className="w-full max-w-md mx-auto shadow-xl border-0">
-        <CardHeader className="text-center space-y-2 pb-6">
-          <CardTitle className="text-2xl font-bold text-gray-800">Cadastrar</CardTitle>
-          <CardDescription className="text-gray-600">Crie sua conta</CardDescription>
-        </CardHeader>
-        
-        <CardContent className="space-y-4">
-          <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-              {/* Nome completo */}
-              <FormField
-                control={form.control}
-                name="fullName"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="text-sm font-medium text-gray-700">Nome completo</FormLabel>
-                    <FormControl>
-                      <div className="relative">
-                        <User className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-                        <Input
-                          placeholder="Seu nome"
-                          className="pl-10 h-11 border-gray-200 focus:border-purple-500"
-                          {...field}
-                        />
-                      </div>
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
+      {/* Header */}
+      <header className="flex justify-between items-center p-6 bg-white/80 backdrop-blur-sm border-b border-gray-200">
+        <Link href="/login">
+          <div className="flex items-center space-x-3">
+            <div className="relative w-12 h-12 bg-gradient-to-br from-blue-600 to-purple-600 rounded-xl flex items-center justify-center shadow-lg">
+              <span className="text-white font-bold text-lg">E</span>
+            </div>
+            <div>
+              <h1 className="text-xl font-bold text-gray-900">EsferaZap</h1>
+              <p className="text-sm text-gray-500">by InsightEsfera</p>
+            </div>
+          </div>
+        </Link>
+        <Link href="/login">
+          <Button variant="ghost" className="text-blue-600 hover:bg-blue-50">
+            <ArrowLeft className="w-4 h-4 mr-2" />
+            Voltar ao Login
+          </Button>
+        </Link>
+      </header>
 
-              {/* Email */}
-              <FormField
-                control={form.control}
-                name="email"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="text-sm font-medium text-gray-700">Email</FormLabel>
-                    <FormControl>
-                      <div className="relative">
-                        <Mail className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+      {/* Main Content */}
+      <main className="flex-1 flex items-center justify-center px-6 py-12">
+        <div className="w-full max-w-2xl">
+          {/* Progress Indicator */}
+          <div className="mb-8">
+            <div className="flex items-center justify-center space-x-4">
+              <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium ${
+                currentStep >= 1 ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-600'
+              }`}>
+                1
+              </div>
+              <div className={`w-20 h-1 rounded ${currentStep >= 2 ? 'bg-blue-600' : 'bg-gray-200'}`} />
+              <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium ${
+                currentStep >= 2 ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-600'
+              }`}>
+                2
+              </div>
+            </div>
+            <div className="flex justify-between mt-2 text-sm text-gray-600">
+              <span>Informações Pessoais</span>
+              <span>Empresa & Senha</span>
+            </div>
+          </div>
+
+          <Card className="shadow-xl border-0 bg-white/95 backdrop-blur-sm">
+            <CardHeader className="text-center pb-6">
+              <CardTitle className="text-2xl font-bold text-gray-900">
+                {currentStep === 1 ? "Crie sua conta" : "Informações da Empresa"}
+              </CardTitle>
+              <CardDescription className="text-gray-600">
+                {currentStep === 1 
+                  ? "Preencha suas informações pessoais para começar"
+                  : "Complete o cadastro com dados da sua empresa"
+                }
+              </CardDescription>
+            </CardHeader>
+
+            <CardContent>
+              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+                {currentStep === 1 ? (
+                  <>
+                    {/* Step 1: Personal Information */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <Label htmlFor="firstName" className="text-sm font-medium text-gray-700">
+                          Nome
+                        </Label>
+                        <div className="relative mt-1">
+                          <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                          <Input
+                            id="firstName"
+                            placeholder="Seu nome"
+                            className="pl-10 h-12 border-gray-200 focus:border-blue-500 focus:ring-blue-500"
+                            {...form.register("firstName")}
+                          />
+                        </div>
+                        {form.formState.errors.firstName && (
+                          <p className="text-red-500 text-xs mt-1">
+                            {form.formState.errors.firstName.message}
+                          </p>
+                        )}
+                      </div>
+
+                      <div>
+                        <Label htmlFor="lastName" className="text-sm font-medium text-gray-700">
+                          Sobrenome
+                        </Label>
+                        <div className="relative mt-1">
+                          <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                          <Input
+                            id="lastName"
+                            placeholder="Seu sobrenome"
+                            className="pl-10 h-12 border-gray-200 focus:border-blue-500 focus:ring-blue-500"
+                            {...form.register("lastName")}
+                          />
+                        </div>
+                        {form.formState.errors.lastName && (
+                          <p className="text-red-500 text-xs mt-1">
+                            {form.formState.errors.lastName.message}
+                          </p>
+                        )}
+                      </div>
+                    </div>
+
+                    <div>
+                      <Label htmlFor="email" className="text-sm font-medium text-gray-700">
+                        Email
+                      </Label>
+                      <div className="relative mt-1">
+                        <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
                         <Input
+                          id="email"
                           type="email"
                           placeholder="seu@email.com"
-                          className="pl-10 h-11 border-gray-200 focus:border-purple-500"
-                          {...field}
+                          className="pl-10 h-12 border-gray-200 focus:border-blue-500 focus:ring-blue-500"
+                          {...form.register("email")}
                         />
                       </div>
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+                      {form.formState.errors.email && (
+                        <p className="text-red-500 text-xs mt-1">
+                          {form.formState.errors.email.message}
+                        </p>
+                      )}
+                    </div>
 
-              {/* Telefone */}
-              <FormField
-                control={form.control}
-                name="phone"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="text-sm font-medium text-gray-700">Telefone</FormLabel>
-                    <FormControl>
-                      <div className="relative">
-                        <Phone className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                    <div>
+                      <Label htmlFor="phone" className="text-sm font-medium text-gray-700">
+                        Telefone
+                      </Label>
+                      <div className="relative mt-1">
+                        <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
                         <Input
-                          placeholder="(11) 91234-5678"
-                          className="pl-10 h-11 border-gray-200 focus:border-purple-500"
-                          {...field}
+                          id="phone"
+                          placeholder="(11) 99999-9999"
+                          className="pl-10 h-12 border-gray-200 focus:border-blue-500 focus:ring-blue-500"
+                          {...form.register("phone")}
+                          onChange={(e) => {
+                            const formatted = formatPhoneNumber(e.target.value);
+                            e.target.value = formatted;
+                            form.setValue("phone", formatted);
+                          }}
                         />
                       </div>
-                    </FormControl>
-                    <FormMessage />
-                    <p className="text-xs text-gray-500">Somente números, com DDD. Exemplo: 11999998888</p>
-                  </FormItem>
-                )}
-              />
+                      {form.formState.errors.phone && (
+                        <p className="text-red-500 text-xs mt-1">
+                          {form.formState.errors.phone.message}
+                        </p>
+                      )}
+                    </div>
 
-              {/* Nome da empresa */}
-              <FormField
-                control={form.control}
-                name="company"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="text-sm font-medium text-gray-700">Nome da empresa</FormLabel>
-                    <FormControl>
-                      <div className="relative">
-                        <Building className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                    <Button
+                      type="button"
+                      onClick={nextStep}
+                      className="w-full h-12 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-medium"
+                    >
+                      Continuar
+                    </Button>
+                  </>
+                ) : (
+                  <>
+                    {/* Step 2: Company & Password */}
+                    <div>
+                      <Label htmlFor="company" className="text-sm font-medium text-gray-700">
+                        Nome da Empresa
+                      </Label>
+                      <div className="relative mt-1">
+                        <Building className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
                         <Input
-                          placeholder="Sua empresa"
-                          className="pl-10 h-11 border-gray-200 focus:border-purple-500"
-                          {...field}
+                          id="company"
+                          placeholder="Nome da sua empresa"
+                          className="pl-10 h-12 border-gray-200 focus:border-blue-500 focus:ring-blue-500"
+                          {...form.register("company")}
                         />
                       </div>
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+                      {form.formState.errors.company && (
+                        <p className="text-red-500 text-xs mt-1">
+                          {form.formState.errors.company.message}
+                        </p>
+                      )}
+                    </div>
 
-              {/* Setor de atuação */}
-              <FormField
-                control={form.control}
-                name="sector"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="text-sm font-medium text-gray-700">Setor de atuação</FormLabel>
-                    <Select onValueChange={field.onChange} value={field.value}>
-                      <FormControl>
-                        <SelectTrigger className="h-11 border-gray-200 focus:border-purple-500">
-                          <SelectValue placeholder="Selecione seu setor" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        {sectors.map((sector) => (
-                          <SelectItem key={sector} value={sector}>
-                            {sector}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              {/* Senha */}
-              <FormField
-                control={form.control}
-                name="password"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="text-sm font-medium text-gray-700">Senha</FormLabel>
-                    <FormControl>
-                      <div className="relative">
-                        <Lock className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-                        <Input
-                          type={showPassword ? "text" : "password"}
-                          placeholder="Sua senha"
-                          className="pl-10 pr-10 h-11 border-gray-200 focus:border-purple-500"
-                          {...field}
-                        />
-                        <button
-                          type="button"
-                          className="absolute right-3 top-3 h-4 w-4 text-gray-400 hover:text-gray-600"
-                          onClick={() => setShowPassword(!showPassword)}
-                        >
-                          {showPassword ? <EyeOff /> : <Eye />}
-                        </button>
+                    <div>
+                      <Label htmlFor="sector" className="text-sm font-medium text-gray-700">
+                        Setor de Atuação
+                      </Label>
+                      <div className="relative mt-1">
+                        <Briefcase className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5 z-10" />
+                        <Select onValueChange={(value) => form.setValue("sector", value)}>
+                          <SelectTrigger className="pl-10 h-12 border-gray-200 focus:border-blue-500 focus:ring-blue-500">
+                            <SelectValue placeholder="Selecione o setor" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {sectors.map((sector) => (
+                              <SelectItem key={sector} value={sector}>
+                                {sector}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
                       </div>
-                    </FormControl>
-                    <FormMessage />
-                    <p className="text-xs text-gray-500">
-                      Mínimo de 8 caracteres. Inclua letras, números e símbolos para uma senha forte.
-                    </p>
-                  </FormItem>
-                )}
-              />
+                      {form.formState.errors.sector && (
+                        <p className="text-red-500 text-xs mt-1">
+                          {form.formState.errors.sector.message}
+                        </p>
+                      )}
+                    </div>
 
-              {/* Confirmar senha */}
-              <FormField
-                control={form.control}
-                name="confirmPassword"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="text-sm font-medium text-gray-700">Confirmar senha</FormLabel>
-                    <FormControl>
-                      <div className="relative">
-                        <Lock className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-                        <Input
-                          type={showConfirmPassword ? "text" : "password"}
-                          placeholder="Confirme sua senha"
-                          className="pl-10 pr-10 h-11 border-gray-200 focus:border-purple-500"
-                          {...field}
-                        />
-                        <button
-                          type="button"
-                          className="absolute right-3 top-3 h-4 w-4 text-gray-400 hover:text-gray-600"
-                          onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                        >
-                          {showConfirmPassword ? <EyeOff /> : <Eye />}
-                        </button>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <Label htmlFor="password" className="text-sm font-medium text-gray-700">
+                          Senha
+                        </Label>
+                        <div className="relative mt-1">
+                          <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                          <Input
+                            id="password"
+                            type={showPassword ? "text" : "password"}
+                            placeholder="Sua senha"
+                            className="pl-10 pr-10 h-12 border-gray-200 focus:border-blue-500 focus:ring-blue-500"
+                            {...form.register("password")}
+                          />
+                          <button
+                            type="button"
+                            className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                            onClick={() => setShowPassword(!showPassword)}
+                          >
+                            {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                          </button>
+                        </div>
+                        {form.formState.errors.password && (
+                          <p className="text-red-500 text-xs mt-1">
+                            {form.formState.errors.password.message}
+                          </p>
+                        )}
                       </div>
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
+
+                      <div>
+                        <Label htmlFor="confirmPassword" className="text-sm font-medium text-gray-700">
+                          Confirmar Senha
+                        </Label>
+                        <div className="relative mt-1">
+                          <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                          <Input
+                            id="confirmPassword"
+                            type={showConfirmPassword ? "text" : "password"}
+                            placeholder="Confirme sua senha"
+                            className="pl-10 pr-10 h-12 border-gray-200 focus:border-blue-500 focus:ring-blue-500"
+                            {...form.register("confirmPassword")}
+                          />
+                          <button
+                            type="button"
+                            className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                            onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                          >
+                            {showConfirmPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                          </button>
+                        </div>
+                        {form.formState.errors.confirmPassword && (
+                          <p className="text-red-500 text-xs mt-1">
+                            {form.formState.errors.confirmPassword.message}
+                          </p>
+                        )}
+                      </div>
+                    </div>
+
+                    <div className="space-y-4">
+                      <div className="flex items-start space-x-3">
+                        <Checkbox
+                          id="acceptTerms"
+                          className="mt-1"
+                          checked={form.watch("acceptTerms")}
+                          onCheckedChange={(checked) => form.setValue("acceptTerms", !!checked)}
+                        />
+                        <div className="text-sm">
+                          <Label htmlFor="acceptTerms" className="text-gray-700 cursor-pointer">
+                            Eu aceito os{" "}
+                            <a href="#" className="text-blue-600 hover:underline">
+                              Termos de Uso
+                            </a>{" "}
+                            e a{" "}
+                            <a href="#" className="text-blue-600 hover:underline">
+                              Política de Privacidade
+                            </a>
+                          </Label>
+                          {form.formState.errors.acceptTerms && (
+                            <p className="text-red-500 text-xs mt-1">
+                              {form.formState.errors.acceptTerms.message}
+                            </p>
+                          )}
+                        </div>
+                      </div>
+
+                      <div className="flex items-start space-x-3">
+                        <Checkbox
+                          id="acceptNewsletter"
+                          className="mt-1"
+                          checked={form.watch("acceptNewsletter")}
+                          onCheckedChange={(checked) => form.setValue("acceptNewsletter", !!checked)}
+                        />
+                        <Label htmlFor="acceptNewsletter" className="text-sm text-gray-700 cursor-pointer">
+                          Quero receber novidades e atualizações por email
+                        </Label>
+                      </div>
+                    </div>
+
+                    <div className="flex gap-3">
+                      <Button
+                        type="button"
+                        variant="outline"
+                        onClick={() => setCurrentStep(1)}
+                        className="flex-1 h-12 border-gray-200 text-gray-600 hover:bg-gray-50"
+                      >
+                        Voltar
+                      </Button>
+                      <Button
+                        type="submit"
+                        disabled={registerMutation.isPending}
+                        className="flex-1 h-12 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-medium"
+                      >
+                        {registerMutation.isPending ? "Criando conta..." : "Criar Conta"}
+                      </Button>
+                    </div>
+                  </>
                 )}
-              />
+              </form>
 
-              <Button
-                type="submit"
-                className="w-full h-11 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white font-medium transition-all duration-200"
-                disabled={registerMutation.isPending}
-              >
-                {registerMutation.isPending ? "Cadastrando..." : "Criar conta"}
-              </Button>
-            </form>
-          </Form>
-
-          <div className="relative my-6">
-            <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-gray-200" />
-            </div>
-            <div className="relative flex justify-center text-sm">
-              <span className="bg-white px-4 text-gray-500">ou</span>
-            </div>
-          </div>
-
-          <Button
-            onClick={handleGoogleRegister}
-            variant="outline"
-            className="w-full h-11 border-gray-200 hover:bg-gray-50 transition-colors"
-          >
-            <svg className="w-4 h-4 mr-2" viewBox="0 0 24 24">
-              <path
-                fill="currentColor"
-                d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
-              />
-              <path
-                fill="currentColor"
-                d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
-              />
-              <path
-                fill="currentColor"
-                d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"
-              />
-              <path
-                fill="currentColor"
-                d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
-              />
-            </svg>
-            Continuar com Google
-          </Button>
-
-          <div className="text-center text-sm text-gray-600">
-            Já tem uma conta?{" "}
-            <a href="/api/login" className="text-purple-600 hover:text-purple-700 font-medium">
-              Fazer login
-            </a>
-          </div>
-        </CardContent>
-      </Card>
+              <div className="mt-6 text-center">
+                <p className="text-sm text-gray-600">
+                  Já tem uma conta?{" "}
+                  <Link href="/login" className="text-blue-600 hover:underline font-medium">
+                    Fazer Login
+                  </Link>
+                </p>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      </main>
     </div>
   );
 }

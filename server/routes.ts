@@ -72,7 +72,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         registrationMethod: 'form',
         isProfileComplete: true,
         firstName: fullName.split(' ')[0],
-        lastName: fullName.split(' ').slice(1).join(' '),
+        lastName: fullName.split(' ').slice(1).join(' ') || fullName.split(' ')[0],
       };
 
       const user = await storage.createUserWithExtendedInfo(userData);

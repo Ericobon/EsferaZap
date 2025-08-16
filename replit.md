@@ -4,19 +4,26 @@ EsferaZap is a comprehensive WhatsApp Business automation platform that enables 
 
 ## Recent Updates (August 2025)
 
-**Google Calendar Integration Added**
+**New Registration Interface (Latest)**
+- Complete redesign following modern Figma-based patterns with EsferaZap brand colors
+- Multi-step registration form with personal info and company details
+- Enhanced database schema with phone, company, and sector fields
+- Integrated validation with real-time error feedback
+- Professional step-by-step progress indicators
+- Consistent gradient design from blue-600 to purple-600
+
+**User Authentication Improvements**
+- Modern login page with hero content and integrated auth form
+- Logout functionality moved to user avatar dropdown menu (standard UX pattern)
+- Removed API Keys section from settings as requested
+- Enhanced user menu with profile information and secure logout
+
+**Google Calendar Integration**
 - Full Google Calendar OAuth integration for scheduling and availability management
 - Calendar connection interface in Settings page with real-time status
 - Automated business hours detection from calendar events
 - Support for appointment reminders and scheduled messages via WhatsApp
 - New calendar integration page with event management and connection controls
-- Enhanced user settings with calendar-specific configuration options
-
-**Enhanced User Interface**
-- Redesigned Settings page with comprehensive configuration sections
-- Calendar integration prominently featured in main navigation
-- Real-time status indicators for external service connections
-- Improved user experience for managing integrations and preferences
 
 # User Preferences
 
