@@ -11,7 +11,8 @@ import Dashboard from "@/pages/dashboard";
 import Bots from "@/pages/bots";
 import IA from "@/pages/ia";
 import UploadDocumentos from "@/pages/upload-documentos";
-import CompraLeads from "@/pages/campanhas/compra-leads-simples";
+import CompraLeads from "@/pages/campanhas/compra-leads";
+import LeadsOrganicos from "@/pages/campanhas/leads-organicos";
 import Geolocalizacao from "@/pages/campanhas/geolocalizacao-simples";
 import CNAEsSegmento from "@/pages/campanhas/cnaes-segmento-simples";
 import Conversations from "@/pages/conversations";
@@ -38,6 +39,7 @@ function Router() {
           <Route path="/ia" component={IA} />
           <Route path="/upload-documentos" component={UploadDocumentos} />
           <Route path="/campanhas/compra-leads" component={CompraLeads} />
+          <Route path="/campanhas/leads-organicos" component={LeadsOrganicos} />
           <Route path="/campanhas/geolocalizacao" component={Geolocalizacao} />
           <Route path="/campanhas/cnaes-segmento" component={CNAEsSegmento} />
           <Route path="/conversations" component={Conversations} />
