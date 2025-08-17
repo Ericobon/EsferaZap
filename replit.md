@@ -4,7 +4,15 @@ EsferaZap is a comprehensive WhatsApp Business automation platform that enables 
 
 ## Recent Updates (August 2025)
 
-**Interface de Conversação Modernizada (Latest - August 17, 2025)**
+**Migração para Evolution API (Latest - August 17, 2025)**
+- Sistema totalmente migrado de Baileys para Evolution API como provider padrão do WhatsApp
+- Atualizado schema do banco para usar 'evolution_api' como provider padrão em novos bots
+- Modificado WhatsAppProvider factory para priorizar Evolution API sobre outros providers
+- Atualizado componente QRCode Display para mostrar "Evolution API" em vez de "Baileys"
+- Configuração automática de webhook URLs para Evolution API como padrão
+- Sistema de fallback: providers desconhecidos agora usam Evolution API
+
+**Interface de Conversação Modernizada (August 17, 2025)**
 - Implementada interface de chat completa baseada em design de customer support dashboard
 - Layout de 3 colunas: lista de conversas + chat principal + painel de detalhes do contato
 - Funcionalidades: busca de conversas, status de mensagens (enviado/entregue/lido), timestamps

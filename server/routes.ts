@@ -145,7 +145,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         ...req.body, 
         userId,
         serverUrl: serverURL,
-        webhookUrl: webhookUrls[req.body.whatsappProvider as keyof typeof webhookUrls] || webhookUrls.meta_business
+        webhookUrl: webhookUrls[req.body.whatsappProvider as keyof typeof webhookUrls] || webhookUrls.evolution_api
       });
       
       const bot = await storage.createBot(botData);
@@ -273,7 +273,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       const provider = createWhatsAppProvider({
-        provider: bot.whatsappProvider || 'meta_business',
+        provider: bot.whatsappProvider || 'evolution_api',
         apiKey: bot.apiKey || undefined,
         accessToken: bot.accessToken || undefined,
         phoneNumberId: bot.phoneNumberId || undefined,
@@ -318,7 +318,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       const provider = createWhatsAppProvider({
-        provider: bot.whatsappProvider || 'meta_business',
+        provider: bot.whatsappProvider || 'evolution_api',
         apiKey: bot.apiKey || undefined,
         accessToken: bot.accessToken || undefined,
         phoneNumberId: bot.phoneNumberId || undefined,

@@ -22,18 +22,18 @@ export function QRCodeDisplay({ botId, botName, phoneNumber, onConnectionSuccess
   const [countdown, setCountdown] = useState<number>(8);
   const { toast } = useToast();
 
-  // Conectar com Baileys real
+  // Conectar com Evolution API
   const generateQRMutation = useMutation({
     mutationFn: async () => {
-      // Chamar API real do Baileys
+      // Chamar API real do Evolution API
       const response = await apiRequest('POST', `/api/bots/${botId}/connect-whatsapp`);
       
       console.log('Resposta da API:', response);
       
       if (response.success) {
         if (response.qrCode) {
-          console.log('QR Code recebido do backend:', response.qrCode.substring(0, 50) + '...');
-          setQrCodeData('baileys_qr_generated');
+          console.log('QR Code recebido do backend Evolution API:', response.qrCode.substring(0, 50) + '...');
+          setQrCodeData('evolution_api_qr_generated');
           setQrCodeImage(response.qrCode);
           setConnectionStatus('connecting');
           setCountdown(8);
@@ -153,7 +153,7 @@ export function QRCodeDisplay({ botId, botName, phoneNumber, onConnectionSuccess
         </div>
         <CardTitle className="flex items-center justify-center gap-2">
           Conectar ao WhatsApp
-          <Badge className="bg-green-100 text-green-800">Baileys</Badge>
+          <Badge className="bg-green-100 text-green-800">Evolution API</Badge>
         </CardTitle>
         <div className="space-y-1">
           <p className="font-medium">{botName}</p>

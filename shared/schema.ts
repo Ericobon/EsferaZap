@@ -74,7 +74,7 @@ export const bots = pgTable("bots", {
   supportsAudio: boolean("supports_audio").default(false),
   supportsImages: boolean("supports_images").default(false),
   // WhatsApp API Provider Configuration
-  whatsappProvider: whatsappProviderEnum("whatsapp_provider").default('meta_business'),
+  whatsappProvider: whatsappProviderEnum("whatsapp_provider").default('evolution_api'),
   providerTier: providerTierEnum("provider_tier").default('official_paid'),
   apiKey: varchar("api_key"), // API Key for the provider
   accessToken: text("access_token"), // OAuth Access Token
