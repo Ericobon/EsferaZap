@@ -22,7 +22,7 @@ import {
   type InsertAnalyticsMetric,
 } from "@shared/schema";
 import { db } from "./db";
-import { eq, desc, and, gte, lte, sql } from "drizzle-orm";
+import { eq, desc, and, gte, lte, sql, inArray } from "drizzle-orm";
 
 // Interface for storage operations
 export interface IStorage {
@@ -300,32 +300,40 @@ export class DatabaseStorage implements IStorage {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
     
-    const todayAnalytics = await db
-      .select({
-        totalMessages: sql<number>`sum(${analytics.totalMessages})`,
-        averageResponseTime: sql<number>`avg(${analytics.averageResponseTime})`,
-      })
-      .from(analytics)
-      .where(
-        and(
-          sql`${analytics.botId} = ANY(${botIds})`,
-          gte(analytics.date, today)
-        )
-      );
+    let todayAnalytics = [{ totalMessages: 0, averageResponseTime: 0 }];
+    
+    if (botIds.length > 0) {
+      todayAnalytics = await db
+        .select({
+          totalMessages: sql<number>`sum(${analytics.totalMessages})`,
+          averageResponseTime: sql<number>`avg(${analytics.averageResponseTime})`,
+        })
+        .from(analytics)
+        .where(
+          and(
+            inArray(analytics.botId, botIds),
+            gte(analytics.date, today)
+          )
+        );
+    }
 
     const activeBots = userBots.filter(bot => bot.status === 'active').length;
 
     // Count unread conversations (simplified - could be enhanced with proper unread tracking)
-    const unreadConversations = await db
-      .select({ count: sql<number>`count(*)` })
-      .from(conversations)
-      .where(
-        and(
-          sql`${conversations.botId} = ANY(${botIds})`,
-          eq(conversations.isActive, true),
-          eq(conversations.assignedToAgent, false)
-        )
-      );
+    let unreadConversations = [{ count: 0 }];
+    
+    if (botIds.length > 0) {
+      unreadConversations = await db
+        .select({ count: sql<number>`count(*)` })
+        .from(conversations)
+        .where(
+          and(
+            inArray(conversations.botId, botIds),
+            eq(conversations.isActive, true),
+            eq(conversations.assignedToAgent, false)
+          )
+        );
+    }
 
     return {
       totalMessages: todayAnalytics[0]?.totalMessages || 0,

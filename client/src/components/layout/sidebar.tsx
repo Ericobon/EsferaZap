@@ -205,7 +205,7 @@ export default function Sidebar() {
               </Link>
               
               {/* Submenu */}
-              {item.submenu && (isActive(item.href) || item.submenu.some(sub => isActive(sub.href) || (sub.submenu && sub.submenu.some(subsub => isActive(subsub.href))))) && (
+              {item.submenu && (
                 <div className="ml-6 mt-2 space-y-1">
                   {item.submenu.map((subItem) => (
                     <div key={subItem.name}>
