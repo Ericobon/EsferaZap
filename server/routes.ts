@@ -492,32 +492,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Conversation routes
-  app.get('/api/conversations', isAuthenticated, async (req: any, res) => {
-    try {
-      const { botId } = req.query;
-      if (!botId) {
-        return res.status(400).json({ message: "Bot ID is required" });
-      }
-      
-      const conversations = await storage.getBotConversations(botId);
-      res.json(conversations);
-    } catch (error) {
-      console.error("Error fetching conversations:", error);
-      res.status(500).json({ message: "Failed to fetch conversations" });
-    }
-  });
 
-  app.get('/api/conversations/:id/messages', isAuthenticated, async (req: any, res) => {
-    try {
-      const { id } = req.params;
-      const messages = await storage.getConversationMessages(id);
-      res.json(messages);
-    } catch (error) {
-      console.error("Error fetching messages:", error);
-      res.status(500).json({ message: "Failed to fetch messages" });
-    }
-  });
 
   // Analytics routes
   app.get('/api/analytics/dashboard', isAuthenticated, async (req: any, res) => {
