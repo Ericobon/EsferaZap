@@ -50,6 +50,7 @@ export const users = pgTable("users", {
 });
 
 export const botStatusEnum = pgEnum('bot_status', ['active', 'inactive', 'configuring']);
+export const botTypeEnum = pgEnum('bot_type', ['text', 'audio', 'voice']);
 export const messageStatusEnum = pgEnum('message_status', ['pending', 'sent', 'delivered', 'read', 'failed', 'received']);
 export const messageTypeEnum = pgEnum('message_type', ['text', 'image', 'audio', 'document', 'video']);
 export const messageDirectionEnum = pgEnum('message_direction', ['inbound', 'outbound']);
@@ -66,7 +67,7 @@ export const bots = pgTable("bots", {
   maxTokens: integer("max_tokens").default(1000),
   temperature: varchar("temperature").default('0.7'),
   // Bot type and capabilities
-  botType: varchar("bot_type").default('business'), // 'business' or 'personal'
+  botType: botTypeEnum("bot_type").default('text'), // 'text', 'audio', or 'voice'
   qrCode: text("qr_code"), // Generated QR code for WhatsApp connection
   qrCodeExpires: timestamp("qr_code_expires"),
   supportsText: boolean("supports_text").default(true),

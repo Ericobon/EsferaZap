@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
+import { useLanguage } from "@/contexts/LanguageContext";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { queryClient } from "@/lib/queryClient";
 import { isUnauthorizedError } from "@/lib/authUtils";
@@ -18,6 +19,7 @@ import { Settings, Trash2, Bot as BotIcon, Activity, QrCode, Wifi, Plus } from "
 export default function Bots() {
   const { toast } = useToast();
   const { isAuthenticated, isLoading } = useAuth();
+  const { t } = useLanguage();
   const [showCreateWizard, setShowCreateWizard] = useState(false);
 
   // Redirect to home if not authenticated
@@ -118,11 +120,11 @@ export default function Bots() {
   const getStatusBadge = (status: string) => {
     switch (status) {
       case 'active':
-        return <Badge className="bg-green-100 text-green-800">Ativo</Badge>;
+        return <Badge className="bg-green-100 text-green-800">{t('bot.status.active')}</Badge>;
       case 'inactive':
-        return <Badge className="bg-gray-100 text-gray-800">Inativo</Badge>;
+        return <Badge className="bg-gray-100 text-gray-800">{t('bot.status.inactive')}</Badge>;
       case 'configuring':
-        return <Badge className="bg-yellow-100 text-yellow-800">Configurando</Badge>;
+        return <Badge className="bg-yellow-100 text-yellow-800">{t('bot.status.configuring')}</Badge>;
       default:
         return <Badge className="bg-gray-100 text-gray-800">{status}</Badge>;
     }
@@ -134,14 +136,14 @@ export default function Bots() {
       
       <div className="flex flex-col flex-1 overflow-hidden">
         <Header 
-          title="Meus Bots" 
+title={t('bots.title')} 
           action={
             <Button
               onClick={() => setShowCreateWizard(true)}
               className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
             >
               <Plus className="h-4 w-4 mr-2" />
-              Criar Chatbot
+{t('bots.create')}
             </Button>
           }
         />
@@ -154,7 +156,7 @@ export default function Bots() {
             {botsLoading ? (
               <div className="text-center py-12">
                 <BotIcon className="h-12 w-12 text-gray-400 mx-auto mb-4 animate-pulse" />
-                <p className="text-gray-600">Carregando chatbots...</p>
+                <p className="text-gray-600">{t('common.loading')}</p>
               </div>
             ) : bots.length === 0 ? (
               <div className="space-y-8">
@@ -177,14 +179,14 @@ export default function Bots() {
                   <div className="w-24 h-24 bg-gray-100 rounded-lg flex items-center justify-center mx-auto mb-6">
                     <BotIcon className="h-12 w-12 text-gray-400" />
                   </div>
-                  <h3 className="text-xl font-semibold text-gray-900 mb-2">Nenhum bot criado</h3>
-                  <p className="text-gray-600 mb-6">Crie seu primeiro bot para começar a automatizar o WhatsApp</p>
+                  <h3 className="text-xl font-semibold text-gray-900 mb-2">{t('bots.empty.title')}</h3>
+                  <p className="text-gray-600 mb-6">{t('bots.empty.description')}</p>
                   <Button
                     onClick={() => setShowCreateWizard(true)}
                     className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
                   >
                     <Plus className="h-4 w-4 mr-2" />
-                    Criar Primeiro Bot
+                    {t('bots.empty.cta')}
                   </Button>
                 </div>
               </div>
