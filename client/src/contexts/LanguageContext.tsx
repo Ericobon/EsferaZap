@@ -236,21 +236,38 @@ export function LanguageProvider({ children }: LanguageProviderProps) {
   }, [language]);
 
   const t = (key: string, ...args: any[]): string => {
-    const translation = translations[language][key as keyof typeof translations[typeof language]];
-    if (!translation) {
-      console.warn(`Missing translation for key: ${key}`);
-      return key;
+    // Handle nested keys like 'bots.empty.title'
+    const keys = key.split('.');
+    let value: any = translations[language];
+    
+    for (const k of keys) {
+      value = value?.[k];
     }
     
-    // Simple string interpolation for arguments
-    if (args.length > 0) {
-      return translation.replace(/{(\d+)}/g, (match, index) => {
-        const argIndex = parseInt(index);
-        return args[argIndex] !== undefined ? String(args[argIndex]) : match;
-      });
+    if (typeof value === 'string') {
+      // Simple string interpolation for arguments
+      if (args.length > 0) {
+        return value.replace(/{(\d+)}/g, (match, index) => {
+          const argIndex = parseInt(index);
+          return args[argIndex] !== undefined ? String(args[argIndex]) : match;
+        });
+      }
+      return value;
     }
     
-    return translation;
+    // Fallback to Portuguese if English translation not found
+    if (language === 'en') {
+      let ptValue: any = translations.pt;
+      for (const k of keys) {
+        ptValue = ptValue?.[k];
+      }
+      if (typeof ptValue === 'string') {
+        return ptValue;
+      }
+    }
+    
+    console.warn(`Missing translation for key: ${key} in language: ${language}`);
+    return key;
   };
 
   return (

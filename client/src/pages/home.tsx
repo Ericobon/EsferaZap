@@ -12,7 +12,7 @@ function HomeContent() {
     queryKey: ["/api/auth/user"],
     retry: false
   });
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
 
   const isAuthenticated = !!user && !isLoading;
 
@@ -47,11 +47,11 @@ function HomeContent() {
               ) : (
                 <div className="flex items-center space-x-4">
                   <Link href="/login">
-                    <Button variant="ghost">Login</Button>
+                    <Button variant="ghost">{language === 'en' ? 'Login' : 'Login'}</Button>
                   </Link>
                   <Link href="/register">
                     <Button className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white">
-                      Começar Grátis
+                      {language === 'en' ? 'Start Free' : 'Começar Grátis'}
                     </Button>
                   </Link>
                 </div>
@@ -66,16 +66,18 @@ function HomeContent() {
         <div className="container mx-auto max-w-6xl">
           <div className="text-center space-y-8">
             <h1 className="text-4xl sm:text-6xl font-bold text-gray-900">
-              Automatize seu{" "}
+              {language === 'en' ? 'Automate your' : 'Automatize seu'}{" "}
               <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
                 WhatsApp Business
               </span>{" "}
-              com IA
+              {language === 'en' ? 'with AI' : 'com IA'}
             </h1>
             
             <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
-              Crie chatbots inteligentes para WhatsApp, automatize atendimentos e aumente suas vendas 
-              com a plataforma mais completa do mercado. Inclui serviços de geração e compra de leads qualificados.
+              {language === 'en' 
+                ? 'Create intelligent chatbots for WhatsApp, automate customer service and increase your sales with the most complete platform on the market. Includes qualified lead generation and purchase services.'
+                : 'Crie chatbots inteligentes para WhatsApp, automatize atendimentos e aumente suas vendas com a plataforma mais completa do mercado. Inclui serviços de geração e compra de leads qualificados.'
+              }
             </p>
 
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
@@ -91,7 +93,7 @@ function HomeContent() {
                   <Link href="/register">
                     <Button size="lg" className="h-14 px-8 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white text-lg">
                       <Play className="mr-2 h-5 w-5" />
-                      Começar Grátis
+                      {language === 'en' ? 'Start Free' : 'Começar Grátis'}
                     </Button>
                   </Link>
                   <Link href="/login">
@@ -308,9 +310,6 @@ function HomeContent() {
 }
 
 export default function Home() {
-  return (
-    <LanguageProvider>
-      <HomeContent />
-    </LanguageProvider>
-  );
+  // Don't wrap in LanguageProvider here since it's already wrapped in App.tsx
+  return <HomeContent />;
 }
