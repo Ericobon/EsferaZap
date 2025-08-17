@@ -4,12 +4,15 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Link } from "wouter";
 import { ArrowRight, Users, BarChart3, MessageCircle, Zap, Play } from "lucide-react";
+import { LanguageSelector } from "@/components/LanguageSelector";
+import { LanguageProvider, useLanguage } from "@/contexts/LanguageContext";
 
-export default function Home() {
+function HomeContent() {
   const { data: user, isLoading } = useQuery({
     queryKey: ["/api/auth/user"],
     retry: false
   });
+  const { t } = useLanguage();
 
   const isAuthenticated = !!user && !isLoading;
 
@@ -21,7 +24,7 @@ export default function Home() {
           <div className="flex items-center justify-between h-16">
             <div className="flex items-center space-x-2">
               <div className="w-8 h-8 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg flex items-center justify-center">
-                <Zap className="w-5 h-5 text-white" />
+                <span className="text-white font-bold text-sm">E</span>
               </div>
               <span className="text-xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
                 EsferaZap
@@ -29,6 +32,7 @@ export default function Home() {
             </div>
             
             <div className="flex items-center space-x-4">
+              <LanguageSelector />
               {isAuthenticated ? (
                 <div className="flex items-center space-x-4">
                   <Link href="/dashboard">
@@ -71,7 +75,7 @@ export default function Home() {
             
             <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
               Crie chatbots inteligentes para WhatsApp, automatize atendimentos e aumente suas vendas 
-              com a plataforma mais completa do mercado.
+              com a plataforma mais completa do mercado. Inclui serviços de geração e compra de leads qualificados.
             </p>
 
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
@@ -235,20 +239,60 @@ export default function Home() {
         </div>
       </section>
 
+      {/* Features Section with Lead Generation */}
+      <section className="py-20 px-4 sm:px-6 lg:px-8">
+        <div className="container mx-auto max-w-6xl">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
+              Serviços de Geração de Leads
+            </h2>
+            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+              Além dos chatbots, oferecemos serviços completos de aquisição e geração de leads qualificados
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-2 gap-8">
+            <Card className="border-gray-200 shadow-sm hover:shadow-md transition-shadow">
+              <CardHeader>
+                <div className="w-12 h-12 bg-gradient-to-r from-green-500 to-green-600 rounded-lg flex items-center justify-center mb-4">
+                  <Users className="w-6 h-6 text-white" />
+                </div>
+                <CardTitle className="text-xl">Leads Orgânicos</CardTitle>
+                <CardDescription className="text-gray-600">
+                  Estratégias de geração orgânica de leads através de conteúdo e SEO especializado
+                </CardDescription>
+              </CardHeader>
+            </Card>
+
+            <Card className="border-gray-200 shadow-sm hover:shadow-md transition-shadow">
+              <CardHeader>
+                <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-blue-600 rounded-lg flex items-center justify-center mb-4">
+                  <BarChart3 className="w-6 h-6 text-white" />
+                </div>
+                <CardTitle className="text-xl">Compra de Leads</CardTitle>
+                <CardDescription className="text-gray-600">
+                  Leads qualificados e segmentados prontos para conversão com garantia de qualidade
+                </CardDescription>
+              </CardHeader>
+            </Card>
+          </div>
+        </div>
+      </section>
+
       {/* Footer */}
       <footer className="py-12 px-4 sm:px-6 lg:px-8 bg-gray-900 text-gray-300">
         <div className="container mx-auto max-w-6xl">
           <div className="text-center">
             <div className="flex items-center justify-center space-x-2 mb-4">
               <div className="w-8 h-8 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg flex items-center justify-center">
-                <Zap className="w-5 h-5 text-white" />
+                <span className="text-white font-bold text-sm">E</span>
               </div>
               <span className="text-xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
                 EsferaZap
               </span>
             </div>
             <p className="text-gray-400 mb-8">
-              © 2025 InsightEsfera. Todos os direitos reservados.
+              © 2025 InsightEsfera. Todos os direitos reservados. Plataforma completa de automatização WhatsApp com IA e geração de leads.
             </p>
             <div className="flex justify-center space-x-8 text-sm">
               <a href="#" className="hover:text-white transition-colors">Termos de Uso</a>
@@ -260,5 +304,13 @@ export default function Home() {
         </div>
       </footer>
     </div>
+  );
+}
+
+export default function Home() {
+  return (
+    <LanguageProvider>
+      <HomeContent />
+    </LanguageProvider>
   );
 }
