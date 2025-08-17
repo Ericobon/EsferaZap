@@ -22,7 +22,7 @@ interface BotData {
   name: string;
   phoneNumber: string;
   prompt: string;
-  botType: 'text' | 'audio' | 'voice';
+  botTypes: ('text' | 'audio' | 'voice')[];
 }
 
 export function CreateBotWizard({ onClose, onComplete }: CreateBotWizardProps) {
@@ -31,7 +31,7 @@ export function CreateBotWizard({ onClose, onComplete }: CreateBotWizardProps) {
     name: '',
     phoneNumber: '',
     prompt: '',
-    botType: 'text'
+    botTypes: ['text']
   });
   const [createdBotId, setCreatedBotId] = useState<string | null>(null);
   const { toast } = useToast();
@@ -42,7 +42,7 @@ export function CreateBotWizard({ onClose, onComplete }: CreateBotWizardProps) {
       return await apiRequest("POST", "/api/bots", {
         ...data,
         whatsappProvider: 'baileys',
-        botType: data.botType
+        botType: data.botTypes.join(',')
       });
     },
     onSuccess: (response: any) => {
@@ -109,35 +109,35 @@ export function CreateBotWizard({ onClose, onComplete }: CreateBotWizardProps) {
   };
 
   const steps = [
-    { number: 1, title: t('wizard.step1.title'), icon: Bot },
-    { number: 2, title: t('bot.form.type'), icon: MessageSquare },
-    { number: 3, title: t('bot.form.phone'), icon: Phone },
-    { number: 4, title: t('bot.form.prompt'), icon: MessageSquare },
-    { number: 5, title: t('wizard.step3.title'), icon: QrCode }
+    { number: 1, title: 'Informações Básicas', icon: Bot },
+    { number: 2, title: 'Tipo de Comunicação', icon: MessageSquare },
+    { number: 3, title: 'Número WhatsApp', icon: Phone },
+    { number: 4, title: 'Personalidade', icon: MessageSquare },
+    { number: 5, title: 'Conectar WhatsApp', icon: QrCode }
   ];
 
   const botTypes = [
     {
       id: 'text' as const,
       icon: MessageSquare,
-      title: t('bot.form.type.text'),
-      description: t('bot.form.type.text.description'),
+      title: 'Mensagens de Texto',
+      description: 'Conversas através de mensagens de texto simples e rápidas',
       color: 'text-blue-600',
       bgColor: 'bg-blue-50 border-blue-200',
     },
     {
       id: 'audio' as const,
       icon: Mic,
-      title: t('bot.form.type.audio'),
-      description: t('bot.form.type.audio.description'),
+      title: 'Mensagens de Áudio',
+      description: 'Inclui áudios gravados para comunicação mais pessoal',
       color: 'text-purple-600',
       bgColor: 'bg-purple-50 border-purple-200',
     },
     {
       id: 'voice' as const,
       icon: PhoneCall,
-      title: t('bot.form.type.voice'),
-      description: t('bot.form.type.voice.description'),
+      title: 'Ligações de Voz',
+      description: 'Suporte completo a ligações telefônicas via WhatsApp',
       color: 'text-green-600',
       bgColor: 'bg-green-50 border-green-200',
     },
@@ -195,16 +195,17 @@ export function CreateBotWizard({ onClose, onComplete }: CreateBotWizardProps) {
             <div className="space-y-4">
               <div className="text-center">
                 <Bot className="h-12 w-12 text-green-600 mx-auto mb-4" />
-                <h3 className="text-lg font-semibold">{t('wizard.step1.subtitle')}</h3>
+                <h3 className="text-lg font-semibold">Como você quer chamar seu bot?</h3>
+                <p className="text-sm text-gray-600 mt-2">Escolha um nome que represente bem seu negócio ou serviço</p>
               </div>
               
               <div>
-                <Label htmlFor="botName">{t('bot.form.name')}</Label>
+                <Label htmlFor="botName">Nome do seu Bot</Label>
                 <Input
                   id="botName"
                   value={botData.name}
                   onChange={(e) => setBotData(prev => ({ ...prev, name: e.target.value }))}
-                  placeholder={t('bot.form.name.placeholder')}
+                  placeholder="Ex: Atendimento Loja ABC, Suporte Técnico..."
                   className="mt-2"
                   autoFocus
                 />
@@ -217,46 +218,60 @@ export function CreateBotWizard({ onClose, onComplete }: CreateBotWizardProps) {
             <div className="space-y-6">
               <div className="text-center">
                 <MessageSquare className="h-12 w-12 text-green-600 mx-auto mb-4" />
-                <h3 className="text-lg font-semibold">{t('bot.form.type')}</h3>
-                <p className="text-sm text-gray-600">{t('wizard.step1.subtitle')}</p>
+                <h3 className="text-lg font-semibold">Como seu bot vai se comunicar?</h3>
+                <p className="text-sm text-gray-600">Selecione os tipos de comunicação que deseja oferecer</p>
               </div>
               
-              <RadioGroup
-                value={botData.botType}
-                onValueChange={(value: 'text' | 'audio' | 'voice') => 
-                  setBotData(prev => ({ ...prev, botType: value }))
-                }
-                className="space-y-3"
-              >
+              <div className="grid gap-3">
                 {botTypes.map((type) => {
                   const Icon = type.icon;
-                  const isSelected = botData.botType === type.id;
+                  const isSelected = botData.botTypes.includes(type.id);
                   
                   return (
-                    <div key={type.id} className="flex items-center space-x-3">
-                      <RadioGroupItem value={type.id} id={type.id} />
-                      <label 
-                        htmlFor={type.id}
-                        className={`flex-1 cursor-pointer border-2 rounded-lg p-4 transition-all ${
-                          isSelected ? type.bgColor : 'bg-gray-50 border-gray-200 hover:bg-gray-100'
-                        }`}
-                      >
-                        <div className="flex items-start space-x-3">
-                          <Icon className={`h-6 w-6 mt-1 ${isSelected ? type.color : 'text-gray-400'}`} />
-                          <div className="flex-1">
-                            <h4 className={`font-medium ${isSelected ? type.color : 'text-gray-700'}`}>
+                    <div
+                      key={type.id}
+                      onClick={() => {
+                        setBotData(prev => ({
+                          ...prev,
+                          botTypes: isSelected
+                            ? prev.botTypes.filter(t => t !== type.id)
+                            : [...prev.botTypes, type.id]
+                        }));
+                      }}
+                      className={`p-4 border-2 rounded-lg cursor-pointer transition-all ${
+                        isSelected 
+                          ? `${type.bgColor} border-2 ${type.color.replace('text-', 'border-')}`
+                          : 'border-gray-200 hover:border-gray-300'
+                      }`}
+                    >
+                      <div className="flex items-start gap-3">
+                        <div className={`p-2 rounded-lg ${isSelected ? type.bgColor : 'bg-gray-100'}`}>
+                          <Icon className={`h-5 w-5 ${isSelected ? type.color : 'text-gray-500'}`} />
+                        </div>
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2">
+                            <h4 className={`font-semibold ${isSelected ? type.color : 'text-gray-900'}`}>
                               {type.title}
                             </h4>
-                            <p className="text-sm text-gray-600 mt-1">
-                              {type.description}
-                            </p>
+                            {isSelected && (
+                              <Check className={`h-4 w-4 ${type.color}`} />
+                            )}
                           </div>
+                          <p className="text-sm text-gray-600 mt-1">
+                            {type.description}
+                          </p>
                         </div>
-                      </label>
+                      </div>
                     </div>
                   );
                 })}
-              </RadioGroup>
+              </div>
+              
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
+                <p className="text-sm text-blue-800">
+                  <strong>💡 Dica:</strong> Você pode selecionar múltiplos tipos para ter mais flexibilidade na comunicação com seus clientes.
+                </p>
+              </div>
             </div>
           )}
 
@@ -265,17 +280,17 @@ export function CreateBotWizard({ onClose, onComplete }: CreateBotWizardProps) {
             <div className="space-y-4">
               <div className="text-center">
                 <Phone className="h-12 w-12 text-green-600 mx-auto mb-4" />
-                <h3 className="text-lg font-semibold">{t('bot.form.phone')}</h3>
-                <p className="text-sm text-gray-600">{t('wizard.step2.subtitle')}</p>
+                <h3 className="text-lg font-semibold">Qual é o número do WhatsApp?</h3>
+                <p className="text-sm text-gray-600">Informe o número que será usado para enviar e receber mensagens</p>
               </div>
               
               <div>
-                <Label htmlFor="phoneNumber">{t('bot.form.phone')}</Label>
+                <Label htmlFor="phoneNumber">Número do WhatsApp</Label>
                 <Input
                   id="phoneNumber"
                   value={botData.phoneNumber}
                   onChange={(e) => setBotData(prev => ({ ...prev, phoneNumber: e.target.value }))}
-                  placeholder={t('bot.form.phone.placeholder')}
+                  placeholder="Ex: +5511999887766"
                   className="mt-2"
                   autoFocus
                 />
@@ -291,12 +306,12 @@ export function CreateBotWizard({ onClose, onComplete }: CreateBotWizardProps) {
             <div className="space-y-4">
               <div className="text-center">
                 <MessageSquare className="h-12 w-12 text-green-600 mx-auto mb-4" />
-                <h3 className="text-lg font-semibold">{t('bot.form.prompt')}</h3>
-                <p className="text-sm text-gray-600">{t('wizard.step2.subtitle')}</p>
+                <h3 className="text-lg font-semibold">Como seu bot deve se comportar?</h3>
+                <p className="text-sm text-gray-600">Descreva a personalidade e estilo de atendimento do seu bot</p>
               </div>
               
               <div>
-                <Label htmlFor="prompt">{t('bot.form.prompt')}</Label>
+                <Label htmlFor="prompt">Personalidade do Bot</Label>
                 <Textarea
                   id="prompt"
                   value={botData.prompt}

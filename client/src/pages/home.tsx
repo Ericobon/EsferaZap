@@ -26,9 +26,12 @@ function HomeContent() {
               <div className="w-8 h-8 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg flex items-center justify-center">
                 <span className="text-white font-bold text-sm">E</span>
               </div>
-              <span className="text-xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-                EsferaZap
-              </span>
+              <div>
+                <div className="text-xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+                  EsferaZap
+                </div>
+                <div className="text-xs text-blue-800 font-medium">by InsightEsfera</div>
+              </div>
             </div>
             
             <div className="flex items-center space-x-4">
@@ -40,7 +43,7 @@ function HomeContent() {
                   </Link>
                   <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full flex items-center justify-center">
                     <span className="text-white text-sm font-medium">
-                      {user?.fullName?.charAt(0) || 'U'}
+                      {(user as any)?.fullName?.charAt(0) || 'U'}
                     </span>
                   </div>
                 </div>
