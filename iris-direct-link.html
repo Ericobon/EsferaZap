@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Iris - Assistente InsightEsfera</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            max-width: 500px;
+            width: 100%;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            text-align: center;
+        }
+
+        .logo {
+            font-size: 80px;
+            margin-bottom: 20px;
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 28px;
+        }
+
+        .subtitle {
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 16px;
+        }
+
+        .number-display {
+            background: linear-gradient(135deg, #667eea 0%, #25d366 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 15px;
+            margin: 20px 0;
+            font-size: 32px;
+            font-weight: bold;
+            letter-spacing: 2px;
+        }
+
+        .whatsapp-btn {
+            display: inline-block;
+            background: #25d366;
+            color: white;
+            padding: 18px 40px;
+            border-radius: 50px;
+            text-decoration: none;
+            font-size: 18px;
+            font-weight: bold;
+            margin: 20px 0;
+            transition: all 0.3s;
+            box-shadow: 0 5px 20px rgba(37, 211, 102, 0.4);
+        }
+
+        .whatsapp-btn:hover {
+            background: #1ebe57;
+            transform: translateY(-3px);
+            box-shadow: 0 8px 30px rgba(37, 211, 102, 0.6);
+        }
+
+        .test-section {
+            margin-top: 40px;
+            padding-top: 30px;
+            border-top: 2px solid #f0f0f0;
+        }
+
+        .test-section h2 {
+            color: #555;
+            font-size: 18px;
+            margin-bottom: 20px;
+        }
+
+        .test-buttons {
+            display: grid;
+            gap: 10px;
+        }
+
+        .test-btn {
+            background: #f8f9fa;
+            border: 2px solid #e9ecef;
+            padding: 12px 20px;
+            border-radius: 10px;
+            text-decoration: none;
+            color: #333;
+            font-size: 14px;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .test-btn:hover {
+            background: #e9ecef;
+            border-color: #667eea;
+            transform: translateX(5px);
+        }
+
+        .info-box {
+            background: #f0f9ff;
+            border: 1px solid #bfdbfe;
+            border-radius: 10px;
+            padding: 15px;
+            margin-top: 20px;
+            color: #1e40af;
+            font-size: 14px;
+        }
+
+        .features {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .feature {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 10px;
+            font-size: 14px;
+            color: #555;
+        }
+
+        .feature-icon {
+            font-size: 24px;
+            margin-bottom: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <div class="logo">💜</div>
+        <h1>Iris - InsightEsfera</h1>
+        <p class="subtitle">Assistente Virtual Inteligente em Dados</p>
+
+        <div class="number-display">
+            📱 (11) 91647-4087
+        </div>
+
+        <a href="https://wa.me/5511916474087?text=Olá%20Iris!%20Gostaria%20de%20saber%20mais%20sobre%20as%20soluções%20da%20InsightEsfera."
+           target="_blank"
+           class="whatsapp-btn">
+            💬 Conversar com a Iris no WhatsApp
+        </a>
+
+        <div class="test-section">
+            <h2>Perguntas para Testar:</h2>
+
+            <div class="test-buttons">
+                <a href="https://wa.me/5511916474087?text=Olá%20Iris!%20Quais%20serviços%20a%20InsightEsfera%20oferece?"
+                   target="_blank"
+                   class="test-btn">
+                    <span>📊</span>
+                    <span>"Quais serviços vocês oferecem?"</span>
+                </a>
+
+                <a href="https://wa.me/5511916474087?text=Iris,%20quanto%20custa%20uma%20consultoria%20em%20dados?"
+                   target="_blank"
+                   class="test-btn">
+                    <span>💰</span>
+                    <span>"Quanto custa uma consultoria?"</span>
+                </a>
+
+                <a href="https://wa.me/5511916474087?text=Vocês%20trabalham%20com%20Python%20e%20Machine%20Learning?"
+                   target="_blank"
+                   class="test-btn">
+                    <span>🐍</span>
+                    <span>"Vocês trabalham com Python?"</span>
+                </a>
+
+                <a href="https://wa.me/5511916474087?text=Gostaria%20de%20agendar%20uma%20reunião%20para%20conhecer%20as%20soluções"
+                   target="_blank"
+                   class="test-btn">
+                    <span>📅</span>
+                    <span>"Quero agendar uma reunião"</span>
+                </a>
+
+                <a href="https://wa.me/5511916474087?text=Iris,%20vocês%20têm%20casos%20de%20sucesso%20para%20compartilhar?"
+                   target="_blank"
+                   class="test-btn">
+                    <span>🏆</span>
+                    <span>"Casos de sucesso"</span>
+                </a>
+
+                <a href="https://wa.me/5511916474087?text=Como%20a%20InsightEsfera%20pode%20ajudar%20minha%20empresa%20com%20BI?"
+                   target="_blank"
+                   class="test-btn">
+                    <span>📈</span>
+                    <span>"Como podem ajudar com BI?"</span>
+                </a>
+            </div>
+        </div>
+
+        <div class="features">
+            <div class="feature">
+                <div class="feature-icon">🤖</div>
+                <strong>IA Avançada</strong><br>
+                Powered by Gemini
+            </div>
+            <div class="feature">
+                <div class="feature-icon">⚡</div>
+                <strong>Resposta Rápida</strong><br>
+                Atendimento 24/7
+            </div>
+            <div class="feature">
+                <div class="feature-icon">📊</div>
+                <strong>Expert em Dados</strong><br>
+                16+ anos experiência
+            </div>
+            <div class="feature">
+                <div class="feature-icon">🔒</div>
+                <strong>100% Seguro</strong><br>
+                LGPD Compliant
+            </div>
+        </div>
+
+        <div class="info-box">
+            💡 <strong>Dica:</strong> Salve o número <strong>(11) 91647-4087</strong> em seus contatos como "Iris InsightEsfera" para melhor experiência!
+        </div>
+    </div>
+
+    <script>
+        // Auto redirect para WhatsApp em mobile
+        if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
+            // Se estiver em mobile, pode redirecionar automaticamente
+            // window.location.href = "https://wa.me/5511916474087?text=Olá%20Iris!";
+        }
+
+        // Adicionar analytics se necessário
+        console.log('Iris WhatsApp Interface Loaded');
+        console.log('Número: +55 11 91647-4087');
+    </script>
+</body>
+</html>

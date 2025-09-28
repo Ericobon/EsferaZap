@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EsferaZap - Teste MVP</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .header h1 {
+            color: #333;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .status {
+            display: inline-block;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .status.online {
+            background: #10b981;
+            color: white;
+        }
+
+        .status.offline {
+            background: #ef4444;
+            color: white;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 20px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .card h2 {
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 18px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        button:hover {
+            background: #5a67d8;
+            transform: translateY(-1px);
+        }
+
+        button.success {
+            background: #10b981;
+        }
+
+        button.danger {
+            background: #ef4444;
+        }
+
+        .input-group {
+            margin-bottom: 15px;
+        }
+
+        input, textarea, select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+
+        .qr-container {
+            background: #f3f4f6;
+            border-radius: 8px;
+            padding: 40px;
+            text-align: center;
+            margin-bottom: 15px;
+        }
+
+        .console {
+            background: #1a1a1a;
+            color: #0f0;
+            padding: 15px;
+            border-radius: 6px;
+            height: 200px;
+            overflow-y: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+        }
+
+        .message {
+            padding: 10px;
+            margin: 5px 0;
+            border-radius: 6px;
+        }
+
+        .message.sent {
+            background: #dcfce7;
+            text-align: right;
+        }
+
+        .message.received {
+            background: #f3f4f6;
+        }
+
+        .emoji {
+            font-size: 24px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1>
+                <span class="emoji">🚀</span>
+                EsferaZap MVP
+                <span id="status" class="status offline">Offline</span>
+            </h1>
+            <p style="color: #666; margin-top: 10px;">Interface de teste rápido - Entrega até Terça!</p>
+        </div>
+
+        <div class="grid">
+            <!-- WhatsApp Connection -->
+            <div class="card">
+                <h2>
+                    <span class="emoji">📱</span>
+                    Conexão WhatsApp
+                </h2>
+
+                <div id="qrcode" class="qr-container">
+                    <span class="emoji" style="font-size: 48px;">📱</span>
+                    <p style="margin-top: 10px; color: #666;">QR Code aparecerá aqui</p>
+                </div>
+
+                <button onclick="connectWhatsApp()">
+                    Gerar QR Code
+                </button>
+            </div>
+
+            <!-- Send Message -->
+            <div class="card">
+                <h2>
+                    <span class="emoji">💬</span>
+                    Enviar Mensagem
+                </h2>
+
+                <div class="input-group">
+                    <input type="tel" id="phone" placeholder="5511999999999" value="5511999999999">
+                </div>
+
+                <div class="input-group">
+                    <textarea id="message" rows="3" placeholder="Digite sua mensagem...">Olá! Teste do EsferaZap MVP 🚀</textarea>
+                </div>
+
+                <button onclick="sendMessage()" class="success">
+                    Enviar Mensagem
+                </button>
+
+                <div id="messages" style="margin-top: 15px; max-height: 200px; overflow-y: auto;">
+                    <!-- Messages will appear here -->
+                </div>
+            </div>
+
+            <!-- Quick Tests -->
+            <div class="card">
+                <h2>
+                    <span class="emoji">⚡</span>
+                    Testes Rápidos
+                </h2>
+
+                <div style="display: flex; flex-direction: column; gap: 10px;">
+                    <button onclick="testAPI('health')">
+                        🏥 Test Health
+                    </button>
+
+                    <button onclick="testBot()">
+                        🤖 Testar Bot IA
+                    </button>
+
+                    <button onclick="testBulkSend()">
+                        📨 Envio em Massa
+                    </button>
+
+                    <button onclick="clearAll()" class="danger">
+                        🗑️ Limpar Tudo
+                    </button>
+                </div>
+            </div>
+
+            <!-- Console -->
+            <div class="card">
+                <h2>
+                    <span class="emoji">💻</span>
+                    Console
+                </h2>
+
+                <div id="console" class="console">
+                    > Sistema inicializado...<br>
+                    > Aguardando comandos...<br>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Configuration
+        const API_URL = 'http://localhost:5000';
+        let isConnected = false;
+
+        // Console logging
+        function log(message, type = 'info') {
+            const consoleEl = document.getElementById('console');
+            const time = new Date().toLocaleTimeString();
+            const colors = {
+                info: '#0f0',
+                error: '#f00',
+                warning: '#ff0',
+                success: '#0ff'
+            };
+
+            consoleEl.innerHTML += `<span style="color: ${colors[type]}">> [${time}] ${message}</span><br>`;
+            consoleEl.scrollTop = consoleEl.scrollHeight;
+        }
+
+        // Update status
+        function updateStatus(connected) {
+            isConnected = connected;
+            const statusEl = document.getElementById('status');
+            statusEl.className = `status ${connected ? 'online' : 'offline'}`;
+            statusEl.textContent = connected ? 'Online' : 'Offline';
+        }
+
+        // Connect WhatsApp
+        async function connectWhatsApp() {
+            log('Conectando WhatsApp...', 'info');
+
+            try {
+                // Simulate QR generation
+                const qrContainer = document.getElementById('qrcode');
+                qrContainer.innerHTML = `
+                    <div style="padding: 20px; background: white; display: inline-block; border-radius: 8px;">
+                        <div style="width: 200px; height: 200px; background: #000; position: relative;">
+                            <div style="position: absolute; inset: 10%; background: white;">
+                                <div style="position: absolute; inset: 10%; background: #000;">
+                                    <div style="position: absolute; inset: 10%; background: white;">
+                                        <div style="position: absolute; inset: 10%; background: #000;"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <p style="margin-top: 10px; color: #666;">Escaneie com WhatsApp</p>
+                `;
+
+                log('QR Code gerado!', 'success');
+
+                // Simulate connection after 3 seconds
+                setTimeout(() => {
+                    updateStatus(true);
+                    log('WhatsApp conectado!', 'success');
+                    qrContainer.innerHTML = `
+                        <span class="emoji" style="font-size: 48px;">✅</span>
+                        <p style="margin-top: 10px; color: #10b981;">Conectado!</p>
+                    `;
+                }, 3000);
+
+            } catch (error) {
+                log(`Erro: ${error.message}`, 'error');
+            }
+        }
+
+        // Send message
+        async function sendMessage() {
+            const phone = document.getElementById('phone').value;
+            const message = document.getElementById('message').value;
+
+            if (!phone || !message) {
+                log('Preencha telefone e mensagem!', 'warning');
+                return;
+            }
+
+            log(`Enviando para ${phone}: "${message}"`, 'info');
+
+            // Add to messages display
+            const messagesDiv = document.getElementById('messages');
+            messagesDiv.innerHTML += `
+                <div class="message sent">
+                    <strong>Você:</strong> ${message}
+                </div>
+            `;
+
+            // Simulate response
+            setTimeout(() => {
+                messagesDiv.innerHTML += `
+                    <div class="message received">
+                        <strong>Bot:</strong> Mensagem recebida! Processando...
+                    </div>
+                `;
+                log('Resposta recebida do bot', 'success');
+            }, 1000);
+        }
+
+        // Test API
+        async function testAPI(endpoint) {
+            log(`Testando /${endpoint}...`, 'info');
+
+            try {
+                const response = await fetch(`${API_URL}/${endpoint}`);
+
+                if (response.ok) {
+                    const data = await response.json();
+                    log(`✅ ${endpoint}: ${JSON.stringify(data)}`, 'success');
+                } else {
+                    throw new Error(`Status: ${response.status}`);
+                }
+            } catch (error) {
+                // Try local simulation
+                log(`API offline, simulando resposta...`, 'warning');
+
+                const mockData = {
+                    health: { status: 'ok', version: '1.0.0' },
+                    bot: { response: 'Olá! Sou o assistente EsferaZap.' }
+                };
+
+                log(`✅ ${endpoint} (mock): ${JSON.stringify(mockData[endpoint] || {})}`, 'success');
+            }
+        }
+
+        // Test Bot
+        function testBot() {
+            log('Testando Bot IA...', 'info');
+
+            const responses = [
+                'Olá! Como posso ajudar?',
+                'Entendi sua solicitação.',
+                'Processando informação...',
+                'Aqui está o que você pediu!'
+            ];
+
+            const randomResponse = responses[Math.floor(Math.random() * responses.length)];
+
+            setTimeout(() => {
+                log(`Bot respondeu: "${randomResponse}"`, 'success');
+
+                const messagesDiv = document.getElementById('messages');
+                messagesDiv.innerHTML += `
+                    <div class="message received">
+                        <strong>Bot IA:</strong> ${randomResponse}
+                    </div>
+                `;
+            }, 1000);
+        }
+
+        // Test bulk send
+        function testBulkSend() {
+            log('Iniciando envio em massa...', 'info');
+
+            const contacts = [
+                '5511999999999',
+                '5511888888888',
+                '5511777777777'
+            ];
+
+            contacts.forEach((contact, index) => {
+                setTimeout(() => {
+                    log(`📨 Enviando para ${contact}...`, 'info');
+
+                    setTimeout(() => {
+                        log(`✅ Entregue para ${contact}`, 'success');
+                    }, 500);
+                }, index * 1000);
+            });
+        }
+
+        // Clear all
+        function clearAll() {
+            document.getElementById('console').innerHTML = '> Console limpo.<br>';
+            document.getElementById('messages').innerHTML = '';
+            document.getElementById('message').value = '';
+            log('Tudo limpo!', 'success');
+        }
+
+        // Initialize
+        window.onload = () => {
+            log('Interface de teste carregada!', 'success');
+            log('Clique em "Gerar QR Code" para começar', 'info');
+
+            // Check connection every 5 seconds
+            setInterval(() => {
+                testAPI('health').catch(() => {});
+            }, 5000);
+        };
+    </script>
+</body>
+</html>

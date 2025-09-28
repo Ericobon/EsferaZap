@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat Test - EsferaZap</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: #f0f0f0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .chat-container {
+            width: 100%;
+            max-width: 500px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .chat-header {
+            background: #25d366;
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .chat-messages {
+            height: 400px;
+            overflow-y: auto;
+            padding: 20px;
+            background: #e5ddd5;
+        }
+
+        .message {
+            margin-bottom: 15px;
+            display: flex;
+        }
+
+        .message.user {
+            justify-content: flex-end;
+        }
+
+        .message-bubble {
+            max-width: 70%;
+            padding: 10px 15px;
+            border-radius: 10px;
+            word-wrap: break-word;
+        }
+
+        .message.user .message-bubble {
+            background: #dcf8c6;
+        }
+
+        .message.bot .message-bubble {
+            background: white;
+        }
+
+        .chat-input {
+            display: flex;
+            padding: 10px;
+            background: white;
+            border-top: 1px solid #ddd;
+        }
+
+        .chat-input input {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 20px;
+            outline: none;
+        }
+
+        .chat-input button {
+            margin-left: 10px;
+            padding: 10px 20px;
+            background: #25d366;
+            color: white;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+        }
+
+        .chat-input button:hover {
+            background: #1ebe57;
+        }
+
+        .typing {
+            display: none;
+            padding: 5px 10px;
+            color: #666;
+            font-style: italic;
+        }
+
+        .typing.show {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div class="chat-container">
+        <div class="chat-header">
+            <h2>💜 Iris - InsightEsfera</h2>
+            <p style="font-size: 12px; margin-top: 5px;">Assistente Virtual de Soluções em Dados</p>
+        </div>
+
+        <div class="chat-messages" id="messages">
+            <div class="message bot">
+                <div class="message-bubble">
+                    💜 Olá! Eu sou a Iris, assistente virtual da InsightEsfera!
+                    <br><br>
+                    🌟 Somos especialistas em transformar dados em decisões estratégicas.
+                    <br><br>
+                    Como posso ajudar você hoje?
+                </div>
+            </div>
+        </div>
+
+        <div class="typing" id="typing">Bot está digitando...</div>
+
+        <div class="chat-input">
+            <input type="text" id="input" placeholder="Digite sua mensagem..." onkeypress="if(event.key==='Enter') sendMessage()">
+            <button onclick="sendMessage()">Enviar</button>
+        </div>
+    </div>
+
+    <script>
+        // IRIS - Assistente Virtual da InsightEsfera
+        const irisResponses = {
+            // Saudações
+            'oi': 'Olá! Eu sou a Iris, assistente virtual da InsightEsfera. 🌟 Como posso ajudar você com soluções em dados hoje?',
+            'olá': 'Oi! Sou a Iris da InsightEsfera! 💜 Estou aqui para ajudar com todas as suas necessidades de dados e analytics.',
+            'bom dia': 'Bom dia! Iris da InsightEsfera ao seu dispor! ☀️ Como posso transformar seus dados em insights hoje?',
+            'boa tarde': 'Boa tarde! Sou a Iris, da InsightEsfera. 🌤️ Em que posso ajudar com nossas soluções em dados?',
+            'boa noite': 'Boa noite! Iris aqui, da InsightEsfera. 🌙 Como posso auxiliar você?',
+
+            // Sobre a empresa
+            'insight': 'A InsightEsfera é líder em soluções de dados! 📊 Oferecemos:\n• Consultoria em Data Science\n• Implementação de BI e Analytics\n• Automação com IA\n• ETL e Data Engineering\n• Machine Learning customizado\nAcesse: insightesfera.io',
+            'empresa': 'A InsightEsfera transforma dados em decisões estratégicas! 🚀 Com 16+ anos de experiência, atendemos grandes empresas como Ticto e Cogna. Quer conhecer nossas soluções?',
+            'quem são': 'Somos a InsightEsfera - especialistas em transformação digital através de dados! 💡 Nossa missão é democratizar o acesso a insights poderosos.',
+
+            // Serviços
+            'serviço': 'Nossos principais serviços:\n📈 Business Intelligence\n🤖 Inteligência Artificial\n⚙️ Automação de Processos\n📊 Data Science & Analytics\n🔄 ETL & Data Engineering\n☁️ Cloud Solutions (GCP/AWS)\nQual área te interessa mais?',
+            'bi': 'Nosso BI transforma dados em dashboards interativos! 📊 Implementamos Power BI, Tableau, Looker e soluções customizadas. ROI médio de 300% em 6 meses!',
+            'data science': 'Data Science é nossa especialidade! 🧬 Criamos modelos preditivos, análise de sentimento, segmentação avançada e muito mais. Casos de sucesso com aumento de 40% em conversão!',
+            'automação': 'Automatizamos processos com IA! 🤖 WhatsApp Business API, chatbots inteligentes, RPA e integrações. Redução de 70% no tempo de resposta!',
+            'etl': 'ETL profissional para seus dados! 🔄 Pipelines robustos, integração em tempo real, qualidade de dados garantida. Processamos bilhões de registros!',
+
+            // Casos de sucesso
+            'casos': 'Nossos casos de sucesso:\n🏢 Ticto: Redução de 60% no tempo de análise\n🎓 Cogna: Dashboard para 1M+ alunos\n🏭 Jamef: Otimização logística com IA\n📱 EsferaZap: WhatsApp automation\nQuer saber mais sobre algum?',
+            'ticto': 'Na Ticto implementamos um Data Lakehouse completo! 🏗️ Resultado: análises 60% mais rápidas e economia de R$2M/ano em infraestrutura.',
+            'cogna': 'Para a Cogna criamos dashboards educacionais para +1 milhão de alunos! 🎓 Aumentamos a retenção em 25% com análise preditiva.',
+
+            // Tecnologias
+            'tecnologia': 'Dominamos as melhores tecnologias:\n☁️ Google Cloud Platform (GCP)\n🗄️ BigQuery & Databricks\n🐍 Python & R\n⚛️ React & Node.js\n🤖 TensorFlow & PyTorch\n📊 Power BI & Tableau\nQual tecnologia você usa?',
+            'python': 'Python é nossa linguagem principal! 🐍 Usamos para Data Science, automação, APIs e muito mais. Temos um guia de boas práticas exclusivo!',
+            'cloud': 'Somos especialistas em Cloud! ☁️ GCP, AWS, Azure - migramos e otimizamos sua infraestrutura. Redução média de 40% em custos!',
+
+            // Contato e valores
+            'contato': '📞 Entre em contato:\n📧 contato@insightesfera.io\n🌐 insightesfera.io\n📱 WhatsApp: Em breve!\n💼 LinkedIn: /company/insightesfera',
+            'preço': 'Nossos projetos são personalizados! 💎 Valores a partir de R$ 5.000/mês para consultoria. Fazemos diagnóstico gratuito! Quer agendar?',
+            'orçamento': 'Oferecemos orçamento personalizado! 📋 Preciso entender:\n1. Qual seu desafio com dados?\n2. Volume de dados?\n3. Prazo desejado?\nCom isso, preparo uma proposta!',
+
+            // Diferenciais
+            'diferencial': 'Nossos diferenciais:\n✅ 16+ anos de experiência\n✅ Equipe certificada Google Cloud\n✅ Metodologia ágil comprovada\n✅ ROI garantido em contrato\n✅ Suporte 24/7\n✅ Código aberto e transparente',
+            'por que': 'Por que InsightEsfera? 🎯\n• Resultados comprovados\n• Tecnologia de ponta\n• Equipe sênior\n• Preço justo\n• Entrega rápida\n• Pós-venda excepcional',
+
+            // Ações
+            'agendar': 'Ótimo! Vamos agendar! 📅 Por favor, me informe:\n1. Seu nome e empresa\n2. Melhor dia/horário\n3. Telefone ou e-mail\nOu acesse: insightesfera.io/contato',
+            'demonstração': 'Adoraria mostrar nossas soluções! 🖥️ Temos demos de:\n• Dashboards interativos\n• Chatbot com IA\n• Pipeline de dados\n• Análise preditiva\nQual prefere ver primeiro?',
+
+            // Ajuda
+            'ajuda': 'Posso ajudar com:\n📊 Informações sobre nossos serviços\n💰 Orçamentos personalizados\n📅 Agendamento de reuniões\n🔧 Suporte técnico\n📚 Casos de sucesso\n❓ Dúvidas sobre dados\nO que você precisa?',
+
+            // Despedidas
+            'obrigado': 'Eu que agradeço! 💜 A InsightEsfera está sempre aqui para transformar seus dados em sucesso!',
+            'tchau': 'Até logo! 👋 Lembre-se: a InsightEsfera está a um clique de distância em insightesfera.io',
+            'até': 'Até breve! 🌟 Qualquer dúvida sobre dados, a Iris e a InsightEsfera estarão aqui!',
+
+            // Default inteligente
+            default: 'Ótima pergunta! 🤔 A InsightEsfera tem soluções completas em dados. Poderia me dar mais detalhes para eu ajudar melhor? Ou prefere conhecer nossos serviços principais?'
+        };
+
+        const botResponses = irisResponses; // Usar Iris responses
+
+        function sendMessage() {
+            const input = document.getElementById('input');
+            const message = input.value.trim();
+
+            if (!message) return;
+
+            // Add user message
+            addMessage(message, 'user');
+
+            // Clear input
+            input.value = '';
+
+            // Show typing indicator
+            const typing = document.getElementById('typing');
+            typing.classList.add('show');
+
+            // Simulate bot response
+            setTimeout(() => {
+                typing.classList.remove('show');
+
+                // Get bot response
+                const lowerMessage = message.toLowerCase();
+                let response = botResponses.default;
+
+                // Check for keywords
+                for (let key in botResponses) {
+                    if (lowerMessage.includes(key)) {
+                        response = botResponses[key];
+                        break;
+                    }
+                }
+
+                addMessage(response, 'bot');
+            }, 1000 + Math.random() * 1000);
+        }
+
+        function addMessage(text, sender) {
+            const messagesDiv = document.getElementById('messages');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${sender}`;
+
+            const bubbleDiv = document.createElement('div');
+            bubbleDiv.className = 'message-bubble';
+            bubbleDiv.textContent = text;
+
+            messageDiv.appendChild(bubbleDiv);
+            messagesDiv.appendChild(messageDiv);
+
+            // Scroll to bottom
+            messagesDiv.scrollTop = messagesDiv.scrollHeight;
+        }
+
+        // Focus on input when page loads
+        window.onload = () => {
+            document.getElementById('input').focus();
+        };
+    </script>
+</body>
+</html>
